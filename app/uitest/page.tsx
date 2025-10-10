@@ -16,6 +16,7 @@ import { useEffect, useState } from "react"
 import { fetchMarkets, fetchMarket } from "@/lib/myriad/api"
 import { Market } from "@/types/market"
 import { Loader2, TrendingUp, BarChart3, ListFilter, MousePointerClick, ChevronDown } from "lucide-react"
+import { LogoSpinner } from "@/components/ui/logo-spinner"
 
 export default function UITestPage() {
   const { address, isConnected, chain } = useAccount()
@@ -437,8 +438,7 @@ export default function UITestPage() {
                 <CardContent>
                   {loading && (
                     <div className="flex items-center justify-center py-8">
-                      <Loader2 className="h-8 w-8 animate-spin text-electric-purple" />
-                      <span className="ml-2">Loading markets...</span>
+                      <LogoSpinner size={40} />
                     </div>
                   )}
 
@@ -470,8 +470,7 @@ export default function UITestPage() {
               <CardContent>
                 {loading && (
                   <div className="flex items-center justify-center py-8">
-                    <Loader2 className="h-8 w-8 animate-spin text-electric-purple" />
-                    <span className="ml-2">Loading markets...</span>
+                    <LogoSpinner size={40} />
                   </div>
                 )}
 
@@ -756,7 +755,7 @@ export default function UITestPage() {
                 {/* Chart Display */}
                 {loading || loadingMarketDetails ? (
                   <div className="flex items-center justify-center h-[400px]">
-                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                    <LogoSpinner size={40} />
                   </div>
                 ) : selectedMarketDetails && selectedMarketDetails.outcomes ? (
                   <div className="space-y-2">
@@ -868,9 +867,49 @@ export default function UITestPage() {
                 <CardTitle>Button Components</CardTitle>
                 <CardDescription>Test all button variants and states</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-center h-64 border-2 border-dashed border-muted-foreground/25 rounded-lg">
-                  <p className="text-muted-foreground">Button components will be tested here</p>
+              <CardContent className="space-y-8">
+                {/* Logo Spinner Section */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Logo Spinner</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Rotating curved line with easing animation (fast at bottom, slow at top)
+                  </p>
+                  
+                  <div className="flex flex-wrap items-center gap-8 p-8 border-2 border-dashed border-muted-foreground/25 rounded-lg bg-muted/30">
+                    {/* Different sizes */}
+                    <div className="flex flex-col items-center gap-2">
+                      <LogoSpinner size={40} />
+                      <span className="text-xs text-muted-foreground">Small (40px)</span>
+                    </div>
+                    
+                    <div className="flex flex-col items-center gap-2">
+                      <LogoSpinner size={60} />
+                      <span className="text-xs text-muted-foreground">Medium (60px)</span>
+                    </div>
+                    
+                    <div className="flex flex-col items-center gap-2">
+                      <LogoSpinner size={80} />
+                      <span className="text-xs text-muted-foreground">Default (80px)</span>
+                    </div>
+                    
+                    <div className="flex flex-col items-center gap-2">
+                      <LogoSpinner size={120} />
+                      <span className="text-xs text-muted-foreground">Large (120px)</span>
+                    </div>
+                  </div>
+                  
+                  {/* Usage example */}
+                  <div className="mt-4 p-4 bg-muted rounded-lg">
+                    <p className="text-xs font-mono text-muted-foreground mb-2">Usage:</p>
+                    <code className="text-xs">
+                      {`<LogoSpinner size={80} />`}
+                    </code>
+                  </div>
+                </div>
+
+                {/* Other button tests placeholder */}
+                <div className="flex items-center justify-center h-32 border-2 border-dashed border-muted-foreground/25 rounded-lg">
+                  <p className="text-muted-foreground">Additional button components will be tested here</p>
                 </div>
               </CardContent>
             </Card>

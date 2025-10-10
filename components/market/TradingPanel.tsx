@@ -10,6 +10,7 @@ import { Market, Outcome } from '@/types/market'
 import { Loader2, TrendingUp, TrendingDown, Info } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/animate-ui/components/animate/tooltip'
+import { LogoSpinner } from '@/components/ui/logo-spinner'
 
 interface TradingPanelProps {
   market: Market
@@ -595,38 +596,9 @@ export function TradingPanel({ market, userAddress, isConnected, onTradeComplete
 
           {/* Loading Summary Skeleton */}
           {isCalculating && amount && parseFloat(amount) > 0 && (
-            <div className="space-y-3 border-t pt-4 animate-pulse">
-              <div className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin text-electric-purple" />
-                <h4 className="font-semibold text-sm">Calculating...</h4>
-              </div>
-              
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <div className="h-4 bg-muted rounded w-24"></div>
-                  <div className="h-4 bg-muted rounded w-16"></div>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <div className="h-4 bg-muted rounded w-28"></div>
-                  <div className="h-4 bg-muted rounded w-20"></div>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <div className="h-4 bg-muted rounded w-20"></div>
-                  <div className="h-4 bg-muted rounded w-16"></div>
-                </div>
-              </div>
-
-              <div className="border-t my-3" />
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <div className="h-4 bg-muted rounded w-16"></div>
-                  <div className="h-4 bg-muted rounded w-20"></div>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <div className="h-4 bg-muted rounded w-24"></div>
-                  <div className="h-4 bg-muted rounded w-28"></div>
-                </div>
+            <div className="space-y-3 border-t pt-4">
+              <div className="flex items-center justify-center">
+                <LogoSpinner size={40} />
               </div>
             </div>
           )}

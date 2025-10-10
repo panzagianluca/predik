@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createChart, ColorType, IChartApi, ISeriesApi, LineData, LineSeries } from 'lightweight-charts'
 import { useTheme } from 'next-themes'
+import { LogoSpinner } from '@/components/ui/logo-spinner'
 
 interface PricePoint {
   value: number
@@ -364,7 +365,7 @@ export function ProbabilityChart({ outcomes, timeframe = '24h', className = '' }
   if (!mounted) {
     return (
       <div className={`w-full h-[400px] flex items-center justify-center bg-muted/10 rounded-lg ${className}`}>
-        <p className="text-muted-foreground">Loading chart...</p>
+        <LogoSpinner size={40} />
       </div>
     )
   }
