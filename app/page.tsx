@@ -131,7 +131,7 @@ export default function Home() {
                     className={cn(
                       'flex items-center gap-2 px-4 h-[36px] rounded-md border-2 transition-all duration-200 font-medium text-[14px] relative overflow-hidden',
                       isActive
-                        ? 'bg-electric-purple text-white border-electric-purple shadow-lg shadow-electric-purple/20'
+                        ? 'bg-electric-purple text-white border-electric-purple'
                         : 'bg-background border-border hover:border-electric-purple/50 text-foreground'
                     )}
                     whileHover={{ scale: 1.05 }}
@@ -196,7 +196,7 @@ export default function Home() {
             >
               {loading ? (
                 <div className="flex items-center justify-center py-12">
-                  <LogoSpinner size={60} />
+                  <LogoSpinner size={32} />
                 </div>
               ) : sortedMarkets.length > 0 ? (
                 <TooltipProvider>
