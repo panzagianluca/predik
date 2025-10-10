@@ -117,7 +117,7 @@ export default function Home() {
         {/* Market Grid Section */}
         <div className="space-y-4">
           {/* Filter Banner */}
-          <div className="flex flex-wrap items-center justify-between gap-4 bg-muted/30 rounded-lg border border-border p-3">
+          <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg py-3">
             {/* Left side: Time filters + Category filters */}
             <div className="flex flex-wrap items-center gap-2">
               {/* Time Filters - Outlined buttons with icons */}
@@ -164,7 +164,7 @@ export default function Home() {
                     className={cn(
                       'px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] relative overflow-hidden',
                       isActive
-                        ? 'text-electric-purple'
+                        ? 'text-electric-purple bg-electric-purple/20'
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                     )}
                     whileHover={{ scale: 1.05 }}
@@ -174,7 +174,7 @@ export default function Home() {
                     {isActive && (
                       <motion.div
                         layoutId="activeCategoryFilter"
-                        className="absolute inset-0 bg-electric-purple/20 rounded-md -z-10"
+                        className="absolute inset-0 bg-electric-purple/20 rounded-md"
                         transition={{ duration: 0.3, ease: "easeInOut" }}
                       />
                     )}
