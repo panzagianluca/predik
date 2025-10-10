@@ -8,12 +8,18 @@ import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { Button } from '@/components/ui/button'
 import { GlobalSearch } from '@/components/layout/GlobalSearch'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/animate-ui/components/radix/dropdown-menu'
-import { Menu, Activity, Trophy, Mail, FileText, Shield, Sun, Moon } from 'lucide-react'
+import { Menu, Activity, Trophy, Mail, FileText, Shield, Sun, Moon, AlertCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/animate-ui/components/radix/dialog'
+import { Confetti } from '@/components/ui/confetti'
 
 export function Navbar() {
   const { theme, resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const [tutorialStep, setTutorialStep] = useState(1)
+  const [showTutorial, setShowTutorial] = useState(false)
+  const [selectedOutcome, setSelectedOutcome] = useState<'si' | 'no'>('si')
+  const [connectModalTrigger, setConnectModalTrigger] = useState<(() => void) | null>(null)
 
   // Avoid hydration mismatch
   useEffect(() => {
@@ -43,9 +49,326 @@ export function Navbar() {
             )}
           </Link>
 
-          {/* Global Search */}
-          <div className="ml-6 lg:ml-8 flex-1 max-w-xl">
+          {/* Global Search + Help Icon */}
+          <div className="ml-6 lg:ml-8 flex-1 max-w-xl flex items-center">
             <GlobalSearch />
+            
+            {/* Help Dialog */}
+            <Dialog 
+              open={showTutorial} 
+              onOpenChange={(open) => {
+                setShowTutorial(open)
+                // Reset to step 1 when dialog closes OR opens
+                if (!open || open) {
+                  setTutorialStep(1)
+                }
+              }}
+            >
+              <DialogTrigger asChild>
+                <button className="flex items-center gap-2 text-sm font-medium text-foreground/70 hover:text-electric-purple transition-colors shrink-0">
+                  <AlertCircle className="h-5 w-5" />
+                  <span>Como Funciona?</span>
+                </button>
+              </DialogTrigger>
+              <DialogContent 
+                className="sm:max-w-md !left-1/2 !top-1/2 !-translate-x-1/2 !-translate-y-1/2 p-0 gap-0"
+                from="top"
+                transition={{ type: 'spring', stiffness: 260, damping: 26 }}
+              >
+                <DialogTitle className="sr-only">Como Funciona Predik</DialogTitle>
+                
+                {tutorialStep === 1 && (
+                  <div className="p-6">
+                    {/* Title */}
+                    <h2 className="text-xl font-semibold mb-4">Como Funciona Predik?</h2>
+                    
+                    {/* Instruction */}
+                    <p className="text-sm text-muted-foreground mb-4">Elegí un mercado</p>
+                    
+                    {/* Market Options */}
+                    <div className="space-y-2 mb-4">
+                      {/* Skeleton Placeholder 1 */}
+                      <div className="flex items-start gap-3 p-3 rounded-lg border border-border bg-muted/30">
+                        <div className="w-12 h-12 rounded-lg bg-muted flex-shrink-0" />
+                        <div className="flex-1 space-y-2">
+                          <div className="h-4 bg-muted rounded w-3/4" />
+                          <div className="h-3 bg-muted rounded w-1/2" />
+                        </div>
+                      </div>
+
+                      {/* Dummy Market Card - "Pasará esto?" */}
+                      <button
+                        onClick={() => setTutorialStep(2)}
+                        className="flex items-start gap-3 p-3 rounded-lg border border-border bg-muted/30 w-full text-left transition-all duration-300 hover:border-electric-purple/50 hover:bg-electric-purple/5"
+                        style={{
+                          animation: 'pulse-scale 2s ease-in-out infinite',
+                        }}
+                      >
+                        {/* Predik Logo as Market Image */}
+                        <div className="w-12 h-12 rounded-lg bg-background flex items-center justify-center flex-shrink-0">
+                          <Image
+                            src="/prediklogoonly.svg"
+                            alt="Predik"
+                            width={32}
+                            height={32}
+                            className="w-8 h-8"
+                          />
+                        </div>
+
+                        {/* Market Info */}
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-sm mb-1">
+                            Pasará esto?
+                          </h4>
+                          
+                          {/* Outcomes */}
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-1 text-xs">
+                              <span className="text-muted-foreground">Si:</span>
+                              <span className="font-semibold text-[#22c55e]">65.0%</span>
+                            </div>
+                            <div className="flex items-center gap-1 text-xs">
+                              <span className="text-muted-foreground">No:</span>
+                              <span className="font-semibold text-[#ef4444]">35.0%</span>
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+
+                      {/* Skeleton Placeholder 2 */}
+                      <div className="flex items-start gap-3 p-3 rounded-lg border border-border bg-muted/30">
+                        <div className="w-12 h-12 rounded-lg bg-muted flex-shrink-0" />
+                        <div className="flex-1 space-y-2">
+                          <div className="h-4 bg-muted rounded w-3/4" />
+                          <div className="h-3 bg-muted rounded w-1/2" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {tutorialStep === 2 && (
+                  <div className="p-6">
+                    {/* Title */}
+                    <h2 className="text-xl font-semibold mb-4">Como Funciona Predik?</h2>
+                    
+                    {/* Instruction */}
+                    <p className="text-sm text-muted-foreground mb-4">Hacé tu predicción</p>
+                    
+                    {/* Market Display - Selected State */}
+                    <div className="flex items-start gap-3 p-3 rounded-lg border-2 border-electric-purple bg-electric-purple/5 mb-4">
+                      <div className="w-12 h-12 rounded-lg bg-background flex items-center justify-center flex-shrink-0">
+                        <Image
+                          src="/prediklogoonly.svg"
+                          alt="Predik"
+                          width={32}
+                          height={32}
+                          className="w-8 h-8"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-sm mb-1">Pasará esto?</h4>
+                        
+                        {/* Outcomes */}
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-1 text-xs">
+                            <span className="text-muted-foreground">Si:</span>
+                            <span className="font-semibold text-[#22c55e]">65.0%</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-xs">
+                            <span className="text-muted-foreground">No:</span>
+                            <span className="font-semibold text-[#ef4444]">35.0%</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Trading Interface */}
+                    <div className="space-y-4">
+                      {/* Yes/No Buttons */}
+                      <div className="grid grid-cols-2 gap-2 relative">
+                        {/* Sliding background indicator */}
+                        <motion.div
+                          layoutId="tutorial-outcome-selector"
+                          className="absolute rounded-md border-2"
+                          style={{
+                            width: 'calc(50% - 4px)',
+                            height: '100%',
+                            top: 0,
+                            backgroundColor: selectedOutcome === 'si' ? 'rgb(34 197 94 / 0.2)' : 'rgb(239 68 68 / 0.2)',
+                            borderColor: selectedOutcome === 'si' ? 'rgb(34 197 94)' : 'rgb(239 68 68)',
+                          }}
+                          initial={false}
+                          animate={{
+                            left: selectedOutcome === 'si' ? '0px' : 'calc(50% + 4px)',
+                          }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 500,
+                            damping: 35,
+                          }}
+                        />
+                        
+                        <button
+                          onClick={() => setSelectedOutcome('si')}
+                          className={`h-auto py-3 rounded-md border-2 flex items-center justify-between px-4 transition-colors relative z-10 ${
+                            selectedOutcome === 'si' 
+                              ? 'border-transparent bg-transparent' 
+                              : 'border-border bg-muted/30'
+                          }`}
+                        >
+                          <span className="font-semibold text-sm text-green-700 dark:text-green-400">
+                            Si
+                          </span>
+                          <span className="text-xs text-green-600 dark:text-green-500">
+                            65.0%
+                          </span>
+                        </button>
+                        <button
+                          onClick={() => setSelectedOutcome('no')}
+                          className={`h-auto py-3 rounded-md border-2 flex items-center justify-between px-4 transition-colors relative z-10 ${
+                            selectedOutcome === 'no' 
+                              ? 'border-transparent bg-transparent' 
+                              : 'border-border bg-muted/30'
+                          }`}
+                        >
+                          <span className="font-semibold text-sm text-red-700 dark:text-red-400">
+                            No
+                          </span>
+                          <span className="text-xs text-red-600 dark:text-red-500">
+                            35.0%
+                          </span>
+                        </button>
+                      </div>
+
+                      {/* Amount Display */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Cantidad</label>
+                        <div className="h-9 px-3 rounded-md border border-input bg-background flex items-center justify-between text-sm">
+                          <span>100</span>
+                          <span className="text-muted-foreground">USDT</span>
+                        </div>
+                      </div>
+
+                      {/* Stats Summary */}
+                      <div className="space-y-3 border-t pt-4">
+                        <h4 className="font-semibold text-sm">Resumen</h4>
+                        
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">
+                              Acciones totales de {selectedOutcome === 'si' ? 'Si' : 'No'}
+                            </span>
+                            <span className="font-medium">
+                              {selectedOutcome === 'si' ? '154' : '286'}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Ganancia Máxima</span>
+                            <span className="font-semibold text-green-600">
+                              {selectedOutcome === 'si' ? '+54 USDT' : '+186 USDT'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Buy Button */}
+                    <Button
+                      onClick={() => setTutorialStep(3)}
+                      className="w-full h-9 mt-4"
+                    >
+                      Comprar {selectedOutcome === 'si' ? '154' : '286'} de {selectedOutcome === 'si' ? 'Si' : 'No'}
+                    </Button>
+                  </div>
+                )}
+
+                {tutorialStep === 3 && (
+                  <div className="p-6 relative">
+                    {/* Confetti Effect */}
+                    <Confetti
+                      className="absolute inset-0 pointer-events-none z-50"
+                      manualstart={false}
+                    />
+                    
+                    {/* Title */}
+                    <h2 className="text-xl font-semibold mb-4">Como Funciona Predik?</h2>
+                    
+                    {/* Instruction */}
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Retirá tus ganancias, o disfrutalas
+                    </p>
+
+                    {/* Winning Summary */}
+                    <div className="space-y-4 mb-4">
+                      {/* Selected Market */}
+                      <div className="flex items-start gap-3 p-3 rounded-lg border-2 border-green-500 bg-green-500/10">
+                        <div className="w-12 h-12 rounded-lg bg-background flex items-center justify-center flex-shrink-0">
+                          <Image
+                            src="/prediklogoonly.svg"
+                            alt="Predik"
+                            width={32}
+                            height={32}
+                            className="w-8 h-8"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-sm mb-1">Pasará esto?</h4>
+                          <div className="flex items-center gap-2 text-xs">
+                            <span className="text-muted-foreground">Tu predicción:</span>
+                            <span className="font-semibold text-green-600">
+                              {selectedOutcome === 'si' ? 'Si' : 'No'} ✓
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Winning Stats */}
+                      <div className="space-y-3 border-t pt-4">
+                        <h4 className="font-semibold text-sm">Resumen de Ganancias</h4>
+                        
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Acciones de {selectedOutcome === 'si' ? 'Si' : 'No'}</span>
+                            <span className="font-medium">{selectedOutcome === 'si' ? '154' : '286'}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Inversión inicial</span>
+                            <span className="font-medium">100 USDT</span>
+                          </div>
+                          <div className="flex items-center justify-between text-sm border-t pt-2">
+                            <span className="text-muted-foreground font-semibold">Total ganado</span>
+                            <span className="font-bold text-green-600 text-base">
+                              {selectedOutcome === 'si' ? '154 USDT' : '286 USDT'}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Ganancia neta</span>
+                            <span className="font-semibold text-green-600">
+                              {selectedOutcome === 'si' ? '+54 USDT' : '+186 USDT'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Start Button */}
+                    <Button
+                      onClick={() => {
+                        setShowTutorial(false)
+                        // Trigger wallet connection modal
+                        if (connectModalTrigger) {
+                          connectModalTrigger()
+                        }
+                      }}
+                      className="w-full h-9"
+                    >
+                      Comenzar
+                    </Button>
+                  </div>
+                )}
+              </DialogContent>
+            </Dialog>
           </div>
 
           {/* Right Side: Wallet + Menu */}
@@ -66,6 +389,11 @@ export function Navbar() {
                   account &&
                   chain &&
                   (!authenticationStatus || authenticationStatus === 'authenticated')
+
+                // Store the openConnectModal function for tutorial use
+                if (openConnectModal && !connectModalTrigger) {
+                  setConnectModalTrigger(() => openConnectModal)
+                }
 
                 return (
                   <div
@@ -102,28 +430,28 @@ export function Navbar() {
                             className="w-auto min-w-[160px]"
                             transition={{ duration: 0.2, ease: "easeInOut" }}
                           >
-                            <DropdownMenuItem className="justify-start group">
-                              <Activity className="mr-2 h-4 w-4 group-hover:text-white" />
-                              <span className="group-hover:text-white">Actividad</span>
+                            <DropdownMenuItem className="justify-start">
+                              <Activity className="mr-2 h-4 w-4" />
+                              <span>Actividad</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="justify-start group">
-                              <Trophy className="mr-2 h-4 w-4 group-hover:text-white" />
-                              <span className="group-hover:text-white">Ranking</span>
+                            <DropdownMenuItem className="justify-start">
+                              <Trophy className="mr-2 h-4 w-4" />
+                              <span>Ranking</span>
                             </DropdownMenuItem>
                             
                             <DropdownMenuSeparator />
                             
-                            <DropdownMenuItem className="justify-start group">
-                              <Mail className="mr-2 h-4 w-4 group-hover:text-white" />
-                              <span className="group-hover:text-white">Contacto</span>
+                            <DropdownMenuItem className="justify-start">
+                              <Mail className="mr-2 h-4 w-4" />
+                              <span>Contacto</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="justify-start group">
-                              <FileText className="mr-2 h-4 w-4 group-hover:text-white" />
-                              <span className="group-hover:text-white">Términos</span>
+                            <DropdownMenuItem className="justify-start">
+                              <FileText className="mr-2 h-4 w-4" />
+                              <span>Términos</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="justify-start group">
-                              <Shield className="mr-2 h-4 w-4 group-hover:text-white" />
-                              <span className="group-hover:text-white">Privacidad</span>
+                            <DropdownMenuItem className="justify-start">
+                              <Shield className="mr-2 h-4 w-4" />
+                              <span>Privacidad</span>
                             </DropdownMenuItem>
                             
                             <DropdownMenuSeparator />
@@ -131,11 +459,31 @@ export function Navbar() {
                             {/* Theme Selector */}
                             <div className="px-2 py-2">
                               <div className="flex items-center gap-1 bg-muted rounded-md p-1 w-full relative">
+                                {/* Sliding background indicator */}
+                                <motion.div
+                                  layoutId="theme-selector-bg"
+                                  className="absolute bg-background rounded shadow-sm"
+                                  style={{
+                                    width: 'calc(50% - 4px)',
+                                    height: 'calc(100% - 8px)',
+                                    top: '4px',
+                                  }}
+                                  initial={false}
+                                  animate={{
+                                    left: resolvedTheme === 'light' ? '4px' : 'calc(50%)',
+                                  }}
+                                  transition={{
+                                    type: "spring",
+                                    stiffness: 500,
+                                    damping: 35,
+                                  }}
+                                />
+                                
                                 <button
                                   onClick={() => setTheme('light')}
-                                  className={`p-1.5 rounded transition-all duration-200 flex-1 flex items-center justify-center ${
+                                  className={`p-1.5 rounded transition-colors duration-200 flex-1 flex items-center justify-center relative z-10 ${
                                     resolvedTheme === 'light' 
-                                      ? 'bg-background text-foreground shadow-sm' 
+                                      ? 'text-foreground' 
                                       : 'text-muted-foreground hover:text-foreground'
                                   }`}
                                 >
@@ -143,9 +491,9 @@ export function Navbar() {
                                 </button>
                                 <button
                                   onClick={() => setTheme('dark')}
-                                  className={`p-1.5 rounded transition-all duration-200 flex-1 flex items-center justify-center ${
+                                  className={`p-1.5 rounded transition-colors duration-200 flex-1 flex items-center justify-center relative z-10 ${
                                     resolvedTheme === 'dark' 
-                                      ? 'bg-background text-foreground shadow-sm' 
+                                      ? 'text-foreground' 
                                       : 'text-muted-foreground hover:text-foreground'
                                   }`}
                                 >

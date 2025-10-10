@@ -13,38 +13,48 @@ const ACCENT_COLOR = '#A855F7'
 const baseDarkTheme = darkTheme({
   accentColor: ACCENT_COLOR,
   accentColorForeground: 'white',
-  borderRadius: 'large',
+  borderRadius: 'medium',
   fontStack: 'system',
 })
 
 const baseLightTheme = lightTheme({
   accentColor: ACCENT_COLOR,
   accentColorForeground: 'white',
-  borderRadius: 'large',
+  borderRadius: 'medium',
   fontStack: 'system',
 })
 
-const modalRadius = '1.25rem'
+const modalRadius = '0.5rem'
 
 const customDarkTheme: Theme = {
   ...baseDarkTheme,
+  colors: {
+    ...baseDarkTheme.colors,
+    modalBackground: '#1C1917', // slate-black from our theme
+    menuItemBackground: 'transparent',
+  },
   radii: {
     ...baseDarkTheme.radii,
     modal: modalRadius,
     modalMobile: modalRadius,
-    connectButton: '0.75rem',
-    actionButton: '0.75rem',
+    connectButton: modalRadius,
+    actionButton: modalRadius,
   },
 }
 
 const customLightTheme: Theme = {
   ...baseLightTheme,
+  colors: {
+    ...baseLightTheme.colors,
+    modalBackground: '#FFFFFF', // white from our theme
+    menuItemBackground: 'transparent',
+  },
   radii: {
     ...baseLightTheme.radii,
     modal: modalRadius,
     modalMobile: modalRadius,
-    connectButton: '0.75rem',
-    actionButton: '0.75rem',
+    connectButton: modalRadius,
+    actionButton: modalRadius,
   },
 }
 

@@ -164,7 +164,7 @@ export default function Home() {
                     className={cn(
                       'px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] relative overflow-hidden',
                       isActive
-                        ? 'text-electric-purple bg-electric-purple/20'
+                        ? 'text-electric-purple bg-electric-purple/5'
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                     )}
                     whileHover={{ scale: 1.05 }}
@@ -174,7 +174,7 @@ export default function Home() {
                     {isActive && (
                       <motion.div
                         layoutId="activeCategoryFilter"
-                        className="absolute inset-0 bg-electric-purple/20 rounded-md"
+                        className="absolute inset-0 bg-electric-purple/5 rounded-md"
                         transition={{ duration: 0.3, ease: "easeInOut" }}
                       />
                     )}

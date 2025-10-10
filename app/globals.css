@@ -91,6 +91,32 @@
   }
 }
 
+@keyframes pulse-scale {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+/* RainbowKit custom hover effect - no transition, just lift */
+[data-testid^="rk-wallet-option"]:hover,
+button[data-testid^="rk-wallet-option"]:hover,
+div[role="menuitem"]:hover {
+  background-color: rgba(168, 85, 247, 0.1) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Dropdown menu items - same lift effect */
+[data-slot="dropdown-menu-item"]:hover,
+[data-slot="dropdown-menu-checkbox-item"]:hover,
+[data-slot="dropdown-menu-radio-item"]:hover {
+  transform: translateY(-1px);
+}
+
+/* RainbowKit custom styling - no animation to avoid conflicts */
+
 @theme inline {
   @keyframes rainbow {
   0% {
