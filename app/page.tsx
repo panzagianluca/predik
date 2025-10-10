@@ -110,7 +110,7 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto">
         {/* Title */}
-        <h1 className="text-[30px] mb-8">
+        <h1 className="text-[30px] mb-4">
           El futuro tiene precio
         </h1>
 

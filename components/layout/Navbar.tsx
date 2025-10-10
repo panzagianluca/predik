@@ -3,12 +3,12 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useTheme } from 'next-themes'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { Button } from '@/components/ui/button'
 import { GlobalSearch } from '@/components/layout/GlobalSearch'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/animate-ui/components/radix/dropdown-menu'
-import { Menu, Activity, Trophy, Mail, FileText, Shield, Sun, Moon, AlertCircle } from 'lucide-react'
+import { Menu, Activity, Trophy, Lightbulb, Mail, FileText, Shield, Sun, Moon, AlertCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/animate-ui/components/radix/dialog'
 import { Confetti } from '@/components/ui/confetti'
@@ -19,7 +19,7 @@ export function Navbar() {
   const [tutorialStep, setTutorialStep] = useState(1)
   const [showTutorial, setShowTutorial] = useState(false)
   const [selectedOutcome, setSelectedOutcome] = useState<'si' | 'no'>('si')
-  const [connectModalTrigger, setConnectModalTrigger] = useState<(() => void) | null>(null)
+  const openConnectModalRef = useRef<(() => void) | null>(null)
 
   // Avoid hydration mismatch
   useEffect(() => {
@@ -357,8 +357,8 @@ export function Navbar() {
                       onClick={() => {
                         setShowTutorial(false)
                         // Trigger wallet connection modal
-                        if (connectModalTrigger) {
-                          connectModalTrigger()
+                        if (openConnectModalRef.current) {
+                          openConnectModalRef.current()
                         }
                       }}
                       className="w-full h-9"
@@ -390,10 +390,8 @@ export function Navbar() {
                   chain &&
                   (!authenticationStatus || authenticationStatus === 'authenticated')
 
-                // Store the openConnectModal function for tutorial use
-                if (openConnectModal && !connectModalTrigger) {
-                  setConnectModalTrigger(() => openConnectModal)
-                }
+                // Store openConnectModal in ref for tutorial use
+                openConnectModalRef.current = openConnectModal
 
                 return (
                   <div
@@ -405,24 +403,26 @@ export function Navbar() {
                   >
                     {!connected ? (
                       <>
-                        <Button
-                          size="default"
-                          className="relative h-9 px-4 overflow-hidden shadow-sm transition-all duration-300 before:pointer-events-none before:absolute before:inset-0 before:-translate-x-full before:bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.6),transparent)] before:opacity-35 before:animate-[shimmer_6s_linear_infinite] before:content-[''] hover:bg-primary/90 hover:shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:before:animate-none dark:hover:bg-primary/85 dark:hover:shadow-[0_0_22px_rgba(168,85,247,0.5)]"
+                        <button
+                          className="group/button relative inline-flex items-center justify-center overflow-hidden rounded-md bg-electric-purple backdrop-blur-lg px-6 h-9 text-sm font-semibold text-white transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl hover:shadow-electric-purple/50"
                           onClick={openConnectModal}
                           type="button"
                         >
-                          Acceder
-                        </Button>
+                          <span className="relative z-10">Acceder</span>
+                          <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-13deg)_translateX(-100%)] group-hover/button:duration-1000 group-hover/button:[transform:skew(-13deg)_translateX(100%)]">
+                            <div className="relative h-full w-10 bg-white/30"></div>
+                          </div>
+                        </button>
                         
                         {/* Hamburger Menu - Only visible when NOT connected */}
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
                               size="default"
-                              variant="outline"
-                              className="h-9 w-9 p-0"
+                              variant="ghost"
+                              className="h-10 w-10 p-0 hover:bg-transparent hover:text-electric-purple transition-colors"
                             >
-                              <Menu className="h-5 w-5" />
+                              <Menu className="h-7 w-7" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent 
@@ -437,6 +437,10 @@ export function Navbar() {
                             <DropdownMenuItem className="justify-start">
                               <Trophy className="mr-2 h-4 w-4" />
                               <span>Ranking</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="justify-start">
+                              <Lightbulb className="mr-2 h-4 w-4" />
+                              <span>Proponer</span>
                             </DropdownMenuItem>
                             
                             <DropdownMenuSeparator />
