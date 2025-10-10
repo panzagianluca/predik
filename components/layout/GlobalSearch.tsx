@@ -51,7 +51,9 @@ export function GlobalSearch() {
   const fetchMarkets = async () => {
     setIsLoading(true)
     try {
-      const response = await fetch('http://localhost:3000/api/markets')
+      const apiBase = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '')
+      const endpoint = apiBase ? `${apiBase}/api/markets` : '/api/markets'
+      const response = await fetch(endpoint, { cache: 'no-store' })
       
       if (!response.ok) {
         throw new Error('Failed to fetch markets')
@@ -76,9 +78,9 @@ export function GlobalSearch() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="flex items-center gap-2 text-sm text-muted-foreground hover:text-electric-purple transition-colors duration-200">
-          <Search className="w-4 h-4" />
-          <span className="hidden md:inline">Buscar Mercados</span>
+        <button className="flex w-full max-w-[360px] items-center gap-2 rounded-md border border-transparent bg-muted/70 px-4 h-9 text-sm text-muted-foreground transition-colors duration-200 hover:bg-muted/90 hover:text-foreground dark:bg-muted/40 dark:hover:bg-muted/60 mr-4 md:mr-6">
+          <Search className="w-4 h-4 text-muted-foreground" />
+          <span className="hidden md:inline whitespace-nowrap">Buscar Mercados</span>
         </button>
       </DialogTrigger>
 
@@ -87,14 +89,14 @@ export function GlobalSearch() {
         <DialogTitle className="sr-only">Buscar Mercados</DialogTitle>
         
         {/* Search Input */}
-        <div className="p-4 border-b">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <div className="border-b">
+          <div className="relative h-11">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Buscar mercados, categorías, resultados..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+              className="h-full rounded-none border-0 pl-10 focus-visible:ring-0 focus-visible:ring-offset-0"
               autoFocus
             />
           </div>
@@ -120,7 +122,7 @@ export function GlobalSearch() {
                 <button
                   key={market.id}
                   onClick={() => handleSelectMarket(market)}
-                  className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-accent transition-colors duration-200 text-left group"
+                  className="w-full flex items-start gap-3 p-3 rounded-lg transition-colors duration-200 text-left hover:bg-electric-purple/20 dark:hover:bg-electric-purple/40"
                 >
                   {/* Market Image */}
                   {market.image_url && (
@@ -133,7 +135,7 @@ export function GlobalSearch() {
 
                   {/* Market Info */}
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-medium line-clamp-2 text-sm group-hover:text-electric-purple transition-colors duration-200">
+                    <h4 className="font-medium line-clamp-2 text-sm">
                       {market.title}
                     </h4>
                     
@@ -162,15 +164,6 @@ export function GlobalSearch() {
                         </div>
                       ))}
                     </div>
-
-                    {/* Category */}
-                    {market.category && (
-                      <div className="mt-1">
-                        <span className="text-xs text-muted-foreground">
-                          {market.category}
-                        </span>
-                      </div>
-                    )}
                   </div>
                 </button>
               ))}

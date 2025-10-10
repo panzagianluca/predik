@@ -76,7 +76,7 @@ export function Navbar() {
                     {!connected ? (
                       <Button
                         size="default"
-                        className="h-9 px-4"
+                        className="relative h-9 px-4 overflow-hidden shadow-sm transition-all duration-300 before:pointer-events-none before:absolute before:inset-0 before:-translate-x-full before:bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.6),transparent)] before:opacity-35 before:animate-[shimmer_6s_linear_infinite] before:content-[''] hover:bg-primary/90 hover:shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:before:animate-none dark:hover:bg-primary/85 dark:hover:shadow-[0_0_22px_rgba(168,85,247,0.5)]"
                         onClick={openConnectModal}
                         type="button"
                       >
