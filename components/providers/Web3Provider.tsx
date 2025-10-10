@@ -2,11 +2,51 @@
 
 import { WagmiProvider } from 'wagmi'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { RainbowKitProvider, darkTheme, lightTheme } from '@rainbow-me/rainbowkit'
+import { RainbowKitProvider, darkTheme, lightTheme, type Theme } from '@rainbow-me/rainbowkit'
 import '@rainbow-me/rainbowkit/styles.css'
 import { config } from '@/lib/wagmi'
 import { ReactNode, useState, useEffect } from 'react'
 import { useTheme } from 'next-themes'
+
+const ACCENT_COLOR = '#A855F7'
+
+const baseDarkTheme = darkTheme({
+  accentColor: ACCENT_COLOR,
+  accentColorForeground: 'white',
+  borderRadius: 'large',
+  fontStack: 'system',
+})
+
+const baseLightTheme = lightTheme({
+  accentColor: ACCENT_COLOR,
+  accentColorForeground: 'white',
+  borderRadius: 'large',
+  fontStack: 'system',
+})
+
+const modalRadius = '1.25rem'
+
+const customDarkTheme: Theme = {
+  ...baseDarkTheme,
+  radii: {
+    ...baseDarkTheme.radii,
+    modal: modalRadius,
+    modalMobile: modalRadius,
+    connectButton: '0.75rem',
+    actionButton: '0.75rem',
+  },
+}
+
+const customLightTheme: Theme = {
+  ...baseLightTheme,
+  radii: {
+    ...baseLightTheme.radii,
+    modal: modalRadius,
+    modalMobile: modalRadius,
+    connectButton: '0.75rem',
+    actionButton: '0.75rem',
+  },
+}
 
 export function Web3Provider({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient())
@@ -16,21 +56,6 @@ export function Web3Provider({ children }: { children: ReactNode }) {
   useEffect(() => {
     setMounted(true)
   }, [])
-
-  // Custom RainbowKit theme matching your electric-purple brand
-  const customDarkTheme = darkTheme({
-    accentColor: '#A855F7', // electric-purple
-    accentColorForeground: 'white',
-    borderRadius: 'medium',
-    fontStack: 'system',
-  })
-
-  const customLightTheme = lightTheme({
-    accentColor: '#A855F7', // electric-purple
-    accentColorForeground: 'white',
-    borderRadius: 'medium',
-    fontStack: 'system',
-  })
 
   return (
     <WagmiProvider config={config}>

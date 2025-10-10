@@ -84,7 +84,12 @@ export function GlobalSearch() {
         </button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-2xl p-0 gap-0 !left-1/2 !top-1/2 !-translate-x-1/2 !-translate-y-1/2" showCloseButton={false}>
+      <DialogContent
+        from="top"
+        transition={{ type: 'spring', stiffness: 260, damping: 26 }}
+        className="max-w-2xl p-0 gap-0 !left-1/2 !top-1/2 !-translate-x-1/2 !-translate-y-1/2 rounded-2xl border border-border/60 shadow-xl backdrop-blur"
+        showCloseButton={false}
+      >
         {/* Hidden title for accessibility */}
         <DialogTitle className="sr-only">Buscar Mercados</DialogTitle>
         
