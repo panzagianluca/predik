@@ -14,14 +14,14 @@ const baseDarkTheme = darkTheme({
   accentColor: ACCENT_COLOR,
   accentColorForeground: 'white',
   borderRadius: 'medium',
-  fontStack: 'system',
+  fontStack: 'rounded',
 })
 
 const baseLightTheme = lightTheme({
   accentColor: ACCENT_COLOR,
   accentColorForeground: 'white',
   borderRadius: 'medium',
-  fontStack: 'system',
+  fontStack: 'rounded',
 })
 
 const modalRadius = '0.5rem'
@@ -40,6 +40,9 @@ const customDarkTheme: Theme = {
     connectButton: modalRadius,
     actionButton: modalRadius,
   },
+  fonts: {
+    body: 'Satoshi, system-ui, sans-serif',
+  },
 }
 
 const customLightTheme: Theme = {
@@ -55,6 +58,9 @@ const customLightTheme: Theme = {
     modalMobile: modalRadius,
     connectButton: modalRadius,
     actionButton: modalRadius,
+  },
+  fonts: {
+    body: 'Satoshi, system-ui, sans-serif',
   },
 }
 

@@ -19,6 +19,7 @@ export function Navbar() {
   const [tutorialStep, setTutorialStep] = useState(1)
   const [showTutorial, setShowTutorial] = useState(false)
   const [selectedOutcome, setSelectedOutcome] = useState<'si' | 'no'>('si')
+  const [triggerConfetti, setTriggerConfetti] = useState(false)
   const openConnectModalRef = useRef<(() => void) | null>(null)
 
   // Avoid hydration mismatch
@@ -278,17 +279,17 @@ export function Navbar() {
                       onClick={() => setTutorialStep(3)}
                       className="w-full h-9 mt-4"
                     >
-                      Comprar {selectedOutcome === 'si' ? '154' : '286'} de {selectedOutcome === 'si' ? 'Si' : 'No'}
+                      Comprar {selectedOutcome === 'si' ? 'Si' : 'No'}
                     </Button>
                   </div>
                 )}
 
                 {tutorialStep === 3 && (
-                  <div className="p-6 relative">
+                  <div className="p-6 relative overflow-hidden">
                     {/* Confetti Effect */}
                     <Confetti
-                      className="absolute inset-0 pointer-events-none z-50"
-                      manualstart={false}
+                      className="fixed inset-x-0 bottom-0 top-1/3 pointer-events-none z-[9999]"
+                      manualstart={triggerConfetti}
                     />
                     
                     {/* Title */}
