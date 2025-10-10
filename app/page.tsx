@@ -129,10 +129,10 @@ export default function Home() {
                     key={filter.id}
                     onClick={() => setTimeFilter(filter.id)}
                     className={cn(
-                      'flex items-center gap-2 px-4 h-[36px] rounded-md border-2 transition-all duration-200 font-medium text-[14px] relative overflow-hidden',
+                      'flex items-center gap-2 px-4 h-[36px] rounded-md border-2 transition-all duration-200 text-[14px] relative overflow-hidden',
                       isActive
-                        ? 'bg-electric-purple text-white border-electric-purple'
-                        : 'bg-background border-border hover:border-electric-purple/50 text-foreground'
+                        ? 'bg-electric-purple text-white border-electric-purple font-semibold'
+                        : 'bg-background border-border hover:border-electric-purple/50 text-foreground font-medium'
                     )}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
