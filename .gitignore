@@ -4,3 +4,4 @@
 .github/instructions/codacy.instructions.md
 .next
 node_modules
+.env.local
