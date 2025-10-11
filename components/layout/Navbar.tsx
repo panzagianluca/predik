@@ -445,14 +445,18 @@ export function Navbar() {
                               <Mail className="mr-2 h-4 w-4" />
                               <span>Contacto</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="justify-start">
-                              <FileText className="mr-2 h-4 w-4" />
-                              <span>Términos</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="justify-start">
-                              <Shield className="mr-2 h-4 w-4" />
-                              <span>Privacidad</span>
-                            </DropdownMenuItem>
+                            <Link href="/terminos">
+                              <DropdownMenuItem className="justify-start">
+                                <FileText className="mr-2 h-4 w-4" />
+                                <span>Términos</span>
+                              </DropdownMenuItem>
+                            </Link>
+                            <Link href="/privacidad">
+                              <DropdownMenuItem className="justify-start">
+                                <Shield className="mr-2 h-4 w-4" />
+                                <span>Privacidad</span>
+                              </DropdownMenuItem>
+                            </Link>
                             
                             <DropdownMenuSeparator />
                             

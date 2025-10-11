@@ -5,6 +5,7 @@ import { Web3Provider } from "@/components/providers/Web3Provider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { CookieConsentBanner } from "@/components/layout/CookieConsent";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,6 +39,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Web3Provider>
+            <CookieConsentBanner />
             <div className="flex flex-col min-h-screen">
               <Navbar />
               <main className="flex-1">
