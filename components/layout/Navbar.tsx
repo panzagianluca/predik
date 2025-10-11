@@ -33,6 +33,7 @@ export function Navbar() {
     : '/svglogoblack.svg'
 
   return (
+    <>
     <nav className="w-full bg-background">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
@@ -285,13 +286,7 @@ export function Navbar() {
                 )}
 
                 {tutorialStep === 3 && (
-                  <div className="p-6 relative overflow-hidden">
-                    {/* Confetti Effect */}
-                    <Confetti
-                      className="fixed inset-x-0 bottom-0 top-1/3 pointer-events-none z-[9999]"
-                      manualstart={triggerConfetti}
-                    />
-                    
+                  <div className="p-6 relative">
                     {/* Title */}
                     <h2 className="text-xl font-semibold mb-4">Como Funciona Predik?</h2>
                     
@@ -538,5 +533,14 @@ export function Navbar() {
         </div>
       </div>
     </nav>
+    
+    {/* Confetti Effect - Rendered outside dialog for proper display */}
+    {showTutorial && tutorialStep === 3 && (
+      <Confetti
+        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[600px] pointer-events-none z-[100]"
+        manualstart={triggerConfetti}
+      />
+    )}
+  </>
   )
 }
