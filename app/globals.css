@@ -2,9 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Cookie Consent Custom Styles */
-@import './cookie-consent.css';
-
 /* Satoshi Variable Font */
 @font-face {
   font-family: 'Satoshi';

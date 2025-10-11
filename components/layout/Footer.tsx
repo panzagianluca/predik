@@ -1,11 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import * as CookieConsent from 'vanilla-cookieconsent'
 
 export function Footer() {
   const openCookiePreferences = () => {
-    CookieConsent.showPreferences()
+    window.dispatchEvent(new CustomEvent('open-cookie-preferences'))
   }
 
   // For testing: uncomment to reset cookie consent on every page load
