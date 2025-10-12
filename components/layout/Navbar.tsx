@@ -15,6 +15,7 @@ import { Confetti } from '@/components/ui/confetti'
 import { useUSDTBalance } from '@/hooks/use-usdt-balance'
 import { getProfilePicture } from '@/lib/profileUtils'
 import { useDisconnect } from 'wagmi'
+import { DepositModal } from '@/components/wallet/DepositModal'
 
 export function Navbar() {
   const { theme, resolvedTheme, setTheme } = useTheme()
@@ -23,6 +24,7 @@ export function Navbar() {
   const [showTutorial, setShowTutorial] = useState(false)
   const [selectedOutcome, setSelectedOutcome] = useState<'si' | 'no'>('si')
   const [triggerConfetti, setTriggerConfetti] = useState(false)
+  const [showDepositModal, setShowDepositModal] = useState(false)
   const openConnectModalRef = useRef<(() => void) | null>(null)
   const { disconnect } = useDisconnect()
   const { formatted: usdtBalance, isLoading: isLoadingBalance } = useUSDTBalance()
@@ -527,20 +529,17 @@ export function Navbar() {
                       // LOGGED IN STATE
                       <div className="flex items-center gap-3">
                         {/* USDT Balance */}
-                        <div className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-md">
-                          <span className="text-sm font-semibold">
-                            {isLoadingBalance ? '...' : parseFloat(usdtBalance).toFixed(2)}
+                        <div className="flex flex-col items-center justify-center h-9 px-4">
+                          <span className="text-[12px] leading-tight">Balance</span>
+                          <span className="text-[16px] font-bold leading-tight">
+                            ${isLoadingBalance ? '...' : parseFloat(usdtBalance).toFixed(2)}
                           </span>
-                          <span className="text-xs text-muted-foreground">USDT</span>
                         </div>
 
                         {/* Depositar Button */}
                         <button
                           className="group/button relative inline-flex items-center justify-center overflow-hidden rounded-md bg-electric-purple backdrop-blur-lg px-6 h-9 text-sm font-semibold text-white transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl hover:shadow-electric-purple/50"
-                          onClick={() => {
-                            // TODO: Implement deposit modal
-                            alert('Deposit functionality coming soon!')
-                          }}
+                          onClick={() => setShowDepositModal(true)}
                           type="button"
                         >
                           <span className="relative z-10">Depositar</span>
@@ -573,16 +572,16 @@ export function Navbar() {
                                 alt="Profile"
                                 className="h-9 w-9 rounded-xl object-cover"
                               />
-                              <ChevronDown className="h-4 w-4" />
+                              <ChevronDown className="h-4 w-4 text-foreground/70" />
                             </button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent 
                             align="end" 
-                            className="w-auto min-w-[200px]"
+                            className="w-[160px]"
                             transition={{ duration: 0.2, ease: "easeInOut" }}
                           >
                             {/* Wallet Address */}
-                            <div className="px-2 py-2 text-sm font-mono text-muted-foreground">
+                            <div className="px-2 py-2 text-sm font-satoshi text-muted-foreground">
                               {account.displayName}
                             </div>
                             
@@ -698,6 +697,15 @@ export function Navbar() {
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
+
+                        {/* Deposit Modal */}
+                        {account?.address && (
+                          <DepositModal
+                            isOpen={showDepositModal}
+                            onClose={() => setShowDepositModal(false)}
+                            walletAddress={account.address}
+                          />
+                        )}
                       </div>
                     )}
                   </div>
