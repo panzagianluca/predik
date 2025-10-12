@@ -8,10 +8,13 @@ import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { Button } from '@/components/ui/button'
 import { GlobalSearch } from '@/components/layout/GlobalSearch'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/animate-ui/components/radix/dropdown-menu'
-import { Menu, Activity, Trophy, Lightbulb, Mail, FileText, Shield, Sun, Moon, AlertCircle } from 'lucide-react'
+import { Menu, Activity, Trophy, Lightbulb, Mail, FileText, Shield, Sun, Moon, AlertCircle, Bell, ChevronDown, User, LogOut } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/animate-ui/components/radix/dialog'
 import { Confetti } from '@/components/ui/confetti'
+import { useUSDTBalance } from '@/hooks/use-usdt-balance'
+import { getProfilePicture } from '@/lib/profileUtils'
+import { useDisconnect } from 'wagmi'
 
 export function Navbar() {
   const { theme, resolvedTheme, setTheme } = useTheme()
@@ -21,6 +24,8 @@ export function Navbar() {
   const [selectedOutcome, setSelectedOutcome] = useState<'si' | 'no'>('si')
   const [triggerConfetti, setTriggerConfetti] = useState(false)
   const openConnectModalRef = useRef<(() => void) | null>(null)
+  const { disconnect } = useDisconnect()
+  const { formatted: usdtBalance, isLoading: isLoadingBalance } = useUSDTBalance()
 
   // Avoid hydration mismatch
   useEffect(() => {
@@ -519,15 +524,181 @@ export function Navbar() {
                         Wrong network
                       </Button>
                     ) : (
-                      <Button
-                        size="default"
-                        variant="outline"
-                        className="h-9 px-4"
-                        onClick={openAccountModal}
-                        type="button"
-                      >
-                        {account.displayName}
-                      </Button>
+                      // LOGGED IN STATE
+                      <div className="flex items-center gap-3">
+                        {/* USDT Balance */}
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-md">
+                          <span className="text-sm font-semibold">
+                            {isLoadingBalance ? '...' : parseFloat(usdtBalance).toFixed(2)}
+                          </span>
+                          <span className="text-xs text-muted-foreground">USDT</span>
+                        </div>
+
+                        {/* Depositar Button */}
+                        <button
+                          className="group/button relative inline-flex items-center justify-center overflow-hidden rounded-md bg-electric-purple backdrop-blur-lg px-6 h-9 text-sm font-semibold text-white transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl hover:shadow-electric-purple/50"
+                          onClick={() => {
+                            // TODO: Implement deposit modal
+                            alert('Deposit functionality coming soon!')
+                          }}
+                          type="button"
+                        >
+                          <span className="relative z-10">Depositar</span>
+                          <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-13deg)_translateX(-100%)] group-hover/button:duration-1000 group-hover/button:[transform:skew(-13deg)_translateX(100%)]">
+                            <div className="relative h-full w-10 bg-white/30"></div>
+                          </div>
+                        </button>
+
+                        {/* Bell Icon (Notifications) */}
+                        <button
+                          className="h-9 w-9 flex items-center justify-center rounded-md hover:bg-muted transition-colors"
+                          onClick={() => {
+                            // TODO: Implement notifications
+                            alert('Notifications coming soon!')
+                          }}
+                          title="Notifications"
+                        >
+                          <Bell className="h-5 w-5" />
+                        </button>
+
+                        {/* Vertical Divider */}
+                        <div className="h-6 w-px bg-border"></div>
+
+                        {/* Profile Dropdown */}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                              <img
+                                src={getProfilePicture(account.address)}
+                                alt="Profile"
+                                className="h-9 w-9 rounded-xl object-cover"
+                              />
+                              <ChevronDown className="h-4 w-4" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent 
+                            align="end" 
+                            className="w-auto min-w-[200px]"
+                            transition={{ duration: 0.2, ease: "easeInOut" }}
+                          >
+                            {/* Wallet Address */}
+                            <div className="px-2 py-2 text-sm font-mono text-muted-foreground">
+                              {account.displayName}
+                            </div>
+                            
+                            <DropdownMenuSeparator />
+                            
+                            {/* Profile */}
+                            <DropdownMenuItem className="justify-start">
+                              <User className="mr-2 h-4 w-4" />
+                              <span>Profile</span>
+                            </DropdownMenuItem>
+                            
+                            <DropdownMenuSeparator />
+                            
+                            {/* Activity */}
+                            <DropdownMenuItem className="justify-start">
+                              <Activity className="mr-2 h-4 w-4" />
+                              <span>Actividad</span>
+                            </DropdownMenuItem>
+                            
+                            {/* Ranking */}
+                            <DropdownMenuItem className="justify-start">
+                              <Trophy className="mr-2 h-4 w-4" />
+                              <span>Ranking</span>
+                            </DropdownMenuItem>
+                            
+                            {/* Proponer */}
+                            <DropdownMenuItem className="justify-start">
+                              <Lightbulb className="mr-2 h-4 w-4" />
+                              <span>Proponer</span>
+                            </DropdownMenuItem>
+                            
+                            <DropdownMenuSeparator />
+                            
+                            {/* Contacto */}
+                            <DropdownMenuItem className="justify-start">
+                              <Mail className="mr-2 h-4 w-4" />
+                              <span>Contacto</span>
+                            </DropdownMenuItem>
+                            
+                            {/* Términos */}
+                            <Link href="/terminos">
+                              <DropdownMenuItem className="justify-start">
+                                <FileText className="mr-2 h-4 w-4" />
+                                <span>Términos</span>
+                              </DropdownMenuItem>
+                            </Link>
+                            
+                            {/* Privacidad */}
+                            <Link href="/privacidad">
+                              <DropdownMenuItem className="justify-start">
+                                <Shield className="mr-2 h-4 w-4" />
+                                <span>Privacidad</span>
+                              </DropdownMenuItem>
+                            </Link>
+                            
+                            <DropdownMenuSeparator />
+                            
+                            {/* Theme Selector */}
+                            <div className="px-2 py-2">
+                              <div className="flex items-center gap-1 bg-muted rounded-md p-1 w-full relative">
+                                {/* Sliding background indicator */}
+                                <motion.div
+                                  layoutId="theme-selector-bg-profile"
+                                  className="absolute bg-background rounded shadow-sm"
+                                  style={{
+                                    width: 'calc(50% - 4px)',
+                                    height: 'calc(100% - 8px)',
+                                    top: '4px',
+                                  }}
+                                  initial={false}
+                                  animate={{
+                                    left: resolvedTheme === 'light' ? '4px' : 'calc(50%)',
+                                  }}
+                                  transition={{
+                                    type: "spring",
+                                    stiffness: 500,
+                                    damping: 35,
+                                  }}
+                                />
+                                
+                                <button
+                                  onClick={() => setTheme('light')}
+                                  className={`p-1.5 rounded transition-colors duration-200 flex-1 flex items-center justify-center relative z-10 ${
+                                    resolvedTheme === 'light' 
+                                      ? 'text-foreground' 
+                                      : 'text-muted-foreground hover:text-foreground'
+                                  }`}
+                                >
+                                  <Sun className="h-4 w-4" />
+                                </button>
+                                <button
+                                  onClick={() => setTheme('dark')}
+                                  className={`p-1.5 rounded transition-colors duration-200 flex-1 flex items-center justify-center relative z-10 ${
+                                    resolvedTheme === 'dark' 
+                                      ? 'text-foreground' 
+                                      : 'text-muted-foreground hover:text-foreground'
+                                  }`}
+                                >
+                                  <Moon className="h-4 w-4" />
+                                </button>
+                              </div>
+                            </div>
+                            
+                            <DropdownMenuSeparator />
+                            
+                            {/* Cerrar Sesión (Disconnect) */}
+                            <DropdownMenuItem 
+                              className="justify-start text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
+                              onClick={() => disconnect()}
+                            >
+                              <LogOut className="mr-2 h-4 w-4" />
+                              <span>Cerrar Sesión</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     )}
                   </div>
                 )
