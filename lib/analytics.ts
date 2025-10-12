@@ -3,6 +3,7 @@
 
 type ConsentState = {
   necessary: boolean
+  behavioral: boolean
   analytics: boolean
   timestamp: number
 }
@@ -58,7 +59,7 @@ export function hasAnalyticsConsent(): boolean {
   
   try {
     const parsed: ConsentState = JSON.parse(consent)
-    return parsed.analytics === true
+    return parsed.behavioral === true || parsed.analytics === true
   } catch {
     return false
   }
@@ -71,23 +72,35 @@ export async function initAnalyticsIfConsented() {
     return
   }
   
-  console.log('✅ Analytics consented - initializing...')
+  const consent = localStorage.getItem('cookie-consent')
+  if (!consent) return
   
-  // Google Analytics - Replace with your Measurement ID
-  const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
-  if (GA_MEASUREMENT_ID) {
-    initGoogleAnalytics(GA_MEASUREMENT_ID)
-  } else {
-    console.warn('⚠️ GA_MEASUREMENT_ID not configured')
-  }
-  
-  // PostHog - Replace with your API key
-  const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY
-  const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com'
-  
-  if (POSTHOG_KEY) {
-    await initPostHog(POSTHOG_KEY, POSTHOG_HOST)
-  } else {
-    console.warn('⚠️ POSTHOG_KEY not configured')
+  try {
+    const parsed: ConsentState = JSON.parse(consent)
+    console.log('✅ Analytics consented - initializing...', parsed)
+    
+    // Google Analytics - only if analytics accepted
+    if (parsed.analytics) {
+      const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
+      if (GA_MEASUREMENT_ID) {
+        initGoogleAnalytics(GA_MEASUREMENT_ID)
+      } else {
+        console.warn('⚠️ GA_MEASUREMENT_ID not configured')
+      }
+    }
+    
+    // PostHog - only if behavioral accepted
+    if (parsed.behavioral) {
+      const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY
+      const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com'
+      
+      if (POSTHOG_KEY) {
+        await initPostHog(POSTHOG_KEY, POSTHOG_HOST)
+      } else {
+        console.warn('⚠️ POSTHOG_KEY not configured')
+      }
+    }
+  } catch (e) {
+    console.error('Failed to parse consent:', e)
   }
 }

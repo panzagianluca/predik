@@ -6,6 +6,7 @@ import { initAnalyticsIfConsented } from '@/lib/analytics'
 
 type ConsentState = {
   necessary: boolean
+  behavioral: boolean
   analytics: boolean
   timestamp: number
 }
@@ -13,6 +14,7 @@ type ConsentState = {
 export function CookieConsentBanner() {
   const [showBanner, setShowBanner] = useState(false)
   const [showPreferences, setShowPreferences] = useState(false)
+  const [behavioralEnabled, setBehavioralEnabled] = useState(false)
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false)
 
   useEffect(() => {
@@ -24,10 +26,11 @@ export function CookieConsentBanner() {
       // Load existing preference and initialize analytics if consented
       try {
         const parsed = JSON.parse(consent) as ConsentState
-        setAnalyticsEnabled(parsed.analytics)
+        setBehavioralEnabled(parsed.behavioral || false)
+        setAnalyticsEnabled(parsed.analytics || false)
         
         // Initialize analytics if user previously consented
-        if (parsed.analytics) {
+        if (parsed.behavioral || parsed.analytics) {
           initAnalyticsIfConsented()
         }
       } catch (e) {
@@ -43,8 +46,10 @@ export function CookieConsentBanner() {
       if (consent) {
         try {
           const parsed = JSON.parse(consent) as ConsentState
-          setAnalyticsEnabled(parsed.analytics)
+          setBehavioralEnabled(parsed.behavioral || false)
+          setAnalyticsEnabled(parsed.analytics || false)
         } catch (e) {
+          setBehavioralEnabled(false)
           setAnalyticsEnabled(false)
         }
       }
@@ -54,19 +59,21 @@ export function CookieConsentBanner() {
     return () => window.removeEventListener('open-cookie-preferences', handleOpenPreferences)
   }, [])
 
-  const saveConsent = async (necessary: boolean, analytics: boolean) => {
+  const saveConsent = async (necessary: boolean, behavioral: boolean, analytics: boolean) => {
     const consent: ConsentState = {
       necessary,
+      behavioral,
       analytics,
       timestamp: Date.now(),
     }
     localStorage.setItem('cookie-consent', JSON.stringify(consent))
+    setBehavioralEnabled(behavioral)
     setAnalyticsEnabled(analytics)
     setShowBanner(false)
     setShowPreferences(false)
     
     // Initialize analytics if accepted
-    if (analytics) {
+    if (behavioral || analytics) {
       console.log('✅ Analytics cookies ENABLED - consent saved:', consent)
       await initAnalyticsIfConsented()
     } else {
@@ -76,12 +83,12 @@ export function CookieConsentBanner() {
 
   const acceptAll = () => {
     console.log('🟢 ACEPTAR TODO clicked - enabling ALL cookies')
-    saveConsent(true, true)
+    saveConsent(true, true, true)
   }
 
   const acceptNecessary = () => {
     console.log('🟡 SOLO NECESARIAS clicked - disabling analytics')
-    saveConsent(true, false)
+    saveConsent(true, false, false)
   }
 
   if (!showBanner && !showPreferences) return null
@@ -171,23 +178,23 @@ export function CookieConsentBanner() {
                 </div>
               </div>
 
-              {/* Analytics Cookies */}
+              {/* Behavioral Cookies (PostHog) */}
               <div className="border border-border rounded-lg p-3">
                 <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-semibold text-[14px]">Cookies de Análisis</h4>
+                  <h4 className="font-semibold text-[14px]">Cookies de Comportamiento</h4>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
                       type="checkbox"
-                      id="analytics-toggle"
+                      id="behavioral-toggle"
                       className="sr-only peer"
-                      checked={analyticsEnabled}
-                      onChange={(e) => setAnalyticsEnabled(e.target.checked)}
+                      checked={behavioralEnabled}
+                      onChange={(e) => setBehavioralEnabled(e.target.checked)}
                     />
-                    <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-electric-purple rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-electric-purple"></div>
+                    <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-electric-purple/50 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-electric-purple"></div>
                   </label>
                 </div>
                 <p className="text-[14px] text-muted-foreground mb-2">
-                  Nos ayudan a mejorar la experiencia del usuario.
+                  Nos ayudan a entender cómo usas el sitio y mejorar la experiencia.
                 </p>
                 <div className="bg-muted/50 rounded p-2 text-[12px]">
                   <div className="grid grid-cols-4 gap-2 font-semibold mb-1 text-muted-foreground">
@@ -196,17 +203,45 @@ export function CookieConsentBanner() {
                     <div>Uso</div>
                     <div>Duración</div>
                   </div>
-                  <div className="grid grid-cols-4 gap-2 mb-1">
-                    <div className="font-mono">_ga</div>
-                    <div className="text-muted-foreground truncate">Google Analytics</div>
-                    <div className="text-muted-foreground">Comportamiento</div>
-                    <div className="text-muted-foreground">2 años</div>
-                  </div>
                   <div className="grid grid-cols-4 gap-2">
                     <div className="font-mono">ph_*</div>
                     <div className="text-muted-foreground truncate">PostHog</div>
-                    <div className="text-muted-foreground">Analytics</div>
+                    <div className="text-muted-foreground">Comportamiento</div>
                     <div className="text-muted-foreground">1 año</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Analytics Cookies (Google Analytics) */}
+              <div className="border border-border rounded-lg p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-semibold text-[14px]">Cookies de Analytics</h4>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      id="analytics-toggle"
+                      className="sr-only peer"
+                      checked={analyticsEnabled}
+                      onChange={(e) => setAnalyticsEnabled(e.target.checked)}
+                    />
+                    <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-electric-purple/50 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-electric-purple"></div>
+                  </label>
+                </div>
+                <p className="text-[14px] text-muted-foreground mb-2">
+                  Nos permiten medir el tráfico y analizar el rendimiento del sitio.
+                </p>
+                <div className="bg-muted/50 rounded p-2 text-[12px]">
+                  <div className="grid grid-cols-4 gap-2 font-semibold mb-1 text-muted-foreground">
+                    <div>Nombre</div>
+                    <div>Servicio</div>
+                    <div>Uso</div>
+                    <div>Duración</div>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    <div className="font-mono">_ga</div>
+                    <div className="text-muted-foreground truncate">Google Analytics</div>
+                    <div className="text-muted-foreground">Analytics</div>
+                    <div className="text-muted-foreground">2 años</div>
                   </div>
                 </div>
               </div>
@@ -216,18 +251,19 @@ export function CookieConsentBanner() {
             <div className="sticky bottom-0 bg-card border-t border-border p-4 flex gap-2">
               <button
                 onClick={() => {
-                  console.log('💾 GUARDAR clicked - saving current toggle state:', analyticsEnabled)
-                  saveConsent(true, analyticsEnabled)
+                  console.log('💾 GUARDAR clicked - saving current toggle state:', { behavioral: behavioralEnabled, analytics: analyticsEnabled })
+                  saveConsent(true, behavioralEnabled, analyticsEnabled)
                 }}
                 className="flex-1 h-9 bg-electric-purple hover:bg-electric-purple/90 text-white font-medium text-[14px] rounded-md transition-all duration-200"
               >
-                Guardar
+                Guardar mis preferencias
               </button>
               <button
                 onClick={() => {
-                  console.log('🟢 ACEPTAR TODO clicked from modal - enabling analytics toggle and saving')
+                  console.log('🟢 ACEPTAR TODO clicked from modal - enabling all toggles and saving')
+                  setBehavioralEnabled(true)
                   setAnalyticsEnabled(true)
-                  saveConsent(true, true)
+                  saveConsent(true, true, true)
                 }}
                 className="flex-1 h-9 bg-muted hover:bg-muted/80 text-foreground font-medium text-[14px] rounded-md transition-all duration-200"
               >
@@ -235,9 +271,10 @@ export function CookieConsentBanner() {
               </button>
               <button
                 onClick={() => {
-                  console.log('🟡 SOLO NECESARIAS clicked from modal - disabling analytics')
+                  console.log('🟡 SOLO NECESARIAS clicked from modal - disabling all analytics')
+                  setBehavioralEnabled(false)
                   setAnalyticsEnabled(false)
-                  saveConsent(true, false)
+                  saveConsent(true, false, false)
                 }}
                 className="flex-1 h-9 border border-border hover:bg-muted text-foreground font-medium text-[14px] rounded-md transition-all duration-200"
               >
