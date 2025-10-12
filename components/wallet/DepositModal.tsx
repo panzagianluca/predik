@@ -58,35 +58,13 @@ export function DepositModal({ isOpen, onClose, walletAddress }: DepositModalPro
         {/* Tabs Section - Scrollable */}
         <div className="flex-1 overflow-y-auto px-6 pb-6">
           <Tabs defaultValue="cex" className="w-full mt-4">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="cex">Desde CEX</TabsTrigger>
               <TabsTrigger value="bridge">Bridge</TabsTrigger>
-              <TabsTrigger value="manual">Manual</TabsTrigger>
             </TabsList>
 
             {/* Tab 1: CEX (LemonCash + Exchanges) */}
             <TabsContent value="cex" className="space-y-4 mt-4">
-              {/* Wallet Address Card */}
-              <div className="rounded-lg border bg-muted/30 p-3">
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 px-3 py-2 bg-background border rounded-md text-sm font-mono">
-                    {shortenAddress(walletAddress)}
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-9 w-9 p-0 shrink-0"
-                    onClick={handleCopy}
-                  >
-                    {copied ? (
-                      <Check className="h-4 w-4 text-green-600" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-              </div>
-
               {/* LemonCash Section */}
               <div className="rounded-lg border bg-card p-4">
                 <div className="flex items-start gap-3 mb-3">
@@ -117,6 +95,27 @@ export function DepositModal({ isOpen, onClose, walletAddress }: DepositModalPro
                   <p className="text-xs text-center text-muted-foreground px-4">
                     Escaneá con LemonCash para enviar USDT a Celo
                   </p>
+                </div>
+
+                {/* Full Wallet Address */}
+                <div className="mb-4">
+                  <div className="flex gap-2">
+                    <div className="flex-1 px-3 py-2 bg-muted border rounded-md text-xs font-mono break-all">
+                      {walletAddress}
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-auto shrink-0"
+                      onClick={handleCopy}
+                    >
+                      {copied ? (
+                        <Check className="h-4 w-4 text-green-600" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
 
                 {/* Instructions */}
@@ -191,27 +190,6 @@ export function DepositModal({ isOpen, onClose, walletAddress }: DepositModalPro
 
             {/* Tab 2: Bridge (Li.Fi Widget) */}
             <TabsContent value="bridge" className="space-y-4 mt-4">
-              {/* Wallet Address Card */}
-              <div className="rounded-lg border bg-muted/30 p-3">
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 px-3 py-2 bg-background border rounded-md text-sm font-mono">
-                    {shortenAddress(walletAddress)}
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-9 w-9 p-0 shrink-0"
-                    onClick={handleCopy}
-                  >
-                    {copied ? (
-                      <Check className="h-4 w-4 text-green-600" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-              </div>
-
               <div className="rounded-lg border bg-card p-4">
                 <h3 className="font-semibold flex items-center gap-2 mb-2">
                   🔄 Transferir desde otra red
@@ -226,70 +204,6 @@ export function DepositModal({ isOpen, onClose, walletAddress }: DepositModalPro
                     integrator="Predik"
                     config={lifiConfig}
                   />
-                </div>
-              </div>
-            </TabsContent>
-
-            {/* Tab 3: Manual */}
-            <TabsContent value="manual" className="space-y-4 mt-4">
-              {/* Wallet Address Card */}
-              <div className="rounded-lg border bg-muted/30 p-3">
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 px-3 py-2 bg-background border rounded-md text-sm font-mono">
-                    {shortenAddress(walletAddress)}
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-9 w-9 p-0 shrink-0"
-                    onClick={handleCopy}
-                  >
-                    {copied ? (
-                      <Check className="h-4 w-4 text-green-600" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-              </div>
-
-              <div className="rounded-lg border bg-card p-4">
-                <h3 className="font-semibold flex items-center gap-2 mb-3">
-                  📱 Transferencia Manual
-                </h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Enviá USDT a esta dirección en la red Celo:
-                </p>
-
-                {/* QR Code */}
-                <div className="flex flex-col items-center gap-3 py-4 bg-white dark:bg-muted rounded-lg mb-4">
-                  <QRCodeSVG
-                    value={walletAddress}
-                    size={200}
-                    level="H"
-                    includeMargin={true}
-                    bgColor="#ffffff"
-                    fgColor="#000000"
-                  />
-                  <p className="text-xs text-center text-muted-foreground px-4">
-                    Escaneá para enviar USDT a tu wallet
-                  </p>
-                </div>
-
-                {/* Warning */}
-                <div className="p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 rounded-md">
-                  <div className="flex gap-2">
-                    <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-500 shrink-0 mt-0.5" />
-                    <div className="text-xs text-red-900 dark:text-red-200 space-y-1">
-                      <p><strong>⚠️ Importante:</strong></p>
-                      <ul className="ml-4 space-y-1">
-                        <li>• Solo enviá <strong>USDT</strong></li>
-                        <li>• Solo en la red <strong>Celo</strong></li>
-                        <li>• Verificá la dirección antes de enviar</li>
-                        <li>• Otros tokens o redes se perderán</li>
-                      </ul>
-                    </div>
-                  </div>
                 </div>
               </div>
             </TabsContent>
