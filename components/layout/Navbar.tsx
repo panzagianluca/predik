@@ -299,7 +299,7 @@ export function Navbar() {
                     
                     {/* Instruction */}
                     <p className="text-sm text-muted-foreground mb-4">
-                      Retirá tus ganancias, o disfrutalas
+                      Disfrutá tus ganancias
                     </p>
 
                     {/* Winning Summary */}
