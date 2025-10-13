@@ -29,7 +29,7 @@ export function Footer() {
               href="https://myriad.markets/" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="hover:text-foreground transition-colors underline"
+              className="hover:text-electric-purple transition-colors underline"
             >
               Myriad Markets
             </a>
@@ -39,7 +39,7 @@ export function Footer() {
               href="https://celo.org/" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="hover:text-foreground transition-colors underline"
+              className="hover:text-electric-purple transition-colors underline"
             >
               Celo
             </a>
@@ -50,7 +50,7 @@ export function Footer() {
           {/* Cookies */}
           <button 
             onClick={openCookiePreferences}
-            className="hover:text-foreground transition-colors underline"
+            className="hover:text-electric-purple transition-colors underline"
           >
             Cookies
           </button>
@@ -63,7 +63,7 @@ export function Footer() {
               href="https://x.com/predik_io" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="hover:text-foreground transition-colors"
+              className="hover:text-electric-purple transition-colors"
               aria-label="X (Twitter)"
             >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -74,7 +74,7 @@ export function Footer() {
               href="https://www.instagram.com/predik.io/" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="hover:text-foreground transition-colors"
+              className="hover:text-electric-purple transition-colors"
               aria-label="Instagram"
             >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">

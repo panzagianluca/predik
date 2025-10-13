@@ -8,7 +8,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { Button } from '@/components/ui/button'
 import { GlobalSearch } from '@/components/layout/GlobalSearch'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/animate-ui/components/radix/dropdown-menu'
-import { Menu, Activity, Trophy, Lightbulb, Mail, FileText, Shield, Sun, Moon, AlertCircle, Bell, ChevronDown, User, LogOut } from 'lucide-react'
+import { Menu, Activity, Trophy, Lightbulb, FileText, Shield, Sun, Moon, AlertCircle, Bell, ChevronDown, User, LogOut } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/animate-ui/components/radix/dialog'
 import { Confetti } from '@/components/ui/confetti'
@@ -448,10 +448,6 @@ export function Navbar() {
                             
                             <DropdownMenuSeparator />
                             
-                            <DropdownMenuItem className="justify-start">
-                              <Mail className="mr-2 h-4 w-4" />
-                              <span>Contacto</span>
-                            </DropdownMenuItem>
                             <Link href="/terminos">
                               <DropdownMenuItem className="justify-start">
                                 <FileText className="mr-2 h-4 w-4" />
@@ -614,12 +610,6 @@ export function Navbar() {
                             </DropdownMenuItem>
                             
                             <DropdownMenuSeparator />
-                            
-                            {/* Contacto */}
-                            <DropdownMenuItem className="justify-start">
-                              <Mail className="mr-2 h-4 w-4" />
-                              <span>Contacto</span>
-                            </DropdownMenuItem>
                             
                             {/* Términos */}
                             <Link href="/terminos">
