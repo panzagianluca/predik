@@ -35,8 +35,8 @@ type HighlightContextType<T extends string> = {
   forceUpdateBounds?: boolean;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const HighlightContext = React.createContext<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   HighlightContextType<any> | undefined
 >(undefined);
 

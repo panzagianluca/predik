@@ -25,7 +25,7 @@ export default function TerminosPage() {
           {/* Introduction */}
           <section>
             <p className="text-muted-foreground leading-relaxed">
-              Predik ("nosotros," "nos" o "nuestro") funciona como una interfaz frontend que muestra mercados y contratos alojados y gestionados por{' '}
+              Predik (&quot;nosotros,&quot; &quot;nos&quot; o &quot;nuestro&quot;) funciona como una interfaz frontend que muestra mercados y contratos alojados y gestionados por{' '}
               <a 
                 href="https://myriad.markets/" 
                 target="_blank" 
@@ -34,7 +34,7 @@ export default function TerminosPage() {
               >
                 Myriad Foundation
               </a>
-              {' '}(la "Fundación Myriad"), la cual opera en varias cadenas de bloques, incluyendo{' '}
+              {' '}(la &quot;Fundación Myriad&quot;), la cual opera en varias cadenas de bloques, incluyendo{' '}
               <a 
                 href="https://celo.org/" 
                 target="_blank" 
@@ -43,7 +43,7 @@ export default function TerminosPage() {
               >
                 Celo
               </a>
-              , Arbitrum y Linea. Predik presenta únicamente los mercados alojados en la cadena Celo (Celo, Ethereum L2). Estos Términos de Servicio preliminares ("Términos") regulan el uso del sitio web, aplicaciones y servicios asociados de Predik (colectivamente, el "Servicio").
+              , Arbitrum y Linea. Predik presenta únicamente los mercados alojados en la cadena Celo (Celo, Ethereum L2). Estos Términos de Servicio preliminares (&quot;Términos&quot;) regulan el uso del sitio web, aplicaciones y servicios asociados de Predik (colectivamente, el &quot;Servicio&quot;).
             </p>
             <p className="text-muted-foreground leading-relaxed mt-4">
               Al acceder o usar el Servicio, usted reconoce y acepta estos Términos, incluyendo su aceptación y cumplimiento de los{' '}
@@ -55,7 +55,7 @@ export default function TerminosPage() {
               >
                 Términos de Uso de la Fundación Myriad
               </a>
-              {' '}("Términos de Myriad"), los cuales rigen todas las operaciones backend, la ejecución de contratos y la custodia de activos digitales relacionados con los mercados mostrados en Predik. Si no está de acuerdo con estos Términos o con los Términos de Myriad, no debe utilizar el Servicio.
+              {' '}(&quot;Términos de Myriad&quot;), los cuales rigen todas las operaciones backend, la ejecución de contratos y la custodia de activos digitales relacionados con los mercados mostrados en Predik. Si no está de acuerdo con estos Términos o con los Términos de Myriad, no debe utilizar el Servicio.
             </p>
           </section>
 

@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/animate-ui/components/animate/tooltip'
 import { Calendar, Users, TrendingUp } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import { useCountUp } from '@/hooks/use-count-up'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 
@@ -102,7 +101,6 @@ export function MarketCard({ market }: MarketCardProps) {
       <CardContent className="px-4 pb-4 space-y-2">
         {market.outcomes.map((outcome, index) => {
           const probability = outcome.price * 100
-          const animatedValue = useCountUp(probability, 200, isVisible)
           const outcomeColor = getOutcomeColor(index)
           
           return (
@@ -118,7 +116,7 @@ export function MarketCard({ market }: MarketCardProps) {
                     className="font-bold"
                     style={{ color: outcomeColor }}
                   >
-                    {animatedValue.toFixed(1)}%
+                    {probability.toFixed(1)}%
                   </span>
                 </div>
                 

@@ -22,7 +22,7 @@ export default function PrivacidadPage() {
           {/* Introduction */}
           <section>
             <p className="text-muted-foreground leading-relaxed mb-4">
-              Predik ("nosotros," "nuestro") valora la privacidad y la protección de los datos personales de quienes utilizan nuestra plataforma. Predik funciona como una interfaz frontend y muestra mercados alojados y gestionados por la{' '}
+              Predik (&quot;nosotros,&quot; &quot;nuestro&quot;) valora la privacidad y la protección de los datos personales de quienes utilizan nuestra plataforma. Predik funciona como una interfaz frontend y muestra mercados alojados y gestionados por la{' '}
               <a 
                 href="https://myriad.markets/" 
                 target="_blank" 
@@ -31,7 +31,7 @@ export default function PrivacidadPage() {
               >
                 Fundación Myriad
               </a>
-              {' '}("Myriad"), en la cadena de bloques{' '}
+              {' '}(&quot;Myriad&quot;), en la cadena de bloques{' '}
               <a 
                 href="https://celo.org/" 
                 target="_blank" 
@@ -40,7 +40,7 @@ export default function PrivacidadPage() {
               >
                 Celo
               </a>
-              {' '}("Celo Chain"). Todas las transacciones se realizan exclusivamente a través del protocolo de Myriad.
+              {' '}(&quot;Celo Chain&quot;). Todas las transacciones se realizan exclusivamente a través del protocolo de Myriad.
             </p>
             <p className="text-muted-foreground leading-relaxed">
               Aunque Predik no está formalmente constituida en la Unión Europea, esta Política de Privacidad adopta buenas prácticas internacionales para el manejo responsable y seguro de datos.

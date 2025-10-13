@@ -584,10 +584,12 @@ export function Navbar() {
                             <DropdownMenuSeparator />
                             
                             {/* Profile */}
-                            <DropdownMenuItem className="justify-start">
-                              <User className="mr-2 h-4 w-4" />
-                              <span>Profile</span>
-                            </DropdownMenuItem>
+                            <Link href="/profile">
+                              <DropdownMenuItem className="justify-start">
+                                <User className="mr-2 h-4 w-4" />
+                                <span>Profile</span>
+                              </DropdownMenuItem>
+                            </Link>
                             
                             <DropdownMenuSeparator />
                             
