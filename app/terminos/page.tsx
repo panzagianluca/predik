@@ -175,7 +175,7 @@ export default function TerminosPage() {
                 .
               </li>
               <li>Predik no es responsable por la ejecución de transacciones, errores, interrupciones o pérdidas derivadas del uso del Servicio o de la plataforma Myriad.</li>
-              <li>Predik brinda el Servicio "tal cual" y renuncia a cualquier garantía expresa o implícita, limitando su responsabilidad según lo permitido por la ley.</li>
+              <li>Predik brinda el Servicio &quot;tal cual&quot; y renuncia a cualquier garantía expresa o implícita, limitando su responsabilidad según lo permitido por la ley.</li>
             </ul>
           </section>
 

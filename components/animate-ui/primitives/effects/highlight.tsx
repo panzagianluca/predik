@@ -35,7 +35,7 @@ type HighlightContextType<T extends string> = {
   forceUpdateBounds?: boolean;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Generic context requires flexible typing
 const HighlightContext = React.createContext<
   HighlightContextType<any> | undefined
 >(undefined);

@@ -128,7 +128,7 @@ export function DepositModal({ isOpen, onClose, walletAddress }: DepositModalPro
                     </li>
                     <li className="flex gap-2">
                       <span className="font-semibold text-foreground">2.</span>
-                      <span>Tocá "Enviar" y escaneá el QR de arriba</span>
+                      <span>Tocá &quot;Enviar&quot; y escaneá el QR de arriba</span>
                     </li>
                     <li className="flex gap-2">
                       <span className="font-semibold text-foreground">3.</span>
