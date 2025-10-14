@@ -136,6 +136,16 @@ div[role="menuitem"]:hover {
 
 /* RainbowKit custom styling - no animation to avoid conflicts */
 
+/* Prevent default browser outline flash before Tailwind hydrates */
+nav button,
+[data-slot="dropdown-menu-trigger"],
+[data-slot="dropdown-menu-item"],
+[data-slot="dropdown-menu-checkbox-item"],
+[data-slot="dropdown-menu-radio-item"],
+[data-slot="dropdown-menu-sub-trigger"] {
+  outline: none;
+}
+
 @theme inline {
   @keyframes rainbow {
   0% {
