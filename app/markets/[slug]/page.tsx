@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
+import Link from 'next/link'
 import { fetchMarket } from '@/lib/myriad/api'
 import { Market } from '@/types/market'
 import { ProbabilityChart } from '@/components/market/ProbabilityChart'
@@ -99,9 +100,9 @@ export default function MarketDetailPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-500 mb-4">{error || 'Market not found'}</p>
-          <a href="/" className="text-electric-purple hover:underline">
+          <Link href="/" className="text-electric-purple hover:underline">
             ← Volver al inicio
-          </a>
+          </Link>
         </div>
       </div>
     )
