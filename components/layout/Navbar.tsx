@@ -116,7 +116,7 @@ export function Navbar() {
               }}
             >
               <DialogTrigger asChild>
-                <button className="flex items-center gap-2 text-sm font-medium text-foreground/70 hover:text-electric-purple transition-colors shrink-0">
+                <button className="flex items-center gap-2 text-sm font-medium text-foreground/70 hover:text-electric-purple transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
                   <AlertCircle className="h-5 w-5" />
                   <span>Como Funciona?</span>
                 </button>
@@ -150,7 +150,7 @@ export function Navbar() {
                       {/* Dummy Market Card - "Pasará esto?" */}
                       <button
                         onClick={() => setTutorialStep(2)}
-                        className="flex items-start gap-3 p-3 rounded-lg border border-border bg-muted/30 w-full text-left transition-all duration-300 hover:border-electric-purple/50 hover:bg-electric-purple/5"
+                        className="flex items-start gap-3 p-3 rounded-lg border border-border bg-muted/30 w-full text-left transition-all duration-300 hover:border-electric-purple/50 hover:bg-electric-purple/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                         style={{
                           animation: 'pulse-scale 2s ease-in-out infinite',
                         }}
@@ -266,7 +266,7 @@ export function Navbar() {
                         
                         <button
                           onClick={() => setSelectedOutcome('si')}
-                          className={`h-auto py-3 rounded-md border-2 flex items-center justify-between px-4 transition-colors relative z-10 ${
+                          className={`h-auto py-3 rounded-md border-2 flex items-center justify-between px-4 transition-colors relative z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                             selectedOutcome === 'si' 
                               ? 'border-transparent bg-transparent' 
                               : 'border-border bg-muted/30'
@@ -281,7 +281,7 @@ export function Navbar() {
                         </button>
                         <button
                           onClick={() => setSelectedOutcome('no')}
-                          className={`h-auto py-3 rounded-md border-2 flex items-center justify-between px-4 transition-colors relative z-10 ${
+                          className={`h-auto py-3 rounded-md border-2 flex items-center justify-between px-4 transition-colors relative z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                             selectedOutcome === 'no' 
                               ? 'border-transparent bg-transparent' 
                               : 'border-border bg-muted/30'
@@ -536,7 +536,7 @@ export function Navbar() {
                                 
                                 <button
                                   onClick={() => setTheme('light')}
-                                  className={`p-1.5 rounded transition-colors duration-200 flex-1 flex items-center justify-center relative z-10 ${
+                                  className={`p-1.5 rounded transition-colors duration-200 flex-1 flex items-center justify-center relative z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                                     resolvedTheme === 'light' 
                                       ? 'text-foreground' 
                                       : 'text-muted-foreground hover:text-foreground'
@@ -546,7 +546,7 @@ export function Navbar() {
                                 </button>
                                 <button
                                   onClick={() => setTheme('dark')}
-                                  className={`p-1.5 rounded transition-colors duration-200 flex-1 flex items-center justify-center relative z-10 ${
+                                  className={`p-1.5 rounded transition-colors duration-200 flex-1 flex items-center justify-center relative z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                                     resolvedTheme === 'dark' 
                                       ? 'text-foreground' 
                                       : 'text-muted-foreground hover:text-foreground'
@@ -586,7 +586,7 @@ export function Navbar() {
 
                         {/* Depositar Button */}
                         <button
-                          className="group/button relative inline-flex items-center justify-center overflow-hidden rounded-md bg-electric-purple backdrop-blur-lg px-6 h-9 text-sm font-semibold text-white transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl hover:shadow-electric-purple/50"
+                          className="group/button relative inline-flex items-center justify-center overflow-hidden rounded-md bg-electric-purple backdrop-blur-lg px-6 h-9 text-sm font-semibold text-white transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl hover:shadow-electric-purple/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                           onClick={() => setShowDepositModal(true)}
                           type="button"
                         >
@@ -598,7 +598,7 @@ export function Navbar() {
 
                         {/* Bell Icon (Notifications) */}
                         <button
-                          className="h-9 w-9 flex items-center justify-center rounded-md hover:bg-muted transition-colors"
+                          className="h-9 w-9 flex items-center justify-center rounded-md hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                           onClick={() => {
                             // TODO: Implement notifications
                             alert('Notifications coming soon!')
@@ -614,7 +614,7 @@ export function Navbar() {
                         {/* Profile Dropdown */}
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                            <button className="flex items-center gap-2 hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
                               <div className="relative h-9 w-9 rounded-xl overflow-hidden">
                                 {isLoadingProfile ? (
                                   <div className="h-9 w-9 bg-muted animate-pulse rounded-xl" />
@@ -725,7 +725,7 @@ export function Navbar() {
                                 
                                 <button
                                   onClick={() => setTheme('light')}
-                                  className={`p-1.5 rounded transition-colors duration-200 flex-1 flex items-center justify-center relative z-10 ${
+                                  className={`p-1.5 rounded transition-colors duration-200 flex-1 flex items-center justify-center relative z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                                     resolvedTheme === 'light' 
                                       ? 'text-foreground' 
                                       : 'text-muted-foreground hover:text-foreground'
@@ -735,7 +735,7 @@ export function Navbar() {
                                 </button>
                                 <button
                                   onClick={() => setTheme('dark')}
-                                  className={`p-1.5 rounded transition-colors duration-200 flex-1 flex items-center justify-center relative z-10 ${
+                                  className={`p-1.5 rounded transition-colors duration-200 flex-1 flex items-center justify-center relative z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                                     resolvedTheme === 'dark' 
                                       ? 'text-foreground' 
                                       : 'text-muted-foreground hover:text-foreground'
