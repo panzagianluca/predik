@@ -6,7 +6,7 @@ import { fetchMarket } from '@/lib/myriad/api'
 import { Market } from '@/types/market'
 import { ProbabilityChart } from '@/components/market/ProbabilityChart'
 import { TradingPanel } from '@/components/market/TradingPanel'
-import { MarketCard } from '@/components/market/MarketCard'
+import { RelatedMarketCard } from '@/components/market/RelatedMarketCard'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from '@/components/animate-ui/components/radix/tabs'
 import { ToggleGroup, ToggleGroupItem } from '@/components/animate-ui/components/radix/toggle-group'
@@ -413,14 +413,12 @@ export default function MarketDetailPage() {
             {/* Related Markets */}
             {market.related_markets && market.related_markets.length > 0 && (
               <div className="space-y-4">
-                <h3 className="font-semibold">Mercados Relacionados</h3>
-                <TooltipProvider>
-                  <div className="space-y-4">
-                    {market.related_markets.slice(0, 3).map((relatedMarket) => (
-                      <MarketCard key={relatedMarket.id} market={relatedMarket} />
-                    ))}
-                  </div>
-                </TooltipProvider>
+                <h3 className="text-[14px] font-semibold">Mercados Relacionados</h3>
+                <div className="space-y-3">
+                  {market.related_markets.slice(0, 3).map((relatedMarket) => (
+                    <RelatedMarketCard key={relatedMarket.id} market={relatedMarket} />
+                  ))}
+                </div>
               </div>
             )}
           </div>
