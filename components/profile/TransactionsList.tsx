@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { UserTransaction, MarketAction } from '@/hooks/use-user-transactions'
 import { formatUnits } from 'viem'
-import { TrendingUp, TrendingDown, ArrowRight, Award } from 'lucide-react'
+import { TrendingUp, TrendingDown, ArrowRight, Award, ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface MarketInfo {
   id: number
@@ -25,6 +25,15 @@ export function TransactionsList({
 }: TransactionsListProps) {
   const [marketNames, setMarketNames] = useState<Map<string, string>>(new Map())
   const [isLoadingMarkets, setIsLoadingMarkets] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
+
+  // Calculate pagination
+  const totalPages = Math.ceil(transactions.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const currentTransactions = transactions.slice(startIndex, endIndex)
+  const showPagination = transactions.length > itemsPerPage
 
   useEffect(() => {
     if (transactions.length === 0) return
@@ -137,7 +146,7 @@ export function TransactionsList({
           </tr>
         </thead>
         <tbody>
-          {transactions.map((tx, index) => {
+          {currentTransactions.map((tx, index) => {
             const sideInfo = getSideInfo(tx.action)
             const SideIcon = sideInfo.icon
             const cost = Number(formatUnits(tx.value, tokenDecimals))
@@ -196,6 +205,33 @@ export function TransactionsList({
           })}
         </tbody>
       </table>
+
+      {showPagination && (
+        <div className="flex items-center justify-between mt-6 pt-4 border-t border-border">
+          <p className="text-sm text-muted-foreground">
+            Mostrando {startIndex + 1} - {Math.min(endIndex, transactions.length)} de {transactions.length} transacciones
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="p-2 rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <span className="text-sm font-medium px-3">
+              Página {currentPage} de {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="p-2 rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

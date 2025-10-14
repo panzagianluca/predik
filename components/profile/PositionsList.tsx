@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { formatUnits } from 'viem'
-import { TrendingUp, TrendingDown } from 'lucide-react'
+import { TrendingUp, TrendingDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { OpenPosition } from '@/hooks/use-user-transactions'
 
 interface MarketInfo {
@@ -134,6 +134,15 @@ export function PositionsList({
 }: PositionsListProps) {
   const [marketData, setMarketData] = useState<Map<string, MarketInfo>>(new Map())
   const [isLoadingMarkets, setIsLoadingMarkets] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
+
+  // Calculate pagination
+  const totalPages = Math.ceil(positions.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const currentPositions = positions.slice(startIndex, endIndex)
+  const showPagination = positions.length > itemsPerPage
 
   useEffect(() => {
     if (positions.length === 0) return
@@ -204,7 +213,7 @@ export function PositionsList({
           </tr>
         </thead>
         <tbody>
-          {positions.map((position, index) => (
+          {currentPositions.map((position, index) => (
             <PositionRow
               key={`${position.marketId}-${position.outcomeId}-${index}`}
               position={position}
@@ -216,6 +225,33 @@ export function PositionsList({
           ))}
         </tbody>
       </table>
+
+      {showPagination && (
+        <div className="flex items-center justify-between mt-6 pt-4 border-t border-border">
+          <p className="text-sm text-muted-foreground">
+            Mostrando {startIndex + 1} - {Math.min(endIndex, positions.length)} de {positions.length} posiciones
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="p-2 rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <span className="text-sm font-medium px-3">
+              Página {currentPage} de {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="p-2 rounded-lg hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
