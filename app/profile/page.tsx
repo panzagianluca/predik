@@ -44,6 +44,7 @@ export default function ProfilePage() {
   const [isEditingProfile, setIsEditingProfile] = useState(false)
   const [currentAvatar, setCurrentAvatar] = useState<string>('/profiles/profile1.png') // Default fallback
   const [username, setUsername] = useState<string>('')
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true)
 
   useEffect(() => {
     if (!isConnected) {
@@ -65,9 +66,10 @@ export default function ProfilePage() {
     }
   }, [address])
 
-  const loadUserProfile = async () => {
+    const loadUserProfile = async () => {
     if (!address) return
 
+    setIsLoadingProfile(true)
     try {
       // Add cache-busting timestamp to force fresh data
       const timestamp = Date.now()
@@ -79,13 +81,11 @@ export default function ProfilePage() {
         const userData = await response.json()
         setCurrentAvatar(userData.customAvatar || getProfilePicture(address))
         setUsername(userData.username || '')
-      } else {
-        // User doesn't exist yet, use default avatar
-        setCurrentAvatar(getProfilePicture(address))
       }
     } catch (error) {
-      console.error('Error loading profile:', error)
-      setCurrentAvatar(getProfilePicture(address))
+      console.error('Failed to load user profile:', error)
+    } finally {
+      setIsLoadingProfile(false)
     }
   }
 
@@ -138,7 +138,7 @@ export default function ProfilePage() {
     return null
   }
 
-  const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`
+  const shortAddress = `${address.slice(0, 6)}...${address.slice(-6)}`
   const joinedDate = 'Octubre 2025' // Placeholder - will be dynamic later
   const activeDays = 15 // Placeholder - will be calculated from join date
 
@@ -166,38 +166,51 @@ export default function ProfilePage() {
                 </button>
                 
                 <div className="flex items-center gap-4">
-                  <Image
-                    src={currentAvatar || getProfilePicture(address)}
-                    alt="Profile"
-                    width={72}
-                    height={72}
-                    className="rounded-xl object-cover w-[72px] h-[72px]"
-                  />
+                  {isLoadingProfile ? (
+                    <div className="w-[72px] h-[72px] rounded-xl bg-muted animate-pulse" />
+                  ) : (
+                    <Image
+                      src={currentAvatar || getProfilePicture(address)}
+                      alt="Profile"
+                      width={72}
+                      height={72}
+                      className="rounded-xl object-cover w-[72px] h-[72px]"
+                    />
+                  )}
                   <div className="flex-1">
-                    <h2 className="font-bold text-lg">{username || shortAddress}</h2>
-                    <div className="flex items-center gap-2 mt-1">
-                      <div className="relative w-4 h-4 p-1 rounded bg-white dark:bg-black flex items-center justify-center flex-shrink-0">
-                        <Image
-                          src="/Celo_Symbol_RGB_ProsperityYellow.png"
-                          alt="Celo"
-                          fill
-                          sizes="16px"
-                          className="object-contain p-[2px]"
-                        />
-                      </div>
-                      <code className="text-xs text-muted-foreground font-mono truncate max-w-[120px]">{address}</code>
-                      <button
-                        onClick={handleCopyAddress}
-                        className="p-1 hover:bg-muted rounded transition-colors flex-shrink-0"
-                        title={copied ? 'Copied!' : 'Copy address'}
-                      >
-                        {copied ? (
-                          <Check className="h-3 w-3 text-green-500" />
-                        ) : (
-                          <Copy className="h-3 w-3" />
-                        )}
-                      </button>
-                    </div>
+                    {isLoadingProfile ? (
+                      <>
+                        <div className="h-7 w-32 bg-muted animate-pulse rounded mb-2" />
+                        <div className="h-4 w-40 bg-muted animate-pulse rounded" />
+                      </>
+                    ) : (
+                      <>
+                        <h2 className="font-bold text-lg">{username || shortAddress}</h2>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="relative w-4 h-4 p-1 rounded bg-[#FCFF52] flex items-center justify-center flex-shrink-0">
+                            <Image
+                              src="/celo.png"
+                              alt="Celo"
+                              fill
+                              sizes="16px"
+                              className="object-contain p-[2px]"
+                            />
+                          </div>
+                          <code className="text-xs text-muted-foreground font-mono truncate max-w-[120px]">{address}</code>
+                          <button
+                            onClick={handleCopyAddress}
+                            className="p-1 hover:bg-muted rounded transition-colors flex-shrink-0"
+                            title={copied ? 'Copied!' : 'Copy address'}
+                          >
+                            {copied ? (
+                              <Check className="h-3 w-3 text-green-500" />
+                            ) : (
+                              <Copy className="h-3 w-3" />
+                            )}
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -208,38 +221,49 @@ export default function ProfilePage() {
               <div className="grid grid-cols-2 gap-3 mb-4">
                 <div>
                   <label className="text-xs text-muted-foreground">Balance Actual</label>
-                  <div className="flex items-baseline gap-1 mt-1">
-                    <span className="text-xl font-bold">
-                      ${isLoadingBalance ? '...' : parseFloat(usdtBalance).toFixed(2)}
-                    </span>
-                    <span className="text-xs text-muted-foreground">USDT</span>
-                  </div>
+                  {isLoadingBalance ? (
+                    <div className="h-8 w-24 bg-muted animate-pulse rounded mt-1" />
+                  ) : (
+                    <div className="flex items-baseline gap-1 mt-1">
+                      <span className="text-xl font-bold">
+                        ${parseFloat(usdtBalance).toFixed(2)}
+                      </span>
+                      <span className="text-xs text-muted-foreground">USDT</span>
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label className="text-xs text-muted-foreground">Volumen Total</label>
-                  <p className="text-xl font-bold mt-1">
-                    {isLoadingTransactions 
-                      ? '...' 
-                      : `$${(Number(formatUnits(stats.totalInvested + stats.totalWithdrawn, 6))).toFixed(2)}`
-                    }
-                  </p>
+                  {isLoadingTransactions ? (
+                    <div className="h-8 w-20 bg-muted animate-pulse rounded mt-1" />
+                  ) : (
+                    <p className="text-xl font-bold mt-1">
+                      ${(Number(formatUnits(stats.totalInvested + stats.totalWithdrawn, 6))).toFixed(2)}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="text-xs text-muted-foreground">Última Operación</label>
-                  <p className="text-sm mt-1">
-                    {isLoadingTransactions 
-                      ? '...' 
-                      : transactions.length > 0 
+                  {isLoadingTransactions ? (
+                    <div className="h-5 w-16 bg-muted animate-pulse rounded mt-1" />
+                  ) : (
+                    <p className="text-sm mt-1">
+                      {transactions.length > 0 
                         ? new Date(transactions[0].timestamp * 1000).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })
                         : 'Sin operaciones'
-                    }
-                  </p>
+                      }
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="text-xs text-muted-foreground">Mercados Operados</label>
-                  <p className="text-xl font-bold mt-1">
-                    {isLoadingTransactions ? '...' : stats.marketsTraded.size}
-                  </p>
+                  {isLoadingTransactions ? (
+                    <div className="h-8 w-12 bg-muted animate-pulse rounded mt-1" />
+                  ) : (
+                    <p className="text-xl font-bold mt-1">
+                      {stats.marketsTraded.size}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -271,27 +295,33 @@ export default function ProfilePage() {
                       <div className="grid grid-cols-3 gap-4">
                         <div className="bg-muted p-4 rounded-lg">
                           <p className="text-sm text-muted-foreground">Total Invertido</p>
-                          <p className="text-2xl font-bold mt-1">
-                            {isLoadingTransactions 
-                              ? '...' 
-                              : `$${Number(formatUnits(stats.totalInvested, 6)).toFixed(2)}`
-                            }
-                          </p>
+                          {isLoadingTransactions ? (
+                            <div className="h-8 w-20 bg-background animate-pulse rounded mt-1" />
+                          ) : (
+                            <p className="text-2xl font-bold mt-1">
+                              ${Number(formatUnits(stats.totalInvested, 6)).toFixed(2)}
+                            </p>
+                          )}
                         </div>
                         <div className="bg-muted p-4 rounded-lg">
                           <p className="text-sm text-muted-foreground">Ganancia/Pérdida</p>
-                          <p className={`text-2xl font-bold mt-1 ${stats.netPosition >= BigInt(0) ? 'text-green-500' : 'text-red-500'}`}>
-                            {isLoadingTransactions 
-                              ? '...' 
-                              : `${stats.netPosition >= BigInt(0) ? '+' : ''}$${Number(formatUnits(stats.netPosition, 6)).toFixed(2)}`
-                            }
-                          </p>
+                          {isLoadingTransactions ? (
+                            <div className="h-8 w-20 bg-background animate-pulse rounded mt-1" />
+                          ) : (
+                            <p className={`text-2xl font-bold mt-1 ${stats.netPosition >= BigInt(0) ? 'text-green-500' : 'text-red-500'}`}>
+                              ${stats.netPosition >= BigInt(0) ? '+' : ''}${Number(formatUnits(stats.netPosition, 6)).toFixed(2)}
+                            </p>
+                          )}
                         </div>
                         <div className="bg-muted p-4 rounded-lg">
                           <p className="text-sm text-muted-foreground">Transacciones</p>
-                          <p className="text-2xl font-bold mt-1">
-                            {isLoadingTransactions ? '...' : stats.transactionCount}
-                          </p>
+                          {isLoadingTransactions ? (
+                            <div className="h-8 w-12 bg-background animate-pulse rounded mt-1" />
+                          ) : (
+                            <p className="text-2xl font-bold mt-1">
+                              {stats.transactionCount}
+                            </p>
+                          )}
                         </div>
                       </div>
                       

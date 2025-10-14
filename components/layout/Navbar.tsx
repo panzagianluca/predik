@@ -32,6 +32,7 @@ export function Navbar() {
   const [triggerConfetti, setTriggerConfetti] = useState(false)
   const [showDepositModal, setShowDepositModal] = useState(false)
   const [userAvatar, setUserAvatar] = useState<string>('')
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false)
   const openConnectModalRef = useRef<(() => void) | null>(null)
   const { disconnect } = useDisconnect()
   const { formatted: usdtBalance, isLoading: isLoadingBalance } = useUSDTBalance()
@@ -47,9 +48,11 @@ export function Navbar() {
     const loadUserAvatar = async () => {
       if (!address) {
         setUserAvatar('')
+        setIsLoadingProfile(false)
         return
       }
 
+      setIsLoadingProfile(true)
       try {
         // Add cache-busting timestamp to force fresh data
         const timestamp = Date.now()
@@ -64,6 +67,8 @@ export function Navbar() {
         }
       } catch (error) {
         setUserAvatar(getProfilePicture(address))
+      } finally {
+        setIsLoadingProfile(false)
       }
     }
 
@@ -570,9 +575,13 @@ export function Navbar() {
                         {/* USDT Balance */}
                         <div className="flex flex-col items-center justify-center h-9 px-4">
                           <span className="text-[12px] leading-tight">Balance</span>
-                          <span className="text-[16px] font-bold leading-tight">
-                            ${isLoadingBalance ? '...' : parseFloat(usdtBalance).toFixed(2)}
-                          </span>
+                          {isLoadingBalance ? (
+                            <div className="h-5 w-16 bg-muted animate-pulse rounded mt-0.5" />
+                          ) : (
+                            <span className="text-[16px] font-bold leading-tight">
+                              ${parseFloat(usdtBalance).toFixed(2)}
+                            </span>
+                          )}
                         </div>
 
                         {/* Depositar Button */}
@@ -607,13 +616,17 @@ export function Navbar() {
                           <DropdownMenuTrigger asChild>
                             <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                               <div className="relative h-9 w-9 rounded-xl overflow-hidden">
-                                <Image
-                                  src={userAvatar || getProfilePicture(account.address)}
-                                  alt="Profile"
-                                  fill
-                                  sizes="36px"
-                                  className="object-cover"
-                                />
+                                {isLoadingProfile ? (
+                                  <div className="h-9 w-9 bg-muted animate-pulse rounded-xl" />
+                                ) : (
+                                  <Image
+                                    src={userAvatar || getProfilePicture(account.address)}
+                                    alt="Profile"
+                                    fill
+                                    sizes="36px"
+                                    className="object-cover"
+                                  />
+                                )}
                               </div>
                               <ChevronDown className="h-4 w-4 text-foreground/70" />
                             </button>
@@ -625,16 +638,16 @@ export function Navbar() {
                           >
                             {/* Wallet Address */}
                             <div className="px-2 py-2 text-sm font-satoshi text-muted-foreground flex items-center gap-2">
-                              <div className="relative w-3 h-3 p-1 rounded bg-white dark:bg-black flex items-center justify-center">
+                              <div className="relative w-3 h-3 p-1 rounded bg-[#FCFF52] flex items-center justify-center">
                                 <Image 
-                                  src="/Celo_Symbol_RGB_ProsperityYellow.png" 
+                                  src="/celo.png" 
                                   alt="Celo" 
                                   fill 
                                   sizes="12px" 
                                   className="object-contain p-[2px]" 
                                 />
                               </div>
-                              {account.displayName}
+                              {`${account.address.slice(0, 6)}...${account.address.slice(-6)}`}
                             </div>
                             
                             <DropdownMenuSeparator />
