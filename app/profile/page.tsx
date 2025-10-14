@@ -278,7 +278,7 @@ export default function ProfilePage() {
             </Card>
 
             {/* Right Column - Activity */}
-            <Card className="p-8">
+            <Card className="p-6">
               <Tabs defaultValue="resumen" className="w-full">
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="resumen">Resumen</TabsTrigger>
