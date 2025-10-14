@@ -577,7 +577,8 @@ export function Navbar() {
                             transition={{ duration: 0.2, ease: "easeInOut" }}
                           >
                             {/* Wallet Address */}
-                            <div className="px-2 py-2 text-sm font-satoshi text-muted-foreground">
+                            <div className="px-2 py-2 text-sm font-satoshi text-muted-foreground flex items-center gap-2">
+                              <img src="/celo.png" alt="Celo" className="w-3 h-3" />
                               {account.displayName}
                             </div>
                             

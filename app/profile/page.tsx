@@ -4,21 +4,22 @@ import { useAccount } from 'wagmi'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { getProfilePicture, getAllProfilePictures } from '@/lib/profileUtils'
+import { getProfilePicture } from '@/lib/profileUtils'
 import { useUSDTBalance } from '@/hooks/use-usdt-balance'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Copy, Check, SquarePen } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import EditProfileModal from '@/components/profile/EditProfileModal'
 
 export default function ProfilePage() {
   const { address, isConnected } = useAccount()
   const router = useRouter()
   const { formatted: usdtBalance, isLoading: isLoadingBalance } = useUSDTBalance()
   const [copied, setCopied] = useState(false)
-  const [isEditingAvatar, setIsEditingAvatar] = useState(false)
-  const [selectedAvatar, setSelectedAvatar] = useState<string>('')
+  const [isEditingProfile, setIsEditingProfile] = useState(false)
   const [currentAvatar, setCurrentAvatar] = useState<string>('')
+  const [username, setUsername] = useState<string>('')
 
   useEffect(() => {
     if (!isConnected) {
@@ -28,11 +29,29 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (address) {
-      const avatar = getProfilePicture(address)
-      setCurrentAvatar(avatar)
-      setSelectedAvatar(avatar)
+      loadUserProfile()
     }
   }, [address])
+
+  const loadUserProfile = async () => {
+    if (!address) return
+
+    try {
+      const response = await fetch(`/api/profile/update?walletAddress=${address}`)
+      
+      if (response.ok) {
+        const userData = await response.json()
+        setCurrentAvatar(userData.customAvatar || getProfilePicture(address))
+        setUsername(userData.username || '')
+      } else {
+        // User doesn't exist yet, use default avatar
+        setCurrentAvatar(getProfilePicture(address))
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error)
+      setCurrentAvatar(getProfilePicture(address))
+    }
+  }
 
   const handleCopyAddress = () => {
     if (address) {
@@ -42,15 +61,35 @@ export default function ProfilePage() {
     }
   }
 
-  const handleSaveAvatar = () => {
-    if (address && selectedAvatar) {
-      const profiles = JSON.parse(localStorage.getItem('predik_user_profiles') || '{}')
-      profiles[address.toLowerCase()] = selectedAvatar
-      localStorage.setItem('predik_user_profiles', JSON.stringify(profiles))
-      setCurrentAvatar(selectedAvatar)
-      setIsEditingAvatar(false)
-      // Force page reload to update navbar avatar
+  const handleSaveProfile = async (data: {
+    avatar?: string
+    username?: string
+  }) => {
+    if (!address) return
+
+    try {
+      // Call API to update profile
+      const response = await fetch('/api/profile/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ walletAddress: address, ...data }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to update profile')
+      }
+
+      const updatedProfile = await response.json()
+
+      // Update local state
+      if (data.avatar) setCurrentAvatar(data.avatar)
+      if (data.username) setUsername(data.username)
+
+      // Reload page to update navbar
       window.location.reload()
+    } catch (error) {
+      console.error('Error updating profile:', error)
+      throw error
     }
   }
 
@@ -58,7 +97,6 @@ export default function ProfilePage() {
     return null
   }
 
-  const allAvatars = getAllProfilePictures()
   const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`
   const joinedDate = 'Octubre 2025' // Placeholder - will be dynamic later
   const activeDays = 15 // Placeholder - will be calculated from join date
@@ -79,9 +117,9 @@ export default function ProfilePage() {
               {/* Profile Image & Username */}
               <div className="relative mb-6">
                 <button
-                  onClick={() => setIsEditingAvatar(!isEditingAvatar)}
+                  onClick={() => setIsEditingProfile(true)}
                   className="absolute top-0 right-0 bg-muted text-foreground p-2 rounded-lg hover:bg-electric-purple hover:text-white transition-all z-10"
-                  title="Change avatar"
+                  title="Editar perfil"
                 >
                   <SquarePen className="h-4 w-4" />
                 </button>
@@ -95,8 +133,15 @@ export default function ProfilePage() {
                     className="rounded-xl"
                   />
                   <div className="flex-1">
-                    <h2 className="font-bold text-lg">{shortAddress}</h2>
+                    <h2 className="font-bold text-lg">{username || shortAddress}</h2>
                     <div className="flex items-center gap-2 mt-1">
+                      <Image
+                        src="/celo.png"
+                        alt="Celo"
+                        width={12}
+                        height={12}
+                        className="flex-shrink-0"
+                      />
                       <code className="text-xs text-muted-foreground font-mono truncate max-w-[120px]">{address}</code>
                       <button
                         onClick={handleCopyAddress}
@@ -111,18 +156,6 @@ export default function ProfilePage() {
                       </button>
                     </div>
                   </div>
-                </div>
-              </div>
-
-              {/* Contact Info */}
-              <div className="grid grid-cols-2 gap-3 mb-4">
-                <div>
-                  <label className="text-xs text-muted-foreground">Twitter</label>
-                  <p className="text-sm text-muted-foreground">No conectado</p>
-                </div>
-                <div>
-                  <label className="text-xs text-muted-foreground">Email</label>
-                  <p className="text-sm text-muted-foreground">No provisto</p>
                 </div>
               </div>
 
@@ -173,59 +206,15 @@ export default function ProfilePage() {
             </Card>
           </div>
 
-          {/* Avatar Selector - Full Width Below Grid */}
-          <AnimatePresence>
-            {isEditingAvatar && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <Card className="p-6">
-                  <h2 className="text-xl font-bold mb-4">Elegí tu avatar</h2>
-                  <div className="grid grid-cols-5 md:grid-cols-10 gap-4 mb-6">
-                    {allAvatars.map((avatar) => (
-                      <button
-                        key={avatar}
-                        onClick={() => setSelectedAvatar(avatar)}
-                        className={`relative rounded-xl overflow-hidden transition-all hover:scale-110 ${
-                          selectedAvatar === avatar
-                            ? 'ring-4 ring-electric-purple scale-110'
-                            : 'opacity-60 hover:opacity-100'
-                        }`}
-                      >
-                        <Image
-                          src={avatar}
-                          alt="Avatar option"
-                          width={80}
-                          height={80}
-                          className="w-full h-full"
-                        />
-                      </button>
-                    ))}
-                  </div>
-                  <div className="flex gap-3">
-                    <Button
-                      onClick={handleSaveAvatar}
-                      className="bg-electric-purple hover:bg-electric-purple/90"
-                    >
-                      Guardar
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        setIsEditingAvatar(false)
-                        setSelectedAvatar(currentAvatar)
-                      }}
-                      variant="outline"
-                    >
-                      Cancelar
-                    </Button>
-                  </div>
-                </Card>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Edit Profile Modal */}
+          <EditProfileModal
+            isOpen={isEditingProfile}
+            onClose={() => setIsEditingProfile(false)}
+            currentAvatar={currentAvatar}
+            currentUsername={username}
+            walletAddress={address}
+            onSave={handleSaveProfile}
+          />
         </motion.div>
       </div>
     </div>
