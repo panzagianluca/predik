@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogPortal, DialogOverlay } from '@/components/animate-ui/primitives/radix/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from '@/components/animate-ui/components/radix/tabs'
 import Image from 'next/image'
 import { Upload, Loader2, Check, X } from 'lucide-react'
 
@@ -33,13 +34,42 @@ export default function EditProfileModal({
   // Avatar state
   const [customAvatarFile, setCustomAvatarFile] = useState<File | null>(null)
   const [customAvatarPreview, setCustomAvatarPreview] = useState<string | null>(null)
+  const [avatarUrl, setAvatarUrl] = useState<string>('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Form state
-  const [username, setUsername] = useState(currentUsername || '')
+  const [username, setUsername] = useState('')
+
+  // Track if form has changes
+  const [hasChanges, setHasChanges] = useState(false)
+
+  // Initialize username when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setUsername(currentUsername || '')
+    }
+  }, [isOpen, currentUsername])
+
+  // Check if form has changes
+  useEffect(() => {
+    const avatarChanged = customAvatarFile !== null || avatarUrl.trim() !== ''
+    const usernameChanged = username !== (currentUsername || '')
+    setHasChanges(avatarChanged || usernameChanged)
+  }, [customAvatarFile, avatarUrl, username, currentUsername])
 
   // Validation
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  // Validate URL helper
+  const isValidUrl = (url: string): boolean => {
+    if (!url.trim()) return false
+    try {
+      new URL(url)
+      return true
+    } catch {
+      return false
+    }
+  }
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -52,9 +82,9 @@ export default function EditProfileModal({
       return
     }
 
-    // Validate file size (max 1MB)
-    if (file.size > 1024 * 1024) {
-      setErrors({ ...errors, avatar: 'La imagen debe ser menor a 1MB' })
+    // Validate file size (max 512KB)
+    if (file.size > 512 * 1024) {
+      setErrors({ ...errors, avatar: 'La imagen debe ser menor a 512KB' })
       return
     }
 
@@ -78,6 +108,14 @@ export default function EditProfileModal({
       newErrors.username = 'Solo letras, números, guiones y guiones bajos'
     }
 
+    if (avatarUrl && avatarUrl.trim()) {
+      try {
+        new URL(avatarUrl)
+      } catch {
+        newErrors.avatarUrl = 'URL inválida'
+      }
+    }
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -90,7 +128,10 @@ export default function EditProfileModal({
       const data: any = {}
 
       // Handle avatar update
-      if (customAvatarFile) {
+      if (avatarUrl && isValidUrl(avatarUrl)) {
+        // Use URL directly - no upload needed
+        data.avatar = avatarUrl
+      } else if (customAvatarFile) {
         // Upload to Vercel Blob
         const formData = new FormData()
         formData.append('file', customAvatarFile)
@@ -125,6 +166,7 @@ export default function EditProfileModal({
     if (!isSaving) {
       setCustomAvatarFile(null)
       setCustomAvatarPreview(null)
+      setAvatarUrl('')
       setUsername(currentUsername || '')
       setErrors({})
       onClose()
@@ -145,19 +187,20 @@ export default function EditProfileModal({
               {/* Avatar Upload Section */}
               <div className="flex items-center gap-6">
                 <div className="flex-shrink-0">
-                  {customAvatarPreview ? (
+                  {customAvatarPreview || (avatarUrl && isValidUrl(avatarUrl)) ? (
                     <div className="relative w-24 h-24">
                       <Image
-                        src={customAvatarPreview}
+                        src={customAvatarPreview || avatarUrl}
                         alt="Preview"
                         width={96}
                         height={96}
-                        className="rounded-xl object-cover"
+                        className="rounded-xl object-cover w-24 h-24"
                       />
                       <button
                         onClick={() => {
                           setCustomAvatarFile(null)
                           setCustomAvatarPreview(null)
+                          setAvatarUrl('')
                         }}
                         className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
                       >
@@ -170,33 +213,61 @@ export default function EditProfileModal({
                       alt="Current avatar"
                       width={96}
                       height={96}
-                      className="rounded-xl"
+                      className="rounded-xl object-cover w-24 h-24"
                     />
                   )}
                 </div>
                 <div className="flex-1">
-                  <Label>Foto de Perfil</Label>
-                  <Button
-                    variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="w-full mt-2"
-                  >
-                    <Upload className="mr-2 h-4 w-4" />
-                    Subir Imagen
-                  </Button>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/png,image/jpeg,image/jpg"
-                    onChange={handleFileSelect}
-                    className="hidden"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Máximo 1MB. Solo JPG o PNG.
-                  </p>
-                  {errors.avatar && (
-                    <p className="text-sm text-red-500 mt-1">{errors.avatar}</p>
-                  )}
+                  <Label className="mb-3 block">Foto de Perfil</Label>
+                  
+                  <Tabs defaultValue="upload" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="upload">Subir Imagen</TabsTrigger>
+                      <TabsTrigger value="url">Usar URL</TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContents transition={{ duration: 0.2, ease: "easeInOut" }}>
+                      <TabsContent value="upload" className="mt-3 space-y-2 pb-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="w-full"
+                          type="button"
+                        >
+                          <Upload className="mr-2 h-4 w-4" />
+                          Seleccionar Archivo
+                        </Button>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/png,image/jpeg,image/jpg"
+                          onChange={handleFileSelect}
+                          className="hidden"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Máximo 512KB. Solo JPG o PNG.
+                        </p>
+                        {errors.avatar && (
+                          <p className="text-sm text-red-500">{errors.avatar}</p>
+                        )}
+                      </TabsContent>
+                      
+                      <TabsContent value="url" className="mt-3 space-y-2 pb-2">
+                        <Input
+                          value={avatarUrl}
+                          onChange={(e) => setAvatarUrl(e.target.value)}
+                          placeholder="https://ejemplo.com/imagen.jpg"
+                          className="w-full"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Pegá la URL de tu imagen
+                        </p>
+                        {errors.avatarUrl && (
+                          <p className="text-sm text-red-500">{errors.avatarUrl}</p>
+                        )}
+                      </TabsContent>
+                    </TabsContents>
+                  </Tabs>
                 </div>
               </div>
 
@@ -245,8 +316,8 @@ export default function EditProfileModal({
           </Button>
           <Button
             onClick={handleSave}
-            disabled={isSaving}
-            className="bg-electric-purple hover:bg-electric-purple/90"
+            disabled={isSaving || !hasChanges}
+            className="bg-electric-purple hover:bg-electric-purple/90 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSaving ? (
               <>

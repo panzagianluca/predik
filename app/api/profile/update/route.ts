@@ -103,7 +103,12 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    return NextResponse.json(user)
+    return NextResponse.json(user, {
+      headers: {
+        // Cache profile data for 60 seconds
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+      },
+    })
   } catch (error: any) {
     console.error('Error fetching profile:', error)
     return NextResponse.json(

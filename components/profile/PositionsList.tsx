@@ -95,10 +95,10 @@ function PositionRow({
         <span className="text-sm font-semibold">{shares.toFixed(2)}</span>
       </td>
       <td className="py-3 px-4 text-right">
-        <span className="text-sm">{avgPrice.toFixed(4)}</span>
+        <span className="text-sm">{avgPrice.toFixed(2)}</span>
       </td>
       <td className="py-3 px-4 text-right">
-        <span className="text-sm font-medium">{currentPrice.toFixed(4)}</span>
+        <span className="text-sm font-medium">{currentPrice.toFixed(2)}</span>
       </td>
       <td className="py-3 px-4 text-right">
         <span className="text-sm font-semibold">

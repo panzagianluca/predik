@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
+import Link from 'next/link'
 import {
   Dialog,
   DialogContent,
@@ -19,6 +21,11 @@ export function GlobalSearch() {
   const [filteredMarkets, setFilteredMarkets] = useState<Market[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+
+  // Prefetch market page on hover
+  const handleMouseEnter = (slug: string) => {
+    router.prefetch(`/markets/${slug}`)
+  }
 
   // Fetch markets on dialog open
   useEffect(() => {
@@ -127,15 +134,21 @@ export function GlobalSearch() {
                 <button
                   key={market.id}
                   onClick={() => handleSelectMarket(market)}
+                  onMouseEnter={() => handleMouseEnter(market.slug)}
                   className="w-full flex items-start gap-3 p-3 rounded-lg transition-colors duration-200 text-left hover:bg-electric-purple/20 dark:hover:bg-electric-purple/40"
                 >
                   {/* Market Image */}
                   {market.image_url && (
-                    <img
-                      src={market.image_url}
-                      alt={market.title}
-                      className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
-                    />
+                    <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                      <Image
+                        src={market.image_url}
+                        alt={market.title}
+                        fill
+                        sizes="48px"
+                        className="object-cover"
+                        loading="lazy"
+                      />
+                    </div>
                   )}
 
                   {/* Market Info */}

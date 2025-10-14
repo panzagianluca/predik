@@ -17,7 +17,7 @@ export async function fetchMarkets(params: FetchMarketsParams = {}) {
   console.log('🔍 Fetching markets:', url, 'params:', params)
 
   const response = await fetch(url, {
-    cache: 'no-store', // Don't cache on client side either
+    next: { revalidate: 30 }, // Cache for 30 seconds
   })
   
   if (!response.ok) {
@@ -31,7 +31,9 @@ export async function fetchMarkets(params: FetchMarketsParams = {}) {
 }
 
 export async function fetchMarket(slug: string) {
-  const response = await fetch(`/api/markets/${slug}`)
+  const response = await fetch(`/api/markets/${slug}`, {
+    next: { revalidate: 30 }, // Cache for 30 seconds
+  })
   
   if (!response.ok) {
     const error = await response.json()

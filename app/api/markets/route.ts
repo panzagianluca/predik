@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
       headers: {
         'Content-Type': 'application/json',
       },
-      cache: 'no-store', // ALWAYS fetch fresh data, no caching
+      next: { revalidate: 30 }, // Cache for 30 seconds, then revalidate
     })
 
     console.log('📡 Myriad API request:', `${MYRIAD_API_URL}/markets?${params}`)
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(data, {
       headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate',
+        'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
       },
     })
   } catch (error) {

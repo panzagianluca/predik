@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useTheme } from 'next-themes'
 import { useEffect, useState, useRef } from 'react'
+import dynamic from 'next/dynamic'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { Button } from '@/components/ui/button'
 import { GlobalSearch } from '@/components/layout/GlobalSearch'
@@ -14,8 +15,13 @@ import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/
 import { Confetti } from '@/components/ui/confetti'
 import { useUSDTBalance } from '@/hooks/use-usdt-balance'
 import { getProfilePicture } from '@/lib/profileUtils'
-import { useDisconnect } from 'wagmi'
-import { DepositModal } from '@/components/wallet/DepositModal'
+import { useDisconnect, useAccount } from 'wagmi'
+
+// Lazy load DepositModal - only loads when needed
+const DepositModal = dynamic(() => import('@/components/wallet/DepositModal').then(mod => ({ default: mod.DepositModal })), {
+  ssr: false,
+  loading: () => null
+})
 
 export function Navbar() {
   const { theme, resolvedTheme, setTheme } = useTheme()
@@ -25,14 +31,40 @@ export function Navbar() {
   const [selectedOutcome, setSelectedOutcome] = useState<'si' | 'no'>('si')
   const [triggerConfetti, setTriggerConfetti] = useState(false)
   const [showDepositModal, setShowDepositModal] = useState(false)
+  const [userAvatar, setUserAvatar] = useState<string>('')
   const openConnectModalRef = useRef<(() => void) | null>(null)
   const { disconnect } = useDisconnect()
   const { formatted: usdtBalance, isLoading: isLoadingBalance } = useUSDTBalance()
+  const { address } = useAccount()
 
   // Avoid hydration mismatch
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  // Load user avatar from database
+  useEffect(() => {
+    const loadUserAvatar = async () => {
+      if (!address) {
+        setUserAvatar('')
+        return
+      }
+
+      try {
+        const response = await fetch(`/api/profile/update?walletAddress=${address}`)
+        if (response.ok) {
+          const userData = await response.json()
+          setUserAvatar(userData.customAvatar || getProfilePicture(address))
+        } else {
+          setUserAvatar(getProfilePicture(address))
+        }
+      } catch (error) {
+        setUserAvatar(getProfilePicture(address))
+      }
+    }
+
+    loadUserAvatar()
+  }, [address])
 
   // Determine which logo to show
   const logoSrc = mounted && (resolvedTheme === 'dark' || theme === 'dark')
@@ -54,6 +86,7 @@ export function Navbar() {
                 height={20}
                 className="h-5 w-auto transition-opacity duration-300"
                 priority
+                quality={100}
               />
             )}
           </Link>
@@ -115,13 +148,15 @@ export function Navbar() {
                       >
                         {/* Predik Logo as Market Image */}
                         <div className="w-12 h-12 rounded-lg bg-background flex items-center justify-center flex-shrink-0">
-                          <Image
-                            src="/prediklogoonly.svg"
-                            alt="Predik"
-                            width={32}
-                            height={32}
-                            className="w-8 h-8"
-                          />
+                          <div className="relative w-8 h-8">
+                            <Image
+                              src="/prediklogoonly.svg"
+                              alt="Predik"
+                              fill
+                              sizes="32px"
+                              className="object-contain"
+                            />
+                          </div>
                         </div>
 
                         {/* Market Info */}
@@ -167,13 +202,15 @@ export function Navbar() {
                     {/* Market Display - Selected State */}
                     <div className="flex items-start gap-3 p-3 rounded-lg border-2 border-electric-purple bg-electric-purple/5 mb-4">
                       <div className="w-12 h-12 rounded-lg bg-background flex items-center justify-center flex-shrink-0">
-                        <Image
-                          src="/prediklogoonly.svg"
-                          alt="Predik"
-                          width={32}
-                          height={32}
-                          className="w-8 h-8"
-                        />
+                        <div className="relative w-8 h-8">
+                          <Image
+                            src="/prediklogoonly.svg"
+                            alt="Predik"
+                            fill
+                            sizes="32px"
+                            className="object-contain"
+                          />
+                        </div>
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-sm mb-1">Pasará esto?</h4>
@@ -307,13 +344,15 @@ export function Navbar() {
                       {/* Selected Market */}
                       <div className="flex items-start gap-3 p-3 rounded-lg border-2 border-green-500 bg-green-500/10">
                         <div className="w-12 h-12 rounded-lg bg-background flex items-center justify-center flex-shrink-0">
-                          <Image
-                            src="/prediklogoonly.svg"
-                            alt="Predik"
-                            width={32}
-                            height={32}
-                            className="w-8 h-8"
-                          />
+                          <div className="relative w-8 h-8">
+                            <Image
+                              src="/prediklogoonly.svg"
+                              alt="Predik"
+                              fill
+                              sizes="32px"
+                              className="object-contain"
+                            />
+                          </div>
                         </div>
                         <div className="flex-1 min-w-0">
                           <h4 className="font-medium text-sm mb-1">Pasará esto?</h4>
@@ -563,11 +602,15 @@ export function Navbar() {
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                              <img
-                                src={getProfilePicture(account.address)}
-                                alt="Profile"
-                                className="h-9 w-9 rounded-xl object-cover"
-                              />
+                              <div className="relative h-9 w-9 rounded-xl overflow-hidden">
+                                <Image
+                                  src={userAvatar || getProfilePicture(account.address)}
+                                  alt="Profile"
+                                  fill
+                                  sizes="36px"
+                                  className="object-cover"
+                                />
+                              </div>
                               <ChevronDown className="h-4 w-4 text-foreground/70" />
                             </button>
                           </DropdownMenuTrigger>
@@ -578,14 +621,16 @@ export function Navbar() {
                           >
                             {/* Wallet Address */}
                             <div className="px-2 py-2 text-sm font-satoshi text-muted-foreground flex items-center gap-2">
-                              <img src="/celo.png" alt="Celo" className="w-3 h-3" />
+                              <div className="relative w-3 h-3">
+                                <Image src="/celo.png" alt="Celo" fill sizes="12px" className="object-contain" />
+                              </div>
                               {account.displayName}
                             </div>
                             
                             <DropdownMenuSeparator />
                             
                             {/* Profile */}
-                            <Link href="/profile">
+                            <Link href="/profile" prefetch={true}>
                               <DropdownMenuItem className="justify-start">
                                 <User className="mr-2 h-4 w-4" />
                                 <span>Profile</span>
@@ -615,7 +660,7 @@ export function Navbar() {
                             <DropdownMenuSeparator />
                             
                             {/* Términos */}
-                            <Link href="/terminos">
+                            <Link href="/terminos" prefetch={true}>
                               <DropdownMenuItem className="justify-start">
                                 <FileText className="mr-2 h-4 w-4" />
                                 <span>Términos</span>
@@ -623,7 +668,7 @@ export function Navbar() {
                             </Link>
                             
                             {/* Privacidad */}
-                            <Link href="/privacidad">
+                            <Link href="/privacidad" prefetch={true}>
                               <DropdownMenuItem className="justify-start">
                                 <Shield className="mr-2 h-4 w-4" />
                                 <span>Privacidad</span>

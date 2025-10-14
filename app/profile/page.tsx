@@ -3,6 +3,7 @@
 import { useAccount } from 'wagmi'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { getProfilePicture } from '@/lib/profileUtils'
 import { useUSDTBalance } from '@/hooks/use-usdt-balance'
@@ -10,12 +11,29 @@ import { useUserTransactions } from '@/hooks/use-user-transactions'
 import { Card } from '@/components/ui/card'
 import { Copy, Check, SquarePen } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import EditProfileModal from '@/components/profile/EditProfileModal'
-import { WinningsChart } from '@/components/profile/WinningsChart'
-import { TransactionsList } from '@/components/profile/TransactionsList'
-import { PositionsList } from '@/components/profile/PositionsList'
 import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from '@/components/animate-ui/components/radix/tabs'
 import { formatUnits } from 'viem'
+
+// Lazy load heavy components - only load when needed
+const EditProfileModal = dynamic(() => import('@/components/profile/EditProfileModal'), {
+  ssr: false,
+  loading: () => null
+})
+
+const WinningsChart = dynamic(() => import('@/components/profile/WinningsChart').then(mod => ({ default: mod.WinningsChart })), {
+  ssr: false,
+  loading: () => <div className="h-[300px] animate-pulse bg-muted rounded-lg" />
+})
+
+const TransactionsList = dynamic(() => import('@/components/profile/TransactionsList').then(mod => ({ default: mod.TransactionsList })), {
+  ssr: false,
+  loading: () => <div className="space-y-2">{[...Array(3)].map((_, i) => <div key={i} className="h-16 animate-pulse bg-muted rounded-lg" />)}</div>
+})
+
+const PositionsList = dynamic(() => import('@/components/profile/PositionsList').then(mod => ({ default: mod.PositionsList })), {
+  ssr: false,
+  loading: () => <div className="space-y-2">{[...Array(3)].map((_, i) => <div key={i} className="h-24 animate-pulse bg-muted rounded-lg" />)}</div>
+})
 
 export default function ProfilePage() {
   const { address, isConnected } = useAccount()
@@ -24,14 +42,22 @@ export default function ProfilePage() {
   const { transactions, positions, stats, isLoading: isLoadingTransactions } = useUserTransactions(address)
   const [copied, setCopied] = useState(false)
   const [isEditingProfile, setIsEditingProfile] = useState(false)
-  const [currentAvatar, setCurrentAvatar] = useState<string>('')
+  const [currentAvatar, setCurrentAvatar] = useState<string>('/profiles/profile1.png') // Default fallback
   const [username, setUsername] = useState<string>('')
 
   useEffect(() => {
     if (!isConnected) {
       router.push('/')
+      return
     }
-  }, [isConnected, router])
+
+    // Set default avatar based on address
+    if (address && !currentAvatar.startsWith('/profiles/profile')) {
+      setCurrentAvatar(getProfilePicture(address))
+    }
+
+    loadUserProfile()
+  }, [isConnected, router, address])
 
   useEffect(() => {
     if (address) {
@@ -132,17 +158,17 @@ export default function ProfilePage() {
                 
                 <div className="flex items-center gap-4">
                   <Image
-                    src={currentAvatar}
+                    src={currentAvatar || getProfilePicture(address)}
                     alt="Profile"
                     width={72}
                     height={72}
-                    className="rounded-xl"
+                    className="rounded-xl object-cover w-[72px] h-[72px]"
                   />
                   <div className="flex-1">
                     <h2 className="font-bold text-lg">{username || shortAddress}</h2>
                     <div className="flex items-center gap-2 mt-1">
                       <Image
-                        src="/celo.png"
+                        src="/Celo_Symbol_RGB_ProsperityYellow.png"
                         alt="Celo"
                         width={12}
                         height={12}

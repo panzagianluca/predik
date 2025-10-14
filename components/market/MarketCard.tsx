@@ -7,6 +7,7 @@ import { Calendar, Users, TrendingUp } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 
 interface MarketCardProps {
   market: Market
@@ -81,15 +82,20 @@ export function MarketCard({ market }: MarketCardProps) {
         <div className="flex items-start gap-3">
           {/* Market Image */}
           {market.image_url && (
-            <img
-              src={market.image_url}
-              alt={market.title}
-              className="w-12 h-12 rounded-xl object-cover flex-shrink-0"
-            />
+            <div className="relative w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
+              <Image
+                src={market.image_url}
+                alt={market.title}
+                fill
+                sizes="48px"
+                className="object-cover"
+                loading="lazy"
+              />
+            </div>
           )}
           
           {/* Market Title - Clickable */}
-          <Link href={`/markets/${market.slug}`} className="flex-1 min-w-0">
+          <Link href={`/markets/${market.slug}`} className="flex-1 min-w-0" prefetch={true}>
             <h3 className="text-base font-semibold leading-tight line-clamp-2 hover:text-primary transition-colors duration-200">
               {market.title}
             </h3>
@@ -108,6 +114,7 @@ export function MarketCard({ market }: MarketCardProps) {
               key={outcome.id} 
               href={`/markets/${market.slug}?outcome=${outcome.id}`}
               className="block group"
+              prefetch={true}
             >
               <div className="space-y-1 hover:opacity-80 transition-opacity duration-200">
                 <div className="flex items-center justify-between text-sm">

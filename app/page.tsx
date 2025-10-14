@@ -1,110 +1,38 @@
-'use client'
-
-import { useState, useEffect } from 'react'
-import { MarketCard } from '@/components/market/MarketCard'
-import { fetchMarkets } from '@/lib/myriad/api'
-import { Market } from '@/types/market'
+import { MarketsGrid } from '@/components/market/MarketsGrid'
 import { LogoSpinner } from '@/components/ui/logo-spinner'
-import { TrendingUp, Clock, Calendar, X } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { TooltipProvider } from '@/components/animate-ui/primitives/animate/tooltip'
-import { motion, AnimatePresence } from 'framer-motion'
+import { Suspense } from 'react'
 
-type TimeFilter = 'trending' | 'recent' | 'closing-soon' | 'closed'
-type CategoryFilter = 'all' | 'sports' | 'economy' | 'politics' | 'crypto' | 'culture'
+const MYRIAD_API_URL = process.env.NEXT_PUBLIC_MYRIAD_API_URL || 'https://api-v1.staging.myriadprotocol.com'
 
-export default function Home() {
-  const [markets, setMarkets] = useState<Market[]>([])
-  const [loading, setLoading] = useState(true)
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>('trending')
-  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all')
-
-  useEffect(() => {
-    loadMarkets()
-  }, [])
-
-  const loadMarkets = async () => {
-    setLoading(true)
-    try {
-      const data = await fetchMarkets({
-        token: 'USDT',
-        network_id: '11142220'
-      })
-      setMarkets(data)
-    } catch (err) {
-      console.error('Error loading markets:', err)
-    } finally {
-      setLoading(false)
+async function getMarkets() {
+  try {
+    const params = new URLSearchParams({
+      network_id: '11142220',
+      token: 'USDT',
+    })
+    
+    const response = await fetch(`${MYRIAD_API_URL}/markets?${params}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      next: { revalidate: 30 }, // Cache for 30 seconds
+    })
+    
+    if (!response.ok) {
+      console.error('Failed to fetch markets:', response.statusText)
+      return []
     }
+    
+    const data = await response.json()
+    return data
+  } catch (err) {
+    console.error('Error loading markets:', err)
+    return []
   }
+}
 
-  // Filter markets based on selected filters
-  const filteredMarkets = markets.filter(market => {
-    // Time filter - only filter by state for "closed"
-    if (timeFilter === 'closed' && market.state !== 'closed') return false
-    if (timeFilter !== 'closed' && market.state === 'closed') return false
-    
-    // Category filter
-    if (categoryFilter !== 'all') {
-      const categoryMap: Record<CategoryFilter, string> = {
-        all: '',
-        sports: 'Deportes',
-        economy: 'Economía',
-        politics: 'Política',
-        crypto: 'Crypto',
-        culture: 'Cultura'
-      }
-      if (market.category !== categoryMap[categoryFilter]) return false
-    }
-    
-    return true
-  })
-
-  // Sort markets based on time filter
-  const sortedMarkets = [...filteredMarkets].sort((a, b) => {
-    if (timeFilter === 'trending') {
-      // Trending: Most volume first
-      return b.volume - a.volume
-    }
-    if (timeFilter === 'recent') {
-      // Recientes: Most recently created first
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    }
-    if (timeFilter === 'closing-soon') {
-      // Cierra Pronto: Soonest to expire first (only open markets)
-      if (a.state !== 'open' || b.state !== 'open') return 0
-      if (!a.expires_at || !b.expires_at) return 0
-      return new Date(a.expires_at).getTime() - new Date(b.expires_at).getTime()
-    }
-    if (timeFilter === 'closed') {
-      // Cerrados: Most recently closed first
-      return new Date(b.expires_at).getTime() - new Date(a.expires_at).getTime()
-    }
-    return 0
-  })
-
-  const timeFilters: Array<{
-    id: TimeFilter
-    label: string
-    icon: React.ComponentType<{ className?: string }>
-  }> = [
-    { id: 'trending', label: 'Trending', icon: TrendingUp },
-    { id: 'recent', label: 'Recientes', icon: Clock },
-    { id: 'closing-soon', label: 'Cierra Pronto', icon: Calendar },
-    { id: 'closed', label: 'Cerrados', icon: X },
-  ]
-
-  const categoryFilters: Array<{
-    id: CategoryFilter
-    label: string
-  }> = [
-    { id: 'all', label: 'Todos' },
-    { id: 'sports', label: 'Deportes' },
-    { id: 'economy', label: 'Economía' },
-    { id: 'politics', label: 'Política' },
-    { id: 'crypto', label: 'Crypto' },
-    { id: 'culture', label: 'Cultura' },
-  ]
+export default async function Home() {
+  const markets = await getMarkets()
 
   return (
     <div className="min-h-screen bg-background">
@@ -115,118 +43,13 @@ export default function Home() {
         </h1>
 
         {/* Market Grid Section */}
-        <div className="space-y-4">
-          {/* Filter Banner */}
-          <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg py-3">
-            {/* Left side: Time filters + Category filters */}
-            <div className="flex flex-wrap items-center gap-2">
-              {/* Time Filters - Outlined buttons with icons */}
-              {timeFilters.map((filter) => {
-                const Icon = filter.icon
-                const isActive = timeFilter === filter.id
-                return (
-                  <motion.button
-                    key={filter.id}
-                    onClick={() => setTimeFilter(filter.id)}
-                    className={cn(
-                      'flex items-center gap-2 px-4 h-[36px] rounded-md border-2 transition-all duration-200 text-[14px] relative overflow-hidden',
-                      isActive
-                        ? 'bg-electric-purple text-white border-electric-purple font-semibold'
-                        : 'bg-background border-border hover:border-electric-purple/50 text-foreground font-medium'
-                    )}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    transition={{ duration: 0.2, ease: "easeOut" }}
-                  >
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeTimeFilter"
-                        className="absolute inset-0 bg-electric-purple rounded-md -z-10"
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
-                      />
-                    )}
-                    <Icon className="h-4 w-4 relative z-10" />
-                    <span className="relative z-10">{filter.label}</span>
-                  </motion.button>
-                )
-              })}
-
-              {/* Divider */}
-              <div className="h-8 w-px bg-border mx-2" />
-
-              {/* Category Filters - Ghost buttons */}
-              {categoryFilters.map((filter) => {
-                const isActive = categoryFilter === filter.id
-                return (
-                  <motion.button
-                    key={filter.id}
-                    onClick={() => setCategoryFilter(filter.id)}
-                    className={cn(
-                      'px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] relative overflow-hidden',
-                      isActive
-                        ? 'text-electric-purple bg-electric-purple/5'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                    )}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    transition={{ duration: 0.2, ease: "easeOut" }}
-                  >
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeCategoryFilter"
-                        className="absolute inset-0 bg-electric-purple/5 rounded-md"
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
-                      />
-                    )}
-                    <span className="relative z-10">{filter.label}</span>
-                  </motion.button>
-                )
-              })}
-            </div>
+        <Suspense fallback={
+          <div className="flex items-center justify-center py-12">
+            <LogoSpinner size={32} />
           </div>
-
-          {/* Market Grid */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`${timeFilter}-${categoryFilter}`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-            >
-              {loading ? (
-                <div className="flex items-center justify-center py-12">
-                  <LogoSpinner size={32} />
-                </div>
-              ) : sortedMarkets.length > 0 ? (
-                <TooltipProvider>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {sortedMarkets.map((market, index) => (
-                      <motion.div
-                        key={market.id}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ 
-                          duration: 0.2, 
-                          delay: index * 0.05,
-                          ease: "easeOut"
-                        }}
-                      >
-                        <MarketCard market={market} />
-                      </motion.div>
-                    ))}
-                  </div>
-                </TooltipProvider>
-              ) : (
-                <div className="text-center py-12">
-                  <p className="text-muted-foreground text-lg">
-                    No se encontraron mercados con estos filtros
-                  </p>
-                </div>
-              )}
-            </motion.div>
-          </AnimatePresence>
-        </div>
+        }>
+          <MarketsGrid markets={markets} />
+        </Suspense>
       </div>
     </div>
   )
