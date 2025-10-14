@@ -183,67 +183,70 @@ export default function MarketDetailPage() {
                 </div>
               </div>
 
-              {/* Metadata Bar */}
-              <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
-                <div className="flex items-center gap-1">
-                  <Calendar className="h-4 w-4" />
-                  <span>
-                    {market.state === 'open' 
-                      ? `Cierra en ${getTimeRemaining(market.expires_at)}`
-                      : `Cerrado el ${formatDate(market.expires_at)}`
-                    }
-                  </span>
+              {/* Metadata Bar with Period Selector */}
+              <div className="flex items-center justify-between text-sm text-muted-foreground flex-wrap gap-4">
+                {/* Left side: Metadata grouped together */}
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1">
+                    <Calendar className="h-4 w-4" />
+                    <span>
+                      {market.state === 'open' 
+                        ? `Cierra en ${getTimeRemaining(market.expires_at)}`
+                        : `Cerrado el ${formatDate(market.expires_at)}`
+                      }
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Users className="h-4 w-4" />
+                    <span>{market.users} operadores</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <TrendingUp className="h-4 w-4" />
+                    <span>${market.volume_eur.toLocaleString()} volumen</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Users className="h-4 w-4" />
-                  <span>{market.users} operadores</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <TrendingUp className="h-4 w-4" />
-                  <span>${market.volume_eur.toLocaleString()} volumen</span>
+                
+                {/* Right side: Period Selector - ToggleGroup */}
+                <div className="flex items-center">
+                  <ToggleGroup 
+                    type="single" 
+                    value={selectedTimeframe}
+                    onValueChange={(value) => {
+                      if (value) setSelectedTimeframe(value as '24h' | '7d' | '30d' | 'all')
+                    }}
+                    className="border rounded-lg p-1 ml-2"
+                  >
+                    <ToggleGroupItem value="24h" aria-label="24 hours" className="text-xs px-3">
+                      24h
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="7d" aria-label="7 days" className="text-xs px-3">
+                      7d
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="30d" aria-label="30 days" className="text-xs px-3">
+                      30d
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="all" aria-label="All time" className="text-xs px-3">
+                      Todo
+                    </ToggleGroupItem>
+                  </ToggleGroup>
                 </div>
               </div>
             </div>
             
             {/* Probability Chart */}
-            <div className="space-y-4">
-              {/* Timeframe Selector - Moved to left */}
-              <div className="flex items-center justify-start">
-                <ToggleGroup 
-                  type="single" 
-                  value={selectedTimeframe}
-                  onValueChange={(value) => {
-                    if (value) setSelectedTimeframe(value as '24h' | '7d' | '30d' | 'all')
-                  }}
-                  className="border rounded-lg p-1"
-                >
-                  <ToggleGroupItem value="24h" aria-label="24 hours" className="text-xs px-3">
-                    24h
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="7d" aria-label="7 days" className="text-xs px-3">
-                    7d
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="30d" aria-label="30 days" className="text-xs px-3">
-                    30d
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="all" aria-label="All time" className="text-xs px-3">
-                    Todo
-                  </ToggleGroupItem>
-                </ToggleGroup>
-              </div>
-
+            <div>
               {/* Chart - Full width, no card wrapper */}
               {market.outcomes && market.outcomes.length > 0 ? (
                 <ProbabilityChart 
                   outcomes={market.outcomes} 
-                    timeframe={selectedTimeframe}
-                    className="h-[400px]"
-                  />
-                ) : (
-                  <div className="h-[400px] flex items-center justify-center border-2 border-dashed border-muted-foreground/25 rounded-lg">
-                    <p className="text-muted-foreground">No hay datos del gráfico disponibles</p>
-                  </div>
-                )}
+                  timeframe={selectedTimeframe}
+                  className="h-[400px] w-full"
+                />
+              ) : (
+                <div className="h-[400px] flex items-center justify-center border-2 border-dashed border-muted-foreground/25 rounded-lg">
+                  <p className="text-muted-foreground">No hay datos del gráfico disponibles</p>
+                </div>
+              )}
             </div>
 
             {/* Tabs: About | Comments | Holders | Activity */}
