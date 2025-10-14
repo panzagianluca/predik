@@ -159,7 +159,7 @@ export function WinningsChart({
       crosshairMarkerBorderColor: lineColor,
       crosshairMarkerBackgroundColor: lineColor,
       lastValueVisible: true,
-      priceLineVisible: true,
+      priceLineVisible: false, // Remove dotted line from last value
       priceFormat: {
         type: 'price',
         precision: 2,
@@ -177,8 +177,23 @@ export function WinningsChart({
 
     series.setData(chartData)
 
-    // Fit content
+    // Fit content to show full period
     chart.timeScale().fitContent()
+    
+    // Set visible range to show entire dataset by default
+    if (chartData.length > 0) {
+      const firstTime = chartData[0].time as number
+      const lastTime = chartData[chartData.length - 1].time as number
+      
+      // Add 5% padding on both sides
+      const timeRange = lastTime - firstTime
+      const padding = timeRange * 0.05
+      
+      chart.timeScale().setVisibleRange({
+        from: (firstTime - padding) as any,
+        to: (lastTime + padding) as any,
+      })
+    }
 
     // Setup custom tooltip
     if (tooltipRef.current) {

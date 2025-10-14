@@ -29,9 +29,21 @@ export interface TransactionStats {
   marketsTraded: Set<string>
 }
 
+export interface OpenPosition {
+  marketId: string
+  outcomeId: string // '0' for NO, '1' for YES
+  shares: bigint // net shares held
+  totalBought: bigint // total shares bought
+  totalSold: bigint // total shares sold
+  invested: bigint // total money spent on buys
+  receivedFromSells: bigint // total money from sells
+  avgEntryPrice: number // invested / totalBought (in token units)
+}
+
 interface UseUserTransactionsResult {
   transactions: UserTransaction[]
   stats: TransactionStats
+  positions: OpenPosition[]
   isLoading: boolean
   error: Error | null
 }
@@ -41,6 +53,7 @@ const PM_CONTRACT = (process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS || '') as
 export function useUserTransactions(userAddress?: Address): UseUserTransactionsResult {
   const publicClient = usePublicClient()
   const [transactions, setTransactions] = useState<UserTransaction[]>([])
+  const [positions, setPositions] = useState<OpenPosition[]>([])
   const [stats, setStats] = useState<TransactionStats>({
     totalInvested: BigInt(0),
     totalWithdrawn: BigInt(0),
@@ -54,6 +67,7 @@ export function useUserTransactions(userAddress?: Address): UseUserTransactionsR
   useEffect(() => {
     if (!userAddress || !publicClient || !PM_CONTRACT) {
       setTransactions([])
+      setPositions([])
       setStats({
         totalInvested: BigInt(0),
         totalWithdrawn: BigInt(0),
@@ -145,7 +159,59 @@ export function useUserTransactions(userAddress?: Address): UseUserTransactionsR
 
         const netPosition = totalWithdrawn - totalInvested
 
+        // Calculate open positions
+        const positionMap = new Map<string, OpenPosition>()
+
+        parsedTransactions.forEach((tx) => {
+          // Only track BUY and SELL actions for positions
+          if (tx.action !== MarketAction.BUY && tx.action !== MarketAction.SELL) {
+            return
+          }
+
+          const key = `${tx.marketId}-${tx.outcomeId}`
+          const existing = positionMap.get(key) || {
+            marketId: tx.marketId.toString(),
+            outcomeId: tx.outcomeId.toString(),
+            shares: BigInt(0),
+            totalBought: BigInt(0),
+            totalSold: BigInt(0),
+            invested: BigInt(0),
+            receivedFromSells: BigInt(0),
+            avgEntryPrice: 0,
+          }
+
+          if (tx.action === MarketAction.BUY) {
+            existing.shares += tx.shares
+            existing.totalBought += tx.shares
+            existing.invested += tx.value
+          } else if (tx.action === MarketAction.SELL) {
+            existing.shares -= tx.shares
+            existing.totalSold += tx.shares
+            existing.receivedFromSells += tx.value
+          }
+
+          // Calculate average entry price (value per share in wei)
+          if (existing.totalBought > BigInt(0)) {
+            // Average price = total invested / total shares bought
+            // Both are in wei, so result is dimensionless (price per share)
+            // We'll format it in the UI component
+            const investedNum = Number(existing.invested)
+            const sharesNum = Number(existing.totalBought)
+            existing.avgEntryPrice = investedNum / sharesNum
+          }
+
+          positionMap.set(key, existing)
+        })
+
+        // Filter to only open positions (shares > 0)
+        const openPositions = Array.from(positionMap.values()).filter(
+          (pos) => pos.shares > BigInt(0)
+        )
+
+        console.log(`📈 Found ${openPositions.length} open positions`)
+
         setTransactions(parsedTransactions)
+        setPositions(openPositions)
         setStats({
           totalInvested,
           totalWithdrawn,
@@ -166,6 +232,7 @@ export function useUserTransactions(userAddress?: Address): UseUserTransactionsR
 
   return {
     transactions,
+    positions,
     stats,
     isLoading,
     error,

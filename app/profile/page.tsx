@@ -12,6 +12,8 @@ import { Copy, Check, SquarePen } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import EditProfileModal from '@/components/profile/EditProfileModal'
 import { WinningsChart } from '@/components/profile/WinningsChart'
+import { TransactionsList } from '@/components/profile/TransactionsList'
+import { PositionsList } from '@/components/profile/PositionsList'
 import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from '@/components/animate-ui/components/radix/tabs'
 import { formatUnits } from 'viem'
 
@@ -19,7 +21,7 @@ export default function ProfilePage() {
   const { address, isConnected } = useAccount()
   const router = useRouter()
   const { formatted: usdtBalance, isLoading: isLoadingBalance } = useUSDTBalance()
-  const { transactions, stats, isLoading: isLoadingTransactions } = useUserTransactions(address)
+  const { transactions, positions, stats, isLoading: isLoadingTransactions } = useUserTransactions(address)
   const [copied, setCopied] = useState(false)
   const [isEditingProfile, setIsEditingProfile] = useState(false)
   const [currentAvatar, setCurrentAvatar] = useState<string>('')
@@ -107,7 +109,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen pb-12">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -221,8 +223,8 @@ export default function ProfilePage() {
               <Tabs defaultValue="resumen" className="w-full">
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="resumen">Resumen</TabsTrigger>
-                  <TabsTrigger value="transacciones">Transacciones</TabsTrigger>
                   <TabsTrigger value="posiciones">Posiciones</TabsTrigger>
+                  <TabsTrigger value="transacciones">Transacciones</TabsTrigger>
                 </TabsList>
 
                 <TabsContents transition={{ duration: 0.3, ease: "easeInOut" }}>
@@ -268,20 +270,22 @@ export default function ProfilePage() {
                     </div>
                   </TabsContent>
 
-                  {/* Transacciones Tab */}
-                  <TabsContent value="transacciones" className="mt-6">
-                    <div className="text-center py-12 text-muted-foreground">
-                      <p>No hay transacciones todavía</p>
-                      <p className="text-sm mt-2">Tus operaciones aparecerán acá</p>
-                    </div>
-                  </TabsContent>
-
                   {/* Posiciones Tab */}
                   <TabsContent value="posiciones" className="mt-6">
-                    <div className="text-center py-12 text-muted-foreground">
-                      <p>No tenés posiciones abiertas</p>
-                      <p className="text-sm mt-2">Tus posiciones activas aparecerán acá</p>
-                    </div>
+                    <PositionsList
+                      positions={positions}
+                      tokenDecimals={6}
+                      tokenSymbol="USDT"
+                    />
+                  </TabsContent>
+
+                  {/* Transacciones Tab */}
+                  <TabsContent value="transacciones" className="mt-6">
+                    <TransactionsList 
+                      transactions={transactions}
+                      tokenDecimals={6}
+                      tokenSymbol="USDT"
+                    />
                   </TabsContent>
                 </TabsContents>
               </Tabs>
