@@ -6,16 +6,20 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { getProfilePicture } from '@/lib/profileUtils'
 import { useUSDTBalance } from '@/hooks/use-usdt-balance'
-import { Button } from '@/components/ui/button'
+import { useUserTransactions } from '@/hooks/use-user-transactions'
 import { Card } from '@/components/ui/card'
 import { Copy, Check, SquarePen } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import EditProfileModal from '@/components/profile/EditProfileModal'
+import { WinningsChart } from '@/components/profile/WinningsChart'
+import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from '@/components/animate-ui/components/radix/tabs'
+import { formatUnits } from 'viem'
 
 export default function ProfilePage() {
   const { address, isConnected } = useAccount()
   const router = useRouter()
   const { formatted: usdtBalance, isLoading: isLoadingBalance } = useUSDTBalance()
+  const { transactions, stats, isLoading: isLoadingTransactions } = useUserTransactions(address)
   const [copied, setCopied] = useState(false)
   const [isEditingProfile, setIsEditingProfile] = useState(false)
   const [currentAvatar, setCurrentAvatar] = useState<string>('')
@@ -174,15 +178,29 @@ export default function ProfilePage() {
                 </div>
                 <div>
                   <label className="text-xs text-muted-foreground">Volumen Total</label>
-                  <p className="text-xl font-bold mt-1">$0.00</p>
+                  <p className="text-xl font-bold mt-1">
+                    {isLoadingTransactions 
+                      ? '...' 
+                      : `$${(Number(formatUnits(stats.totalInvested + stats.totalWithdrawn, 6))).toFixed(2)}`
+                    }
+                  </p>
                 </div>
                 <div>
                   <label className="text-xs text-muted-foreground">Última Operación</label>
-                  <p className="text-sm mt-1">Sin operaciones</p>
+                  <p className="text-sm mt-1">
+                    {isLoadingTransactions 
+                      ? '...' 
+                      : transactions.length > 0 
+                        ? new Date(transactions[0].timestamp * 1000).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })
+                        : 'Sin operaciones'
+                    }
+                  </p>
                 </div>
                 <div>
                   <label className="text-xs text-muted-foreground">Mercados Operados</label>
-                  <p className="text-xl font-bold mt-1">0</p>
+                  <p className="text-xl font-bold mt-1">
+                    {isLoadingTransactions ? '...' : stats.marketsTraded.size}
+                  </p>
                 </div>
               </div>
 
@@ -199,10 +217,74 @@ export default function ProfilePage() {
             {/* Right Column - Activity */}
             <Card className="p-8">
               <h2 className="text-2xl font-bold mb-4">Actividad Reciente</h2>
-              <div className="text-center py-12 text-muted-foreground">
-                <p>No hay actividad todavía</p>
-                <p className="text-sm mt-2">Tus predicciones aparecerán acá</p>
-              </div>
+              
+              <Tabs defaultValue="resumen" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="resumen">Resumen</TabsTrigger>
+                  <TabsTrigger value="transacciones">Transacciones</TabsTrigger>
+                  <TabsTrigger value="posiciones">Posiciones</TabsTrigger>
+                </TabsList>
+
+                <TabsContents transition={{ duration: 0.3, ease: "easeInOut" }}>
+                  {/* Resumen Tab */}
+                  <TabsContent value="resumen" className="mt-6">
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="bg-muted p-4 rounded-lg">
+                          <p className="text-sm text-muted-foreground">Total Invertido</p>
+                          <p className="text-2xl font-bold mt-1">
+                            {isLoadingTransactions 
+                              ? '...' 
+                              : `$${Number(formatUnits(stats.totalInvested, 6)).toFixed(2)}`
+                            }
+                          </p>
+                        </div>
+                        <div className="bg-muted p-4 rounded-lg">
+                          <p className="text-sm text-muted-foreground">Ganancia/Pérdida</p>
+                          <p className={`text-2xl font-bold mt-1 ${stats.netPosition >= BigInt(0) ? 'text-green-500' : 'text-red-500'}`}>
+                            {isLoadingTransactions 
+                              ? '...' 
+                              : `${stats.netPosition >= BigInt(0) ? '+' : ''}$${Number(formatUnits(stats.netPosition, 6)).toFixed(2)}`
+                            }
+                          </p>
+                        </div>
+                        <div className="bg-muted p-4 rounded-lg">
+                          <p className="text-sm text-muted-foreground">Transacciones</p>
+                          <p className="text-2xl font-bold mt-1">
+                            {isLoadingTransactions ? '...' : stats.transactionCount}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Winnings Over Time Chart */}
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3">Ganancias en el Tiempo</h3>
+                        <WinningsChart 
+                          transactions={transactions} 
+                          tokenDecimals={6}
+                          tokenSymbol="USDT"
+                        />
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  {/* Transacciones Tab */}
+                  <TabsContent value="transacciones" className="mt-6">
+                    <div className="text-center py-12 text-muted-foreground">
+                      <p>No hay transacciones todavía</p>
+                      <p className="text-sm mt-2">Tus operaciones aparecerán acá</p>
+                    </div>
+                  </TabsContent>
+
+                  {/* Posiciones Tab */}
+                  <TabsContent value="posiciones" className="mt-6">
+                    <div className="text-center py-12 text-muted-foreground">
+                      <p>No tenés posiciones abiertas</p>
+                      <p className="text-sm mt-2">Tus posiciones activas aparecerán acá</p>
+                    </div>
+                  </TabsContent>
+                </TabsContents>
+              </Tabs>
             </Card>
           </div>
 
