@@ -69,7 +69,11 @@ export default function ProfilePage() {
     if (!address) return
 
     try {
-      const response = await fetch(`/api/profile/update?walletAddress=${address}`)
+      // Add cache-busting timestamp to force fresh data
+      const timestamp = Date.now()
+      const response = await fetch(`/api/profile/update?walletAddress=${address}&_t=${timestamp}`, {
+        cache: 'no-store', // Prevent caching on client side
+      })
       
       if (response.ok) {
         const userData = await response.json()
@@ -105,6 +109,7 @@ export default function ProfilePage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ walletAddress: address, ...data }),
+        cache: 'no-store', // Prevent caching
       })
 
       if (!response.ok) {
@@ -113,11 +118,15 @@ export default function ProfilePage() {
 
       const updatedProfile = await response.json()
 
-      // Update local state
+      // Update local state immediately
       if (data.avatar) setCurrentAvatar(data.avatar)
       if (data.username) setUsername(data.username)
 
-      // Reload page to update navbar
+      // Force reload profile data to ensure consistency
+      await loadUserProfile()
+
+      // Reload page to update navbar (this refreshes everything)
+      window.location.reload()
       window.location.reload()
     } catch (error) {
       console.error('Error updating profile:', error)
@@ -167,13 +176,15 @@ export default function ProfilePage() {
                   <div className="flex-1">
                     <h2 className="font-bold text-lg">{username || shortAddress}</h2>
                     <div className="flex items-center gap-2 mt-1">
-                      <Image
-                        src="/Celo_Symbol_RGB_ProsperityYellow.png"
-                        alt="Celo"
-                        width={12}
-                        height={12}
-                        className="flex-shrink-0"
-                      />
+                      <div className="relative w-4 h-4 p-1 rounded bg-white dark:bg-black flex items-center justify-center flex-shrink-0">
+                        <Image
+                          src="/Celo_Symbol_RGB_ProsperityYellow.png"
+                          alt="Celo"
+                          fill
+                          sizes="16px"
+                          className="object-contain p-[2px]"
+                        />
+                      </div>
                       <code className="text-xs text-muted-foreground font-mono truncate max-w-[120px]">{address}</code>
                       <button
                         onClick={handleCopyAddress}

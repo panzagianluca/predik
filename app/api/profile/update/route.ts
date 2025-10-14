@@ -58,7 +58,12 @@ export async function POST(request: NextRequest) {
         .where(eq(users.walletAddress, walletAddress.toLowerCase()))
         .returning()
 
-      return NextResponse.json(updatedUser)
+      return NextResponse.json(updatedUser, {
+        headers: {
+          // Invalidate cache immediately after update
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+        },
+      })
     } else {
       // Create new user
       const [newUser] = await db
@@ -69,7 +74,12 @@ export async function POST(request: NextRequest) {
         })
         .returning()
 
-      return NextResponse.json(newUser)
+      return NextResponse.json(newUser, {
+        headers: {
+          // Invalidate cache immediately after creation
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+        },
+      })
     }
   } catch (error: any) {
     console.error('Error updating profile:', error)

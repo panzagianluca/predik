@@ -51,7 +51,11 @@ export function Navbar() {
       }
 
       try {
-        const response = await fetch(`/api/profile/update?walletAddress=${address}`)
+        // Add cache-busting timestamp to force fresh data
+        const timestamp = Date.now()
+        const response = await fetch(`/api/profile/update?walletAddress=${address}&_t=${timestamp}`, {
+          cache: 'no-store', // Prevent caching
+        })
         if (response.ok) {
           const userData = await response.json()
           setUserAvatar(userData.customAvatar || getProfilePicture(address))
@@ -621,8 +625,14 @@ export function Navbar() {
                           >
                             {/* Wallet Address */}
                             <div className="px-2 py-2 text-sm font-satoshi text-muted-foreground flex items-center gap-2">
-                              <div className="relative w-3 h-3">
-                                <Image src="/celo.png" alt="Celo" fill sizes="12px" className="object-contain" />
+                              <div className="relative w-3 h-3 p-1 rounded bg-white dark:bg-black flex items-center justify-center">
+                                <Image 
+                                  src="/Celo_Symbol_RGB_ProsperityYellow.png" 
+                                  alt="Celo" 
+                                  fill 
+                                  sizes="12px" 
+                                  className="object-contain p-[2px]" 
+                                />
                               </div>
                               {account.displayName}
                             </div>
