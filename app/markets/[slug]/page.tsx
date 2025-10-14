@@ -214,18 +214,18 @@ export default function MarketDetailPage() {
                     onValueChange={(value) => {
                       if (value) setSelectedTimeframe(value as '24h' | '7d' | '30d' | 'all')
                     }}
-                    className="border rounded-lg p-1 ml-2"
+                    className="p-1 ml-2"
                   >
-                    <ToggleGroupItem value="24h" aria-label="24 hours" className="text-xs px-3">
+                    <ToggleGroupItem value="24h" aria-label="24 hours" className="text-xs px-3 py-1 h-7">
                       24h
                     </ToggleGroupItem>
-                    <ToggleGroupItem value="7d" aria-label="7 days" className="text-xs px-3">
+                    <ToggleGroupItem value="7d" aria-label="7 days" className="text-xs px-3 py-1 h-7">
                       7d
                     </ToggleGroupItem>
-                    <ToggleGroupItem value="30d" aria-label="30 days" className="text-xs px-3">
+                    <ToggleGroupItem value="30d" aria-label="30 days" className="text-xs px-3 py-1 h-7">
                       30d
                     </ToggleGroupItem>
-                    <ToggleGroupItem value="all" aria-label="All time" className="text-xs px-3">
+                    <ToggleGroupItem value="all" aria-label="All time" className="text-xs px-3 py-1 h-7">
                       Todo
                     </ToggleGroupItem>
                   </ToggleGroup>
