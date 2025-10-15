@@ -6,10 +6,10 @@ import { eq, and } from 'drizzle-orm'
 // DELETE /api/comments/[id]
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
     const { searchParams } = new URL(request.url)
     const userAddress = searchParams.get('user_address')
 
@@ -61,10 +61,10 @@ export async function DELETE(
 // PATCH /api/comments/[id] - Toggle upvote on a comment
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
     const body = await request.json()
     const { userAddress } = body
 
