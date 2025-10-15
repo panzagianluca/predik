@@ -149,7 +149,7 @@ export default function MarketDetailPage() {
                 )}
                 
                 <div className="flex-1 min-w-0">
-                  <h1 className="text-[24px] font-medium mb-2">{market.title}</h1>
+                  <h1 className="text-[24px] font-medium mb-1">{market.title}</h1>
                   
                   {/* Badges */}
                   <div className="flex items-center gap-2 flex-wrap">
@@ -259,16 +259,19 @@ export default function MarketDetailPage() {
                 <TabsTrigger value="activity">Actividad</TabsTrigger>
               </TabsList>
 
-              <TabsContents transition={{ duration: 0.3, ease: "easeInOut" }}>
+              <TabsContents 
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                style={{ overflow: 'visible' }}
+              >
                 {/* About Tab */}
                 <TabsContent value="about" className="mt-4">
-                  <Card>
+                  <Card className="overflow-visible">
                     <CardContent className="p-6 space-y-4">
                       {/* Description */}
                       {market.description && (
                         <div>
                           <h3 className="font-semibold mb-2">Descripción</h3>
-                          <p className="text-muted-foreground">{market.description}</p>
+                          <p className="text-muted-foreground break-words">{market.description}</p>
                         </div>
                       )}
 
@@ -316,7 +319,7 @@ export default function MarketDetailPage() {
 
                 {/* Comments Tab */}
                 <TabsContent value="comments" className="mt-4">
-                  <Card>
+                  <Card className="overflow-visible">
                     <CardContent className="p-6">
                       <div className="text-center py-12 text-muted-foreground">
                         <p>Los comentarios estarán disponibles pronto</p>
@@ -328,7 +331,7 @@ export default function MarketDetailPage() {
 
                 {/* Holders Tab */}
                 <TabsContent value="holders" className="mt-4">
-                  <Card>
+                  <Card className="overflow-visible">
                     <CardContent className="p-6">
                       <div className="text-center py-12 text-muted-foreground">
                         <p>Top holders por outcome</p>
@@ -340,7 +343,7 @@ export default function MarketDetailPage() {
 
                 {/* Activity Tab */}
                 <TabsContent value="activity" className="mt-4">
-                  <Card>
+                  <Card className="overflow-visible">
                     <CardContent className="p-6">
                       <div className="text-center py-12 text-muted-foreground">
                         <p>Actividad reciente del mercado</p>
