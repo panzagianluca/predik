@@ -269,58 +269,56 @@ export default function MarketDetailPage() {
             </div>
 
             {/* Description Section */}
-            <Card>
-              <CardContent className="p-6 space-y-4">
-                {/* Description */}
-                {market.description && (
-                  <div>
-                    <h3 className="font-semibold mb-3">Descripción</h3>
-                    <p className="text-foreground break-words leading-relaxed">
-                      {formatDescription(market.description)}
-                    </p>
-                  </div>
-                )}
-
-                {/* Resolution Source */}
-                {market.resolution_source && (
-                  <div>
-                    <h3 className="font-semibold mb-2">Fuente de Resolución</h3>
-                    <a 
-                      href={market.resolution_source} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-electric-purple hover:underline flex items-center gap-1"
-                    >
-                      {market.resolution_title || market.resolution_source}
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
-                  </div>
-                )}
-
-                {/* Market Details */}
+            <div className="border-t border-b border-border py-6 space-y-4">
+              {/* Description */}
+              {market.description && (
                 <div>
-                  <h3 className="font-semibold mb-2">Detalles del Mercado</h3>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-muted-foreground">Creado:</span>
-                      <p className="font-medium">{formatDate(market.created_at)}</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Cierra:</span>
-                      <p className="font-medium">{formatDate(market.expires_at)}</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Token:</span>
-                      <p className="font-medium">{market.token.symbol}</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Fee:</span>
-                      <p className="font-medium">{(market.fee * 100).toFixed(1)}%</p>
-                    </div>
+                  <h3 className="font-semibold mb-3">Descripción</h3>
+                  <p className="text-foreground break-words leading-relaxed">
+                    {formatDescription(market.description)}
+                  </p>
+                </div>
+              )}
+
+              {/* Resolution Source */}
+              {market.resolution_source && (
+                <div>
+                  <h3 className="font-semibold mb-2">Fuente de Resolución</h3>
+                  <a 
+                    href={market.resolution_source} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-electric-purple hover:underline flex items-center gap-1"
+                  >
+                    {market.resolution_title || market.resolution_source}
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                </div>
+              )}
+
+              {/* Market Details */}
+              <div>
+                <h3 className="font-semibold mb-2">Detalles del Mercado</h3>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-muted-foreground">Creado:</span>
+                    <p className="font-medium">{formatDate(market.created_at)}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Cierra:</span>
+                    <p className="font-medium">{formatDate(market.expires_at)}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Token:</span>
+                    <p className="font-medium">{market.token.symbol}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Fee:</span>
+                    <p className="font-medium">{(market.fee * 100).toFixed(1)}%</p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Tabs: Comments | Holders | Activity */}
             <Tabs defaultValue="comments" className="w-full">
@@ -335,7 +333,7 @@ export default function MarketDetailPage() {
                 style={{ overflow: 'visible' }}
               >
                 {/* Comments Tab */}
-                <TabsContent value="comments" className="mt-4">
+                <TabsContent value="comments" className="mt-4 overflow-visible">
                   <CommentSection 
                     marketId={market.slug} 
                     userAddress={address}
@@ -369,8 +367,8 @@ export default function MarketDetailPage() {
             </Tabs>
           </div>
 
-          {/* RIGHT COLUMN - Sticky */}
-          <div className="space-y-6 lg:sticky lg:top-4 lg:h-fit">
+          {/* RIGHT COLUMN */}
+          <div className="space-y-6">
             
             {/* Trading Panel */}
             <TooltipProvider>

@@ -33,9 +33,18 @@ export function CommentSection({ marketId, userAddress }: CommentSectionProps) {
   // Fetch comments
   const fetchComments = async (offset: number = 0) => {
     try {
-      const response = await fetch(
-        `/api/comments?market_id=${marketId}&limit=${limit}&offset=${offset}`
-      )
+      const params = new URLSearchParams({
+        market_id: marketId,
+        limit: limit.toString(),
+        offset: offset.toString()
+      })
+      
+      // Include user_address if available to get hasVoted status
+      if (userAddress) {
+        params.append('user_address', userAddress)
+      }
+      
+      const response = await fetch(`/api/comments?${params}`)
       
       if (!response.ok) throw new Error('Failed to fetch comments')
       
@@ -59,7 +68,7 @@ export function CommentSection({ marketId, userAddress }: CommentSectionProps) {
 
   useEffect(() => {
     fetchComments()
-  }, [marketId])
+  }, [marketId, userAddress]) // Refetch when user connects/disconnects wallet
 
   const handleNewComment = async (content: string, gifUrl?: string) => {
     if (!userAddress) return
@@ -147,7 +156,7 @@ export function CommentSection({ marketId, userAddress }: CommentSectionProps) {
   }
 
   return (
-    <div>
+    <div className="overflow-visible">
       {/* Comment Form */}
       <CommentForm
         marketId={marketId}

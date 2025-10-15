@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { comments } from '@/lib/db/schema'
-import { eq } from 'drizzle-orm'
+import { comments, commentVotes } from '@/lib/db/schema'
+import { eq, and } from 'drizzle-orm'
 
 // DELETE /api/comments/[id]
 export async function DELETE(
@@ -34,7 +34,8 @@ export async function DELETE(
       )
     }
 
-    if (comment.userAddress !== userAddress) {
+    // Case-insensitive address comparison
+    if (comment.userAddress.toLowerCase() !== userAddress.toLowerCase()) {
       return NextResponse.json(
         { error: 'You can only delete your own comments' },
         { status: 403 }
@@ -57,7 +58,7 @@ export async function DELETE(
   }
 }
 
-// PATCH /api/comments/[id] - Vote on a comment
+// PATCH /api/comments/[id] - Toggle upvote on a comment
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -65,14 +66,17 @@ export async function PATCH(
   try {
     const { id } = params
     const body = await request.json()
-    const { direction } = body
+    const { userAddress } = body
 
-    if (!direction || !['up', 'down'].includes(direction)) {
+    if (!userAddress) {
       return NextResponse.json(
-        { error: 'direction must be "up" or "down"' },
+        { error: 'userAddress is required' },
         { status: 400 }
       )
     }
+
+    // Normalize address for consistency
+    const normalizedAddress = userAddress.toLowerCase()
 
     // Fetch current comment
     const [comment] = await db
@@ -88,9 +92,41 @@ export async function PATCH(
       )
     }
 
-    // Update votes
-    const newVotes = direction === 'up' ? comment.votes + 1 : comment.votes - 1
+    // Check if user has already voted
+    const [existingVote] = await db
+      .select()
+      .from(commentVotes)
+      .where(and(
+        eq(commentVotes.commentId, id),
+        eq(commentVotes.userAddress, normalizedAddress)
+      ))
+      .limit(1)
 
+    let newVotes: number
+    let hasVoted: boolean
+
+    if (existingVote) {
+      // Remove vote (toggle off)
+      await db
+        .delete(commentVotes)
+        .where(eq(commentVotes.id, existingVote.id))
+      
+      newVotes = comment.votes - 1
+      hasVoted = false
+    } else {
+      // Add vote (toggle on)
+      await db
+        .insert(commentVotes)
+        .values({
+          commentId: id,
+          userAddress: normalizedAddress
+        })
+      
+      newVotes = comment.votes + 1
+      hasVoted = true
+    }
+
+    // Update comment vote count
     const [updatedComment] = await db
       .update(comments)
       .set({ 
@@ -102,7 +138,8 @@ export async function PATCH(
 
     return NextResponse.json({
       id: updatedComment.id,
-      votes: updatedComment.votes
+      votes: updatedComment.votes,
+      hasVoted
     })
   } catch (error) {
     console.error('Error voting on comment:', error)

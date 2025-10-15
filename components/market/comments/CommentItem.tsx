@@ -17,12 +17,20 @@ interface CommentItemProps {
 
 // Helper to format comment text with markdown
 const formatCommentText = (text: string) => {
-  // Bold: **text**
-  let formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-  // Italic: *text*
-  formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>')
+  // Escape HTML to prevent XSS
+  let formatted = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+  
+  // Bold: **text** (must come FIRST before italic!)
+  formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
   // Underline: __text__
-  formatted = formatted.replace(/__(.*?)__/g, '<u>$1</u>')
+  formatted = formatted.replace(/__(.+?)__/g, '<u>$1</u>')
+  // Italic: *text* (single asterisk - after bold to avoid conflicts)
+  formatted = formatted.replace(/\*(.+?)\*/g, '<em>$1</em>')
+  // Line breaks: \n
+  formatted = formatted.replace(/\n/g, '<br>')
   
   return <span dangerouslySetInnerHTML={{ __html: formatted }} />
 }
@@ -34,7 +42,8 @@ export function CommentItem({
   onDelete,
   isReply = false
 }: CommentItemProps) {
-  const isOwner = userAddress === comment.userAddress
+  // Case-insensitive comparison for ownership check
+  const isOwner = userAddress?.toLowerCase() === comment.userAddress.toLowerCase()
   const hasReplies = comment.replies && comment.replies.length > 0
 
   // Generate avatar from address if no custom avatar
@@ -93,7 +102,9 @@ export function CommentItem({
             <div className="flex items-center gap-4 mt-2">
               <VoteButtons 
                 commentId={comment.id} 
-                initialVotes={comment.votes} 
+                initialVotes={comment.votes}
+                initialHasVoted={comment.hasVoted}
+                userAddress={userAddress}
               />
               
               {!isReply && onReply && (

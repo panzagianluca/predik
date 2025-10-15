@@ -14,6 +14,7 @@ export interface Comment {
   username?: string
   avatarUrl?: string
   replies?: Comment[]
+  hasVoted?: boolean // Whether current user has upvoted this comment
 }
 
 // API request/response types
@@ -25,6 +26,4 @@ export interface CreateCommentRequest {
   parentId?: string
 }
 
-export interface VoteCommentRequest {
-  direction: 'up' | 'down'
-}
+// Removed VoteCommentRequest - upvote is now a toggle (no direction needed)

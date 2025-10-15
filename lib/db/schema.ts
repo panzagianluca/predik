@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, boolean, numeric, index, integer } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, uuid, boolean, numeric, index, integer, varchar, unique } from 'drizzle-orm/pg-core'
 
 // User profiles table
 export const users = pgTable('users', {
@@ -70,5 +70,20 @@ export const comments = pgTable('comments', {
   votesIdx: index('comments_votes_idx').on(table.votes),
   // Index for sorting by date
   createdAtIdx: index('comments_created_at_idx').on(table.createdAt),
+}))
+
+// Comment votes table - tracks who upvoted which comments
+export const commentVotes = pgTable('comment_votes', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  commentId: uuid('comment_id').notNull().references(() => comments.id, { onDelete: 'cascade' }),
+  userAddress: varchar('user_address', { length: 255 }).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => ({
+  // Composite unique constraint - user can only vote once per comment
+  commentUserUnique: unique('comment_votes_comment_id_user_address_unique').on(table.commentId, table.userAddress),
+  // Index for fetching votes by comment
+  commentIdIdx: index('comment_votes_comment_id_idx').on(table.commentId),
+  // Index for fetching votes by user
+  userAddressIdx: index('comment_votes_user_address_idx').on(table.userAddress),
 }))
 

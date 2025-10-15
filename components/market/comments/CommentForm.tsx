@@ -1,9 +1,8 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { Bold, Italic, Underline, Smile, Image as ImageIcon, Send } from 'lucide-react'
+import { Bold, Italic, Underline, Image as ImageIcon, Send } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import EmojiPicker from 'emoji-picker-react'
 
 interface CommentFormProps {
   marketId: string
@@ -26,7 +25,6 @@ export function CommentForm({
 }: CommentFormProps) {
   const [content, setContent] = useState('')
   const [gifUrl, setGifUrl] = useState<string>('')
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -58,11 +56,6 @@ export function CommentForm({
         start + before.length + selectedText.length
       )
     }, 0)
-  }
-
-  const handleEmojiClick = (emojiObject: any) => {
-    setContent(prev => prev + emojiObject.emoji)
-    setShowEmojiPicker(false)
   }
 
   const handleSubmit = async () => {
@@ -182,24 +175,6 @@ export function CommentForm({
               </button>
 
               <div className="w-px h-4 bg-border mx-1" />
-
-              {/* Emoji Picker */}
-              <div className="relative">
-                <button
-                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                  className="p-1.5 rounded hover:bg-muted transition-colors"
-                  title="Emoji"
-                  disabled={!userAddress}
-                >
-                  <Smile className="h-4 w-4" />
-                </button>
-
-                {showEmojiPicker && (
-                  <div className="absolute bottom-full left-0 mb-2 z-50">
-                    <EmojiPicker onEmojiClick={handleEmojiClick} />
-                  </div>
-                )}
-              </div>
 
               {/* GIF Picker - Placeholder for now */}
               <button

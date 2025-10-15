@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { comments, users } from '@/lib/db/schema'
+import { comments, users, commentVotes } from '@/lib/db/schema'
 import { eq, and, isNull, desc, inArray } from 'drizzle-orm'
 import { Comment } from '@/types/comment'
 
-// GET /api/comments?market_id=slug&limit=20&offset=0
+// GET /api/comments?market_id=slug&limit=20&offset=0&user_address=0x...
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const marketId = searchParams.get('market_id')
+    const userAddress = searchParams.get('user_address')
     const limit = parseInt(searchParams.get('limit') || '20')
     const offset = parseInt(searchParams.get('offset') || '0')
 
@@ -46,7 +47,8 @@ export async function GET(request: NextRequest) {
       ...topLevelComments.map(c => c.userAddress),
       ...replies.map(r => r.userAddress)
     ]
-    const uniqueAddresses = [...new Set(allUserAddresses)]
+    // Normalize to lowercase for database query
+    const uniqueAddresses = [...new Set(allUserAddresses.map(addr => addr.toLowerCase()))]
     
     const userProfiles = uniqueAddresses.length > 0
       ? await db
@@ -55,16 +57,35 @@ export async function GET(request: NextRequest) {
           .where(inArray(users.walletAddress, uniqueAddresses))
       : []
 
-    // Create a map of address -> profile
+    // Create a map of address -> profile (lowercase keys for case-insensitive lookup)
     const profileMap = new Map(
-      userProfiles.map(p => [p.walletAddress, p])
+      userProfiles.map(p => [p.walletAddress.toLowerCase(), p])
     )
+
+    // Fetch user's votes if userAddress is provided
+    const allCommentIds = [...topLevelComments.map(c => c.id), ...replies.map(r => r.id)]
+    let userVotesSet = new Set<string>()
+    
+    if (userAddress && allCommentIds.length > 0) {
+      const normalizedUserAddress = userAddress.toLowerCase()
+      const userVotes = await db
+        .select()
+        .from(commentVotes)
+        .where(and(
+          inArray(commentVotes.commentId, allCommentIds),
+          eq(commentVotes.userAddress, normalizedUserAddress)
+        ))
+      
+      userVotesSet = new Set(userVotes.map(v => v.commentId))
+    }
 
     // Helper to format comment with user data
     const formatComment = (comment: typeof topLevelComments[0]): Comment => {
-      const profile = profileMap.get(comment.userAddress)
+      // Normalize address to lowercase for map lookup
+      const profile = profileMap.get(comment.userAddress.toLowerCase())
       const username = profile?.username || `${comment.userAddress.slice(0, 6)}...${comment.userAddress.slice(-4)}`
       const avatarUrl = profile?.customAvatar ? profile.customAvatar : undefined
+      const hasVoted = userVotesSet.has(comment.id)
       
       console.log('Formatting comment:', {
         userAddress: comment.userAddress,
@@ -86,6 +107,7 @@ export async function GET(request: NextRequest) {
         updatedAt: comment.updatedAt.toISOString(),
         username,
         avatarUrl,
+        hasVoted,
         replies: []
       }
     }
@@ -153,23 +175,23 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create comment
+    // Create comment (normalize address to lowercase for consistency)
     const [newComment] = await db
       .insert(comments)
       .values({
         marketId,
-        userAddress,
+        userAddress: userAddress.toLowerCase(),
         content,
         gifUrl: gifUrl || null,
         parentId: parentId || null,
       })
       .returning()
 
-    // Fetch user profile
+    // Fetch user profile (use lowercase for lookup)
     const [userProfile] = await db
       .select()
       .from(users)
-      .where(eq(users.walletAddress, userAddress))
+      .where(eq(users.walletAddress, userAddress.toLowerCase()))
       .limit(1)
 
     console.log('Creating comment - user profile:', userProfile)
