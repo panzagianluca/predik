@@ -18,6 +18,23 @@ import { Calendar, Users, TrendingUp, ExternalLink, CheckCircle2, XCircle, Clock
 import { cn } from '@/lib/utils'
 import { TooltipProvider } from '@/components/animate-ui/primitives/animate/tooltip'
 
+// Helper function to format description with bold markdown
+const formatDescription = (text: string) => {
+  const parts = text.split(/(\*\*.*?\*\*)/g)
+  return parts.map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      const boldText = part.slice(2, -2)
+      return (
+        <span key={index}>
+          <br />
+          <strong>{boldText}</strong>
+        </span>
+      )
+    }
+    return <span key={index}>{part}</span>
+  })
+}
+
 export default function MarketDetailPage() {
   const params = useParams()
   const slug = params.slug as string
@@ -111,7 +128,7 @@ export default function MarketDetailPage() {
   return (
     <div className="min-h-screen pb-12">
       {/* Container with same max-width as navbar - NO extra padding */}
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto">
         
         {/* Banner Image (if available) - Full width */}
         {market.banner_url && (
@@ -250,10 +267,63 @@ export default function MarketDetailPage() {
               )}
             </div>
 
-            {/* Tabs: About | Comments | Holders | Activity */}
-            <Tabs defaultValue="about" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="about">Acerca de</TabsTrigger>
+            {/* Description Section */}
+            <Card>
+              <CardContent className="p-6 space-y-4">
+                {/* Description */}
+                {market.description && (
+                  <div>
+                    <h3 className="font-semibold mb-3">Descripción</h3>
+                    <p className="text-muted-foreground break-words leading-relaxed">
+                      {formatDescription(market.description)}
+                    </p>
+                  </div>
+                )}
+
+                {/* Resolution Source */}
+                {market.resolution_source && (
+                  <div>
+                    <h3 className="font-semibold mb-2">Fuente de Resolución</h3>
+                    <a 
+                      href={market.resolution_source} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-electric-purple hover:underline flex items-center gap-1"
+                    >
+                      {market.resolution_title || market.resolution_source}
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                )}
+
+                {/* Market Details */}
+                <div>
+                  <h3 className="font-semibold mb-2">Detalles del Mercado</h3>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-muted-foreground">Creado:</span>
+                      <p className="font-medium">{formatDate(market.created_at)}</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Cierra:</span>
+                      <p className="font-medium">{formatDate(market.expires_at)}</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Token:</span>
+                      <p className="font-medium">{market.token.symbol}</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Fee:</span>
+                      <p className="font-medium">{(market.fee * 100).toFixed(1)}%</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Tabs: Comments | Holders | Activity */}
+            <Tabs defaultValue="comments" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="comments">Comentarios</TabsTrigger>
                 <TabsTrigger value="holders">Holders</TabsTrigger>
                 <TabsTrigger value="activity">Actividad</TabsTrigger>
@@ -263,60 +333,6 @@ export default function MarketDetailPage() {
                 transition={{ duration: 0.3, ease: "easeInOut" }}
                 style={{ overflow: 'visible' }}
               >
-                {/* About Tab */}
-                <TabsContent value="about" className="mt-4">
-                  <Card className="overflow-visible">
-                    <CardContent className="p-6 space-y-4">
-                      {/* Description */}
-                      {market.description && (
-                        <div>
-                          <h3 className="font-semibold mb-2">Descripción</h3>
-                          <p className="text-muted-foreground break-words">{market.description}</p>
-                        </div>
-                      )}
-
-                      {/* Resolution Source */}
-                      {market.resolution_source && (
-                        <div>
-                          <h3 className="font-semibold mb-2">Fuente de Resolución</h3>
-                          <a 
-                            href={market.resolution_source} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-electric-purple hover:underline flex items-center gap-1"
-                          >
-                            {market.resolution_title || market.resolution_source}
-                            <ExternalLink className="h-3 w-3" />
-                          </a>
-                        </div>
-                      )}
-
-                      {/* Market Details */}
-                      <div>
-                        <h3 className="font-semibold mb-2">Detalles del Mercado</h3>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <span className="text-muted-foreground">Creado:</span>
-                            <p className="font-medium">{formatDate(market.created_at)}</p>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Cierra:</span>
-                            <p className="font-medium">{formatDate(market.expires_at)}</p>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Token:</span>
-                            <p className="font-medium">{market.token.symbol}</p>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Fee:</span>
-                            <p className="font-medium">{(market.fee * 100).toFixed(1)}%</p>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-
                 {/* Comments Tab */}
                 <TabsContent value="comments" className="mt-4">
                   <Card className="overflow-visible">
