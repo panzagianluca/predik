@@ -12,6 +12,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from '@/components/animate-ui/components/radix/tabs'
 import { ToggleGroup, ToggleGroupItem } from '@/components/animate-ui/components/radix/toggle-group'
 import { LogoSpinner } from '@/components/ui/logo-spinner'
+import { CommentSection } from '@/components/market/comments/CommentSection'
 import { useAccount } from 'wagmi'
 import Image from 'next/image'
 import { Calendar, Users, TrendingUp, ExternalLink, CheckCircle2, XCircle, Clock } from 'lucide-react'
@@ -274,7 +275,7 @@ export default function MarketDetailPage() {
                 {market.description && (
                   <div>
                     <h3 className="font-semibold mb-3">Descripción</h3>
-                    <p className="text-muted-foreground break-words leading-relaxed">
+                    <p className="text-foreground break-words leading-relaxed">
                       {formatDescription(market.description)}
                     </p>
                   </div>
@@ -335,14 +336,10 @@ export default function MarketDetailPage() {
               >
                 {/* Comments Tab */}
                 <TabsContent value="comments" className="mt-4">
-                  <Card className="overflow-visible">
-                    <CardContent className="p-6">
-                      <div className="text-center py-12 text-muted-foreground">
-                        <p>Los comentarios estarán disponibles pronto</p>
-                        <p className="text-sm mt-2">{market.comments} comentarios</p>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <CommentSection 
+                    marketId={market.slug} 
+                    userAddress={address}
+                  />
                 </TabsContent>
 
                 {/* Holders Tab */}

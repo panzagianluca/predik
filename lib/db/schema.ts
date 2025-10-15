@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, boolean, numeric, index } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, uuid, boolean, numeric, index, integer } from 'drizzle-orm/pg-core'
 
 // User profiles table
 export const users = pgTable('users', {
@@ -49,3 +49,26 @@ export const userStats = pgTable('user_stats', {
   // Index for recent activity sorting
   lastTradeIdx: index('last_trade_idx').on(table.lastTradeAt),
 }))
+
+// Comments table for market discussions
+export const comments = pgTable('comments', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  marketId: text('market_id').notNull(), // market slug
+  userAddress: text('user_address').notNull(),
+  content: text('content').notNull(), // max 300 chars (enforced in API)
+  gifUrl: text('gif_url'), // Tenor GIF URL (optional)
+  parentId: uuid('parent_id'), // null = top-level comment, uuid = reply to comment
+  votes: integer('votes').default(0).notNull(), // upvotes - downvotes
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => ({
+  // Index for fetching comments by market
+  marketIdIdx: index('comments_market_id_idx').on(table.marketId),
+  // Index for fetching replies to a comment
+  parentIdIdx: index('comments_parent_id_idx').on(table.parentId),
+  // Index for sorting by votes
+  votesIdx: index('comments_votes_idx').on(table.votes),
+  // Index for sorting by date
+  createdAtIdx: index('comments_created_at_idx').on(table.createdAt),
+}))
+
