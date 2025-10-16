@@ -483,14 +483,12 @@ export function Navbar() {
                             className="w-auto min-w-[160px]"
                             transition={{ duration: 0.2, ease: "easeInOut" }}
                           >
-                            <DropdownMenuItem className="justify-start">
-                              <Activity className="mr-2 h-4 w-4" />
-                              <span>Actividad</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="justify-start">
-                              <Trophy className="mr-2 h-4 w-4" />
-                              <span>Ranking</span>
-                            </DropdownMenuItem>
+                            <Link href="/ranking">
+                              <DropdownMenuItem className="justify-start">
+                                <Trophy className="mr-2 h-4 w-4" />
+                                <span>Ranking</span>
+                              </DropdownMenuItem>
+                            </Link>
                             <DropdownMenuItem className="justify-start">
                               <Lightbulb className="mr-2 h-4 w-4" />
                               <span>Proponer</span>
@@ -664,17 +662,13 @@ export function Navbar() {
                             
                             <DropdownMenuSeparator />
                             
-                            {/* Activity */}
-                            <DropdownMenuItem className="justify-start">
-                              <Activity className="mr-2 h-4 w-4" />
-                              <span>Actividad</span>
-                            </DropdownMenuItem>
-                            
                             {/* Ranking */}
-                            <DropdownMenuItem className="justify-start">
-                              <Trophy className="mr-2 h-4 w-4" />
-                              <span>Ranking</span>
-                            </DropdownMenuItem>
+                            <Link href="/ranking" prefetch={true}>
+                              <DropdownMenuItem className="justify-start">
+                                <Trophy className="mr-2 h-4 w-4" />
+                                <span>Ranking</span>
+                              </DropdownMenuItem>
+                            </Link>
                             
                             {/* Proponer */}
                             <DropdownMenuItem className="justify-start">
