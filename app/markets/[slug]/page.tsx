@@ -14,6 +14,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/animate-ui/components
 import { LogoSpinner } from '@/components/ui/logo-spinner'
 import { CommentSection } from '@/components/market/comments/CommentSection'
 import { HoldersList } from '@/components/market/HoldersList'
+import { ActivityList } from '@/components/market/ActivityList'
 import { useAccount } from 'wagmi'
 import Image from 'next/image'
 import { Calendar, Users, TrendingUp, ExternalLink, CheckCircle2, XCircle, Clock } from 'lucide-react'
@@ -348,14 +349,7 @@ export default function MarketDetailPage() {
 
                 {/* Activity Tab */}
                 <TabsContent value="activity" className="mt-4">
-                  <Card className="overflow-visible">
-                    <CardContent className="p-6">
-                      <div className="text-center py-12 text-muted-foreground">
-                        <p>Actividad reciente del mercado</p>
-                        <p className="text-sm mt-2">Función en desarrollo</p>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <ActivityList marketSlug={market.slug} />
                 </TabsContent>
               </TabsContents>
             </Tabs>

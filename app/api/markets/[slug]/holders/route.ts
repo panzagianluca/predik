@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getHolderShares } from '@/lib/getHolderShares'
 
 const MYRIAD_API_URL = process.env.NEXT_PUBLIC_MYRIAD_API_URL || 'https://api-v1.staging.myriadprotocol.com'
 
-// In-memory cache for 1 hour
+// In-memory cache for 12 hours (twice daily refresh)
 const cache = new Map<string, { data: any; timestamp: number }>()
-const CACHE_DURATION = 60 * 60 * 1000 // 1 hour
+const CACHE_DURATION = 12 * 60 * 60 * 1000 // 12 hours
 
 export async function GET(
   request: NextRequest,
@@ -18,7 +19,7 @@ export async function GET(
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
       return NextResponse.json(cached.data, {
         headers: {
-          'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
+          'Cache-Control': 'public, s-maxage=43200, stale-while-revalidate=86400',
           'X-Cache': 'HIT'
         }
       })
@@ -38,40 +39,69 @@ export async function GET(
     const outcomes = market.outcomes
     const topHolders: string[] = market.top_holders || []
 
-    console.log(`🔍 Market ${marketId}: ${market.title}`)
-    console.log(`📊 Top holders from Myriad: ${topHolders.length}`)
-    console.log(`📊 Top holders list:`, topHolders)
+    console.log(`🔍 Fetching REAL blockchain shares for market ${marketId}...`)
+    console.log(`📊 Top holders: ${topHolders.length}`)
 
-    // For now, we'll use the Myriad API's top_holders list directly
-    // TODO: Query blockchain to get actual shares per outcome using polkamarkets-js SDK
-    // The PredictionMarket contract requires getUserMarketShares method, not standard ERC-1155 balanceOf
-    
+    // For each outcome, get real shares from blockchain
+    const holdersByOutcome: Record<number, Array<{
+      address: string
+      shares: string
+    }>> = {}
+
+    for (let outcomeIndex = 0; outcomeIndex < outcomes.length; outcomeIndex++) {
+      const holders: Array<{ address: string; shares: bigint }> = []
+      
+      console.log(`\n🔎 Processing outcome ${outcomeIndex}: ${outcomes[outcomeIndex].title}`)
+      
+      // Query blockchain for each holder's shares
+      for (const holderAddress of topHolders) {
+        try {
+          const { outcomeShares } = await getHolderShares(marketId, holderAddress)
+          const shares = outcomeShares[outcomeIndex]
+          
+          if (shares > BigInt(0)) {
+            holders.push({
+              address: holderAddress,
+              shares
+            })
+            console.log(`  ✅ ${holderAddress}: ${shares} raw shares`)
+          }
+        } catch (err) {
+          console.error(`  ❌ Error for ${holderAddress}:`, err)
+        }
+      }
+
+      // Sort by shares descending
+      holders.sort((a, b) => Number(b.shares - a.shares))
+      const top20 = holders.slice(0, 20)
+
+      // Format shares (6 decimals for USDT)
+      holdersByOutcome[outcomeIndex] = top20.map(holder => ({
+        address: holder.address,
+        shares: (Number(holder.shares) / 1e6).toFixed(2)
+      }))
+
+      console.log(`  📊 Found ${top20.length} holders with shares for outcome ${outcomeIndex}`)
+    }
+
     const responseData = {
       marketId,
-      outcomes: outcomes.map((outcome: any) => ({
+      outcomes: outcomes.map((outcome: any, index: number) => ({
         id: outcome.id,
         title: outcome.title,
         price: outcome.price,
-        // For now, show top holders without specific share amounts
-        holders: topHolders.slice(0, 20).map((address, index) => ({
-          address,
-          shares: 'N/A', // TODO: Query using getUserMarketShares from polkamarkets-js
-          usdValue: 'N/A' // TODO: Calculate from shares * outcome price
-        }))
+        holders: holdersByOutcome[index] || []
       })),
       cachedAt: new Date().toISOString(),
-      note: 'Currently showing top holders from Myriad API. Per-outcome share amounts require server-side polkamarkets-js integration.'
+      note: 'Real blockchain data - cached for 12 hours'
     }
 
-    // Cache the result
-    cache.set(slug, {
-      data: responseData,
-      timestamp: Date.now()
-    })
+    // Cache for 12 hours
+    cache.set(slug, { data: responseData, timestamp: Date.now() })
 
     return NextResponse.json(responseData, {
       headers: {
-        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
+        'Cache-Control': 'public, s-maxage=43200, stale-while-revalidate=86400',
         'X-Cache': 'MISS'
       }
     })
