@@ -143,7 +143,7 @@ export default function ProfilePage() {
   const activeDays = 15 // Placeholder - will be calculated from join date
 
   return (
-    <div className="min-h-screen pb-12">
+    <div className="pb-12">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

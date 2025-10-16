@@ -130,7 +130,7 @@ export default function MarketDetailPage() {
   }
 
   return (
-    <div className="min-h-screen pb-12">
+    <div className="pb-12">
       {/* Container with same max-width as navbar - NO extra padding */}
       <div className="max-w-7xl mx-auto">
         

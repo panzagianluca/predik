@@ -407,8 +407,10 @@ export function Navbar() {
                     <Button
                       onClick={() => {
                         setShowTutorial(false)
-                        // Trigger wallet connection modal
-                        if (openConnectModalRef.current) {
+                        // If user is logged in, open deposit modal, otherwise open connect wallet
+                        if (address) {
+                          setShowDepositModal(true)
+                        } else if (openConnectModalRef.current) {
                           openConnectModalRef.current()
                         }
                       }}

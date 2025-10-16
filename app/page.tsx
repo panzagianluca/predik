@@ -35,7 +35,7 @@ export default async function Home() {
   const markets = await getMarkets()
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background">
       <div className="max-w-7xl mx-auto">
         {/* Title */}
         <h1 className="text-[30px] mb-4">
