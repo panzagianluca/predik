@@ -87,3 +87,35 @@ export const commentVotes = pgTable('comment_votes', {
   userAddressIdx: index('comment_votes_user_address_idx').on(table.userAddress),
 }))
 
+// Market proposals table
+export const marketProposals = pgTable('market_proposals', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  title: text('title').notNull(), // The question
+  category: text('category').notNull(), // Sports, Economy, Politics, Crypto, Culture
+  endDate: timestamp('end_date').notNull(), // Estimated market end date
+  source: text('source'), // Optional URL for resolution
+  outcomes: text('outcomes').notNull(), // JSON array: ["Yes", "No"] or custom
+  createdBy: text('created_by').notNull(), // Wallet address
+  upvotes: integer('upvotes').default(0).notNull(),
+  status: text('status').default('pending').notNull(), // pending, approved, rejected
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => ({
+  categoryIdx: index('proposals_category_idx').on(table.category),
+  statusIdx: index('proposals_status_idx').on(table.status),
+  upvotesIdx: index('proposals_upvotes_idx').on(table.upvotes),
+  createdAtIdx: index('proposals_created_at_idx').on(table.createdAt),
+}))
+
+// Proposal votes table
+export const proposalVotes = pgTable('proposal_votes', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  proposalId: uuid('proposal_id').notNull().references(() => marketProposals.id, { onDelete: 'cascade' }),
+  voterAddress: text('voter_address').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => ({
+  // User can only vote once per proposal
+  proposalVoterUnique: unique('proposal_votes_unique').on(table.proposalId, table.voterAddress),
+  proposalIdIdx: index('proposal_votes_proposal_id_idx').on(table.proposalId),
+  voterAddressIdx: index('proposal_votes_voter_address_idx').on(table.voterAddress),
+}))
+

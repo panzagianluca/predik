@@ -489,10 +489,12 @@ export function Navbar() {
                                 <span>Ranking</span>
                               </DropdownMenuItem>
                             </Link>
-                            <DropdownMenuItem className="justify-start">
-                              <Lightbulb className="mr-2 h-4 w-4" />
-                              <span>Proponer</span>
-                            </DropdownMenuItem>
+                            <Link href="/proponer">
+                              <DropdownMenuItem className="justify-start">
+                                <Lightbulb className="mr-2 h-4 w-4" />
+                                <span>Proponer</span>
+                              </DropdownMenuItem>
+                            </Link>
                             
                             <DropdownMenuSeparator />
                             
@@ -653,7 +655,7 @@ export function Navbar() {
                             <DropdownMenuSeparator />
                             
                             {/* Profile */}
-                            <Link href="/profile" prefetch={true}>
+                            <Link href="/perfil" prefetch={true}>
                               <DropdownMenuItem className="justify-start">
                                 <User className="mr-2 h-4 w-4" />
                                 <span>Profile</span>
@@ -671,10 +673,12 @@ export function Navbar() {
                             </Link>
                             
                             {/* Proponer */}
-                            <DropdownMenuItem className="justify-start">
-                              <Lightbulb className="mr-2 h-4 w-4" />
-                              <span>Proponer</span>
-                            </DropdownMenuItem>
+                            <Link href="/proponer">
+                              <DropdownMenuItem className="justify-start">
+                                <Lightbulb className="mr-2 h-4 w-4" />
+                                <span>Proponer</span>
+                              </DropdownMenuItem>
+                            </Link>
                             
                             <DropdownMenuSeparator />
                             

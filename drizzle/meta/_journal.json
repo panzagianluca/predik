@@ -15,6 +15,13 @@
       "when": 1760443472711,
       "tag": "0001_wise_meggan",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1760644243397,
+      "tag": "0002_adorable_whiplash",
+      "breakpoints": true
     }
   ]
 }
