@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { marketProposals, proposalVotes } from '@/lib/db/schema'
-import { eq, and, sql } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 
-// POST /api/proposals/[id]/vote - Upvote a proposal
-export async function POST(
+// PATCH /api/proposals/[id]/vote - Toggle vote on a proposal
+export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -15,116 +15,80 @@ export async function POST(
 
     if (!voterAddress) {
       return NextResponse.json(
-        { error: 'Voter address is required' },
+        { error: 'voterAddress is required' },
         { status: 400 }
       )
     }
 
-    // Check if user already voted
-    const existingVote = await db
-      .select()
-      .from(proposalVotes)
-      .where(
-        and(
-          eq(proposalVotes.proposalId, id),
-          eq(proposalVotes.voterAddress, voterAddress)
-        )
-      )
-      .limit(1)
+    // Normalize address for consistency
+    const normalizedAddress = voterAddress.toLowerCase()
 
-    if (existingVote.length > 0) {
-      return NextResponse.json(
-        { error: 'You have already voted for this proposal' },
-        { status: 400 }
-      )
-    }
-
-    // Insert vote
-    await db.insert(proposalVotes).values({
-      proposalId: id,
-      voterAddress,
-    })
-
-    // Increment upvotes count
-    await db
-      .update(marketProposals)
-      .set({
-        upvotes: sql`${marketProposals.upvotes} + 1`,
-      })
-      .where(eq(marketProposals.id, id))
-
-    // Get updated proposal
-    const [updatedProposal] = await db
+    // Fetch current proposal
+    const [proposal] = await db
       .select()
       .from(marketProposals)
       .where(eq(marketProposals.id, id))
       .limit(1)
 
-    return NextResponse.json(updatedProposal)
-  } catch (error) {
-    console.error('Error voting on proposal:', error)
-    return NextResponse.json(
-      { error: 'Failed to vote on proposal' },
-      { status: 500 }
-    )
-  }
-}
-
-// DELETE /api/proposals/[id]/vote - Remove vote (unvote)
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await params
-    const { searchParams } = new URL(request.url)
-    const voterAddress = searchParams.get('voterAddress')
-
-    if (!voterAddress) {
+    if (!proposal) {
       return NextResponse.json(
-        { error: 'Voter address is required' },
-        { status: 400 }
-      )
-    }
-
-    // Delete vote
-    const result = await db
-      .delete(proposalVotes)
-      .where(
-        and(
-          eq(proposalVotes.proposalId, id),
-          eq(proposalVotes.voterAddress, voterAddress)
-        )
-      )
-      .returning()
-
-    if (result.length === 0) {
-      return NextResponse.json(
-        { error: 'Vote not found' },
+        { error: 'Proposal not found' },
         { status: 404 }
       )
     }
 
-    // Decrement upvotes count
-    await db
-      .update(marketProposals)
-      .set({
-        upvotes: sql`${marketProposals.upvotes} - 1`,
-      })
-      .where(eq(marketProposals.id, id))
-
-    // Get updated proposal
-    const [updatedProposal] = await db
+    // Check if user has already voted
+    const [existingVote] = await db
       .select()
-      .from(marketProposals)
-      .where(eq(marketProposals.id, id))
+      .from(proposalVotes)
+      .where(and(
+        eq(proposalVotes.proposalId, id),
+        eq(proposalVotes.voterAddress, normalizedAddress)
+      ))
       .limit(1)
 
-    return NextResponse.json(updatedProposal)
+    let newVotes: number
+    let hasVoted: boolean
+
+    if (existingVote) {
+      // Remove vote (toggle off)
+      await db
+        .delete(proposalVotes)
+        .where(eq(proposalVotes.id, existingVote.id))
+      
+      newVotes = proposal.upvotes - 1
+      hasVoted = false
+    } else {
+      // Add vote (toggle on)
+      await db
+        .insert(proposalVotes)
+        .values({
+          proposalId: id,
+          voterAddress: normalizedAddress
+        })
+      
+      newVotes = proposal.upvotes + 1
+      hasVoted = true
+    }
+
+    // Update proposal vote count
+    const [updatedProposal] = await db
+      .update(marketProposals)
+      .set({ 
+        upvotes: newVotes
+      })
+      .where(eq(marketProposals.id, id))
+      .returning()
+
+    return NextResponse.json({
+      id: updatedProposal.id,
+      upvotes: updatedProposal.upvotes,
+      hasVoted
+    })
   } catch (error) {
-    console.error('Error removing vote:', error)
+    console.error('Error voting on proposal:', error)
     return NextResponse.json(
-      { error: 'Failed to remove vote' },
+      { error: 'Failed to vote on proposal' },
       { status: 500 }
     )
   }

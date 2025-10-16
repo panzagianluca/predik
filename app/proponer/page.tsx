@@ -75,44 +75,24 @@ export default function ProponerPage() {
   }
 
   const fetchUserVotes = async () => {
-    // TODO: Implement API to fetch user's votes
-    // For now, we'll handle it client-side
+    if (!address) return
+    
+    try {
+      // Fetch all proposal IDs that the user has voted on
+      const response = await fetch(`/api/proposals/user-votes?voterAddress=${address}`)
+      if (response.ok) {
+        const votedProposalIds = await response.json()
+        setUserVotes(new Set(votedProposalIds))
+      }
+    } catch (error) {
+      console.error('Error fetching user votes:', error)
+    }
   }
 
   const handleVote = async (proposalId: string) => {
-    if (!address) return
-
-    const hasVoted = userVotes.has(proposalId)
-    
-    try {
-      const response = await fetch(`/api/proposals/${proposalId}/vote`, {
-        method: hasVoted ? 'DELETE' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: hasVoted ? undefined : JSON.stringify({ voterAddress: address }),
-        ...(hasVoted && { 
-          method: 'DELETE',
-          headers: {},
-          body: undefined 
-        })
-      })
-
-      if (!response.ok) throw new Error('Failed to vote')
-
-      // Update local state
-      const newVotes = new Set(userVotes)
-      if (hasVoted) {
-        newVotes.delete(proposalId)
-      } else {
-        newVotes.add(proposalId)
-      }
-      setUserVotes(newVotes)
-
-      // Refresh proposals to get updated counts
-      await fetchProposals()
-    } catch (error) {
-      console.error('Error voting:', error)
-      throw error
-    }
+    // Just refresh proposals to keep counts in sync
+    // The ProposalCard component handles the actual voting
+    await fetchProposals()
   }
 
   const truncateAddress = (address: string) => {

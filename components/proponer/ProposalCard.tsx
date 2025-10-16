@@ -32,15 +32,37 @@ export function ProposalCard({ proposal, userAddress, userVoted = false, onVote 
   const [voteCount, setVoteCount] = useState(proposal.upvotes)
 
   const handleVote = async () => {
-    if (!userAddress || !onVote || isVoting) return
+    if (!userAddress || isVoting) return
 
     setIsVoting(true)
+    
+    // Optimistic update
+    const newHasVoted = !hasVoted
+    const newVoteCount = hasVoted ? voteCount - 1 : voteCount + 1
+    setHasVoted(newHasVoted)
+    setVoteCount(newVoteCount)
+
     try {
-      await onVote(proposal.id)
-      setHasVoted(!hasVoted)
-      setVoteCount(prev => hasVoted ? prev - 1 : prev + 1)
+      const response = await fetch(`/api/proposals/${proposal.id}/vote`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ voterAddress: userAddress })
+      })
+
+      if (!response.ok) throw new Error('Vote failed')
+
+      const data = await response.json()
+      setVoteCount(data.upvotes)
+      setHasVoted(data.hasVoted)
+      
+      if (onVote) {
+        onVote(proposal.id)
+      }
     } catch (error) {
       console.error('Error voting:', error)
+      // Revert optimistic update
+      setHasVoted(hasVoted)
+      setVoteCount(voteCount)
     } finally {
       setIsVoting(false)
     }
