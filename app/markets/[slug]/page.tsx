@@ -277,9 +277,30 @@ export default function MarketDetailPage() {
               {market.description && (
                 <div>
                   <h3 className="font-semibold mb-3">Descripción</h3>
-                  <p className="text-foreground break-words leading-relaxed">
-                    {formatDescription(market.description)}
-                  </p>
+                  <div className="text-foreground break-words leading-relaxed whitespace-pre-line">
+                    {(() => {
+                      // Split at "Market dates:" if it exists
+                      const lowerDesc = market.description.toLowerCase()
+                      const splitPoint = lowerDesc.indexOf('market dates:')
+                      
+                      let textToShow = splitPoint !== -1 
+                        ? market.description.substring(0, splitPoint)
+                        : market.description
+                      
+                      // Remove trailing ** and whitespace
+                      textToShow = textToShow.replace(/\*\*\s*$/, '').trim()
+
+                      // Format bold text (**text**)
+                      const parts = textToShow.split(/(\*\*.*?\*\*)/g)
+                      return parts.map((part, index) => {
+                        if (part.startsWith('**') && part.endsWith('**')) {
+                          const boldText = part.slice(2, -2)
+                          return <strong key={index}>{boldText}</strong>
+                        }
+                        return <span key={index}>{part}</span>
+                      })
+                    })()}
+                  </div>
                 </div>
               )}
 
@@ -309,6 +330,34 @@ export default function MarketDetailPage() {
                   )}
                 >
                   <div className="space-y-4">
+                    {/* Market Details from Description (Market dates onwards) */}
+                    {market.description && market.description.toLowerCase().includes('market dates:') && (
+                      <div>
+                        <div className="text-sm text-foreground whitespace-pre-line">
+                          {(() => {
+                            const lowerDesc = market.description.toLowerCase()
+                            const splitPoint = lowerDesc.indexOf('market dates:')
+                            let detailsText = market.description.substring(splitPoint).trim()
+                            
+                            // Wrap "Market dates:" in ** if not already wrapped
+                            if (!detailsText.startsWith('**Market dates:**')) {
+                              detailsText = detailsText.replace(/^Market dates:/i, '**Market dates:**')
+                            }
+                            
+                            // Format bold text (**text**)
+                            const parts = detailsText.split(/(\*\*.*?\*\*)/g)
+                            return parts.map((part, index) => {
+                              if (part.startsWith('**') && part.endsWith('**')) {
+                                const boldText = part.slice(2, -2)
+                                return <strong key={index}>{boldText}</strong>
+                              }
+                              return <span key={index}>{part}</span>
+                            })
+                          })()}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Resolution Source */}
                     {market.resolution_source && (
                       <div>
