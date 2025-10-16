@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getHolderShares } from '@/lib/getHolderShares'
+import Web3 from 'web3'
+import { PREDICTION_MARKET_ABI, MarketAction } from '@/lib/abis/PredictionMarketV3_4'
 
 const MYRIAD_API_URL = process.env.NEXT_PUBLIC_MYRIAD_API_URL || 'https://api-v1.staging.myriadprotocol.com'
+const PM_CONTRACT = process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS as string
+const CELO_RPC = 'https://forno.celo-sepolia.celo-testnet.org'
 
-// In-memory cache for 12 hours (twice daily refresh)
+// In-memory cache for 5 minutes (real-time updates)
 const cache = new Map<string, { data: any; timestamp: number }>()
-const CACHE_DURATION = 12 * 60 * 60 * 1000 // 12 hours
+const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
 
 export async function GET(
   request: NextRequest,
@@ -19,97 +22,110 @@ export async function GET(
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
       return NextResponse.json(cached.data, {
         headers: {
-          'Cache-Control': 'public, s-maxage=43200, stale-while-revalidate=86400',
+          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
           'X-Cache': 'HIT'
         }
       })
     }
 
-    // Fetch market data from Myriad API
+    // Fetch market data
     const marketResponse = await fetch(`${MYRIAD_API_URL}/markets/${slug}`)
     if (!marketResponse.ok) {
-      return NextResponse.json(
-        { error: 'Market not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Market not found' }, { status: 404 })
     }
 
     const market = await marketResponse.json()
     const marketId = market.id
     const outcomes = market.outcomes
-    const topHolders: string[] = market.top_holders || []
 
-    console.log(`🔍 Fetching REAL blockchain shares for market ${marketId}...`)
-    console.log(`📊 Top holders: ${topHolders.length}`)
+    console.log(`🔍 Calculating holders for market ${marketId} from blockchain events...`)
 
-    // For each outcome, get real shares from blockchain
-    const holdersByOutcome: Record<number, Array<{
-      address: string
-      shares: string
-    }>> = {}
+    // Initialize Web3
+    const web3 = new Web3(CELO_RPC)
+    const contract = new web3.eth.Contract(PREDICTION_MARKET_ABI as any, PM_CONTRACT)
 
-    for (let outcomeIndex = 0; outcomeIndex < outcomes.length; outcomeIndex++) {
-      const holders: Array<{ address: string; shares: bigint }> = []
-      
-      console.log(`\n🔎 Processing outcome ${outcomeIndex}: ${outcomes[outcomeIndex].title}`)
-      
-      // Query blockchain for each holder's shares
-      for (const holderAddress of topHolders) {
-        try {
-          const { outcomeShares } = await getHolderShares(marketId, holderAddress)
-          const shares = outcomeShares[outcomeIndex]
-          
-          if (shares > BigInt(0)) {
-            holders.push({
-              address: holderAddress,
-              shares
-            })
-            console.log(`  ✅ ${holderAddress}: ${shares} raw shares`)
-          }
-        } catch (err) {
-          console.error(`  ❌ Error for ${holderAddress}:`, err)
-        }
+    // Get ALL MarketActionTx events for this market (from block 0)
+    const events = await contract.getPastEvents('MarketActionTx', {
+      fromBlock: '0',
+      toBlock: 'latest',
+      filter: {
+        marketId: [marketId]
+      }
+    })
+
+    console.log(`📊 Found ${events.length} total transactions for market ${marketId}`)
+
+    // Calculate balances per user per outcome
+    const balances: Record<number, Record<string, bigint>> = {}
+    
+    // Initialize outcome balances
+    outcomes.forEach((outcome: any, index: number) => {
+      balances[index] = {}
+    })
+
+    // Process events chronologically
+    for (const event of events) {
+      const { user, action, outcomeId, shares } = event.returnValues as any
+      const outcomeIndex = Number(outcomeId)
+      const userAddress = (user as string).toLowerCase()
+      const shareAmount = BigInt(shares)
+
+      // Initialize user balance if not exists
+      if (!balances[outcomeIndex][userAddress]) {
+        balances[outcomeIndex][userAddress] = BigInt(0)
       }
 
-      // Sort by shares descending
-      holders.sort((a, b) => Number(b.shares - a.shares))
-      const top20 = holders.slice(0, 20)
-
-      // Format shares (6 decimals for USDT)
-      holdersByOutcome[outcomeIndex] = top20.map(holder => ({
-        address: holder.address,
-        shares: (Number(holder.shares) / 1e6).toFixed(2)
-      }))
-
-      console.log(`  📊 Found ${top20.length} holders with shares for outcome ${outcomeIndex}`)
+      // Update balance based on action
+      if (Number(action) === MarketAction.BUY) {
+        balances[outcomeIndex][userAddress] += shareAmount
+      } else if (Number(action) === MarketAction.SELL) {
+        balances[outcomeIndex][userAddress] -= shareAmount
+      }
+      // Ignore other actions (ADD_LIQUIDITY, REMOVE_LIQUIDITY, etc.)
     }
 
-    const responseData = {
+    // Convert to holder lists per outcome
+    const holdersData = {
       marketId,
-      outcomes: outcomes.map((outcome: any, index: number) => ({
-        id: outcome.id,
-        title: outcome.title,
-        price: outcome.price,
-        holders: holdersByOutcome[index] || []
-      })),
-      cachedAt: new Date().toISOString(),
-      note: 'Real blockchain data - cached for 12 hours'
+      outcomes: outcomes.map((outcome: any, index: number) => {
+        // Get all holders with non-zero balance for this outcome
+        const holders = Object.entries(balances[index])
+          .filter(([_, balance]) => balance > BigInt(0))
+          .map(([address, balance]) => ({
+            address,
+            shares: (Number(balance) / 1e6).toFixed(2) // Try 6 decimals like USDT
+          }))
+          .sort((a, b) => parseFloat(b.shares) - parseFloat(a.shares)) // Sort by balance descending
+          .slice(0, 20) // Top 20 holders
+
+        return {
+          id: outcome.id,
+          title: outcome.title,
+          holders
+        }
+      }),
+      note: 'Real-time blockchain data - cached for 5 minutes',
+      cachedAt: new Date().toISOString()
     }
 
-    // Cache for 12 hours
-    cache.set(slug, { data: responseData, timestamp: Date.now() })
+    console.log(`✅ Calculated holders:`, outcomes.map((o: any, i: number) => 
+      `${o.title}: ${holdersData.outcomes[i].holders.length} holders`
+    ).join(', '))
 
-    return NextResponse.json(responseData, {
+    // Cache for 5 minutes
+    cache.set(slug, { data: holdersData, timestamp: Date.now() })
+
+    return NextResponse.json(holdersData, {
       headers: {
-        'Cache-Control': 'public, s-maxage=43200, stale-while-revalidate=86400',
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
         'X-Cache': 'MISS'
       }
     })
 
   } catch (error) {
-    console.error('❌ Error fetching holders:', error)
+    console.error('❌ Error calculating holders:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch holders data', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to calculate holders', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }
