@@ -17,7 +17,7 @@ import { HoldersList } from '@/components/market/HoldersList'
 import { ActivityList } from '@/components/market/ActivityList'
 import { useAccount } from 'wagmi'
 import Image from 'next/image'
-import { Calendar, Users, TrendingUp, ExternalLink, CheckCircle2, XCircle, Clock } from 'lucide-react'
+import { Calendar, Users, TrendingUp, ExternalLink, CheckCircle2, XCircle, Clock, ChevronDown, ChevronUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TooltipProvider } from '@/components/animate-ui/primitives/animate/tooltip'
 
@@ -47,6 +47,7 @@ export default function MarketDetailPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedTimeframe, setSelectedTimeframe] = useState<'24h' | '7d' | '30d' | 'all'>('24h')
+  const [showMoreDetails, setShowMoreDetails] = useState(false)
 
   useEffect(() => {
     const loadMarket = async () => {
@@ -282,41 +283,70 @@ export default function MarketDetailPage() {
                 </div>
               )}
 
-              {/* Resolution Source */}
-              {market.resolution_source && (
-                <div>
-                  <h3 className="font-semibold mb-2">Fuente de Resolución</h3>
-                  <a 
-                    href={market.resolution_source} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-electric-purple hover:underline flex items-center gap-1"
-                  >
-                    {market.resolution_title || market.resolution_source}
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                </div>
-              )}
-
-              {/* Market Details */}
+              {/* Expandable Details Section */}
               <div>
-                <h3 className="font-semibold mb-2">Detalles del Mercado</h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">Creado:</span>
-                    <p className="font-medium">{formatDate(market.created_at)}</p>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Cierra:</span>
-                    <p className="font-medium">{formatDate(market.expires_at)}</p>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Token:</span>
-                    <p className="font-medium">{market.token.symbol}</p>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Fee:</span>
-                    <p className="font-medium">{(market.fee * 100).toFixed(1)}%</p>
+                <button
+                  onClick={() => setShowMoreDetails(!showMoreDetails)}
+                  className="flex items-center gap-2 text-sm font-semibold text-electric-purple hover:underline transition-colors"
+                >
+                  {showMoreDetails ? (
+                    <>
+                      <ChevronUp className="h-4 w-4" />
+                      Ver menos
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="h-4 w-4" />
+                      Ver más detalles
+                    </>
+                  )}
+                </button>
+
+                <div 
+                  className={cn(
+                    "overflow-hidden transition-all duration-500 ease-in-out",
+                    showMoreDetails ? "max-h-[800px] opacity-100 mt-4" : "max-h-0 opacity-0"
+                  )}
+                >
+                  <div className="space-y-4">
+                    {/* Resolution Source */}
+                    {market.resolution_source && (
+                      <div>
+                        <h3 className="font-semibold mb-2">Fuente de Resolución</h3>
+                        <a 
+                          href={market.resolution_source} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-electric-purple hover:underline flex items-center gap-1"
+                        >
+                          {market.resolution_title || market.resolution_source}
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </div>
+                    )}
+
+                    {/* Market Details */}
+                    <div>
+                      <h3 className="font-semibold mb-2">Detalles del Mercado</h3>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">Creado:</span>
+                          <p className="font-medium">{formatDate(market.created_at)}</p>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Cierra:</span>
+                          <p className="font-medium">{formatDate(market.expires_at)}</p>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Token:</span>
+                          <p className="font-medium">{market.token.symbol}</p>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Fee:</span>
+                          <p className="font-medium">{(market.fee * 100).toFixed(1)}%</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
