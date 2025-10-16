@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
-import { ArrowBigUp } from 'lucide-react'
+import { Triangle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatDistanceToNow } from 'date-fns'
 import { es } from 'date-fns/locale'
@@ -30,6 +30,16 @@ export function ProposalCard({ proposal, userAddress, userVoted = false, onVote 
   const [isVoting, setIsVoting] = useState(false)
   const [hasVoted, setHasVoted] = useState(userVoted)
   const [voteCount, setVoteCount] = useState(proposal.upvotes)
+
+  // Sync hasVoted state when prop changes (e.g., after fetching user votes)
+  useEffect(() => {
+    setHasVoted(userVoted)
+  }, [userVoted])
+
+  // Sync voteCount when proposal upvotes change
+  useEffect(() => {
+    setVoteCount(proposal.upvotes)
+  }, [proposal.upvotes])
 
   const handleVote = async () => {
     if (!userAddress || isVoting) return
@@ -83,17 +93,18 @@ export function ProposalCard({ proposal, userAddress, userVoted = false, onVote 
             onClick={handleVote}
             disabled={!userAddress || isVoting}
             className={cn(
-              "flex flex-col items-center gap-1 px-2 py-1 rounded-md transition-colors min-w-[50px] h-fit",
+              "flex flex-col items-center gap-1 px-2 py-1 rounded-md transition-all min-w-[50px] h-fit",
+              "disabled:opacity-50 disabled:cursor-not-allowed",
               hasVoted
-                ? "bg-electric-purple/10 text-electric-purple"
-                : "bg-muted hover:bg-muted/70",
-              !userAddress && "opacity-50 cursor-not-allowed"
+                ? "bg-electric-purple/20 text-electric-purple hover:bg-electric-purple/30"
+                : "bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground"
             )}
+            aria-label={hasVoted ? "Remove vote" : "Vote"}
           >
-            <ArrowBigUp
+            <Triangle
               className={cn(
-                "h-6 w-6",
-                hasVoted && "fill-electric-purple"
+                "h-5 w-5 transition-all",
+                hasVoted && "fill-current"
               )}
             />
             <span className="text-sm font-bold">{voteCount}</span>
