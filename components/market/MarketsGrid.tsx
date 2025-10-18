@@ -21,9 +21,14 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
 
   // Filter markets based on selected filters
   const filteredMarkets = markets.filter(market => {
-    // Time filter - only filter by state for "closed"
-    if (timeFilter === 'closed' && market.state !== 'closed') return false
-    if (timeFilter !== 'closed' && market.state === 'closed') return false
+    // Time filter logic
+    if (timeFilter === 'closed') {
+      // Show only closed or resolved markets
+      if (market.state !== 'closed' && market.state !== 'resolved') return false
+    } else {
+      // For all other filters, only show open markets
+      if (market.state !== 'open') return false
+    }
     
     // Category filter
     if (categoryFilter !== 'all') {
