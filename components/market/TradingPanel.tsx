@@ -275,10 +275,10 @@ export function TradingPanel({ market, userAddress, isConnected, onTradeComplete
       const priceImpact = ((avgPrice - priceFrom) / priceFrom) * 100
 
       console.log('✅ Calculation result:', {
-        shares: shares.toFixed(4),
+        shares: shares.toFixed(2),
         avgPrice: (avgPrice * 100).toFixed(2) + '%',
-        fee: fee.toFixed(4),
-        maxProfit: maxProfit.toFixed(4),
+        fee: fee.toFixed(2),
+        maxProfit: maxProfit.toFixed(2),
         priceImpact: priceImpact.toFixed(2) + '%',
       })
 
@@ -334,7 +334,7 @@ export function TradingPanel({ market, userAddress, isConnected, onTradeComplete
         comparison: `${tradeAmount} > ${balance}`,
         result: tradeAmount > balance,
       })
-      setError(`Insufficient ${market.token.symbol} balance. You have ${balance.toFixed(4)}, need ${tradeAmount}`)
+      setError(`Insufficient ${market.token.symbol} balance. You have ${balance.toFixed(2)}, need ${tradeAmount}`)
       return
     }
 
@@ -518,7 +518,7 @@ export function TradingPanel({ market, userAddress, isConnected, onTradeComplete
                   <div className="flex items-center justify-between w-full gap-2 relative z-10">
                     <span className="font-semibold text-sm">{outcome.title}</span>
                     <span className="text-xs opacity-80">
-                      {(outcome.price * 100).toFixed(1)}%
+                      {(outcome.price * 100).toFixed(2)}%
                     </span>
                   </div>
                 </Button>
@@ -631,7 +631,7 @@ export function TradingPanel({ market, userAddress, isConnected, onTradeComplete
                 {/* Shares */}
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Shares {tradeType === 'buy' ? 'Received' : 'Sold'}</span>
-                  <span className="font-medium">{calculation.shares.toFixed(4)}</span>
+                  <span className="font-medium">{calculation.shares.toFixed(2)}</span>
                 </div>
               </div>
 
@@ -641,8 +641,8 @@ export function TradingPanel({ market, userAddress, isConnected, onTradeComplete
               {/* Fee and Profit */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Fee ({(market.fee * 100).toFixed(1)}%)</span>
-                  <span>{calculation.fee.toFixed(4)} {market.token.symbol}</span>
+                  <span className="text-muted-foreground">Fee ({(market.fee * 100).toFixed(2)}%)</span>
+                  <span>{calculation.fee.toFixed(2)} {market.token.symbol}</span>
                 </div>
 
                 {tradeType === 'buy' && (
@@ -662,10 +662,10 @@ export function TradingPanel({ market, userAddress, isConnected, onTradeComplete
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-green-600">
-                        +{calculation.maxProfit.toFixed(4)} {market.token.symbol}
+                        +{calculation.maxProfit.toFixed(2)} {market.token.symbol}
                       </span>
                       <span className="text-xs text-green-600">
-                        ({calculation.maxProfitPercent.toFixed(1)}%)
+                        ({calculation.maxProfitPercent.toFixed(2)}%)
                       </span>
                     </div>
                   </div>
@@ -685,11 +685,11 @@ export function TradingPanel({ market, userAddress, isConnected, onTradeComplete
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Shares</span>
-                <span className="font-semibold">{userPosition.shares.toFixed(4)}</span>
+                <span className="font-semibold">{userPosition.shares.toFixed(2)}</span>
               </div>
-              <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Value</span>
-                <span className="font-semibold">{userPosition.value.toFixed(4)}</span>
+                <span className="font-semibold">{userPosition.value.toFixed(2)}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">P&L</span>
@@ -698,7 +698,7 @@ export function TradingPanel({ market, userAddress, isConnected, onTradeComplete
                     'font-semibold',
                     userPosition.dollarChange >= 0 ? 'text-green-600' : 'text-red-600'
                   )}>
-                    {userPosition.dollarChange >= 0 ? '+' : ''}{userPosition.dollarChange.toFixed(4)}
+                    {userPosition.dollarChange >= 0 ? '+' : ''}{userPosition.dollarChange.toFixed(2)}
                   </span>
                   <span className={cn(
                     'text-xs flex items-center',
@@ -709,7 +709,7 @@ export function TradingPanel({ market, userAddress, isConnected, onTradeComplete
                     ) : (
                       <TrendingDown className="h-3 w-3 mr-1" />
                     )}
-                    {Math.abs(userPosition.percentChange).toFixed(1)}%
+                    {Math.abs(userPosition.percentChange).toFixed(2)}%
                   </span>
                 </div>
               </div>

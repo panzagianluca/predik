@@ -49,12 +49,12 @@ export function MarketCard({ market }: MarketCardProps) {
   // Format volume with K/M suffix
   const formatVolume = (volume: number) => {
     if (volume >= 1000000) {
-      return `$${(volume / 1000000).toFixed(1)}M`
+      return `$${(volume / 1000000).toFixed(2)}M`
     }
     if (volume >= 1000) {
-      return `$${(volume / 1000).toFixed(1)}K`
+      return `$${(volume / 1000).toFixed(2)}K`
     }
-    return `$${volume.toFixed(0)}`
+    return `$${volume.toFixed(2)}`
   }
 
   // Format full volume for tooltip
@@ -123,7 +123,7 @@ export function MarketCard({ market }: MarketCardProps) {
                     className="font-bold"
                     style={{ color: outcomeColor }}
                   >
-                    {probability.toFixed(1)}%
+                    {probability.toFixed(2)}%
                   </span>
                 </div>
                 

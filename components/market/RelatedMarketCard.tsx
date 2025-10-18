@@ -56,7 +56,7 @@ export function RelatedMarketCard({ market }: RelatedMarketCardProps) {
               className="font-bold"
               style={{ color: outcomeColor }}
             >
-              {probability.toFixed(1)}%
+              {probability.toFixed(2)}%
             </span>
           </div>
         </div>
