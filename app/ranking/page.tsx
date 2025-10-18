@@ -160,7 +160,7 @@ export default function RankingPage() {
 
         {/* Timeframe Tabs */}
         <Tabs value={timeframe} onValueChange={(value) => setTimeframe(value as 'month' | 'all')}>
-          <TabsList className="grid w-full max-w-md grid-cols-2 mb-8">
+          <TabsList className="grid w-full max-w-md grid-cols-2 my-3 mb-8">
             <TabsTrigger value="month">Este Mes</TabsTrigger>
             <TabsTrigger value="all">Todos los Tiempos</TabsTrigger>
           </TabsList>
