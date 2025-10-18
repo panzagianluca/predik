@@ -294,7 +294,7 @@ export function TradingPanel({ market, userAddress, isConnected, onTradeComplete
       })
     } catch (err) {
       console.error('Calculation error:', err)
-      setError('Unable to calculate trade. Market may be closed or have insufficient liquidity.')
+      setError('No se puede calcular la operación. El mercado puede estar cerrado o tener liquidez insuficiente.')
       setCalculation(null)
     } finally {
       setIsCalculating(false)
@@ -334,7 +334,7 @@ export function TradingPanel({ market, userAddress, isConnected, onTradeComplete
         comparison: `${tradeAmount} > ${balance}`,
         result: tradeAmount > balance,
       })
-      setError(`Insufficient ${market.token.symbol} balance. You have ${balance.toFixed(2)}, need ${tradeAmount}`)
+      setError(`Saldo insuficiente de ${market.token.symbol}. Tienes ${balance.toFixed(2)}, necesitas ${tradeAmount}`)
       return
     }
 
@@ -455,8 +455,8 @@ export function TradingPanel({ market, userAddress, isConnected, onTradeComplete
       }
     } catch (err) {
       console.error('❌ Trade execution error:', err)
-      const message = err instanceof Error ? err.message : 'Unknown error'
-      setError(`Trade failed: ${message}`)
+      const message = err instanceof Error ? err.message : 'Error desconocido'
+      setError(`Operación fallida: ${message}`)
     } finally {
       setIsExecuting(false)
     }
@@ -476,7 +476,7 @@ export function TradingPanel({ market, userAddress, isConnected, onTradeComplete
     return (
       <Card className={className}>
         <CardContent className="flex items-center justify-center h-64">
-          <p className="text-muted-foreground">No outcomes available for this market</p>
+          <p className="text-muted-foreground">No hay resultados disponibles para este mercado</p>
         </CardContent>
       </Card>
     )
@@ -490,17 +490,17 @@ export function TradingPanel({ market, userAddress, isConnected, onTradeComplete
           <Tabs value={tradeType} onValueChange={(value) => setTradeType(value as 'buy' | 'sell')}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="buy" className="data-[state=active]:text-green-600">
-                Buy
+                Comprar
               </TabsTrigger>
               <TabsTrigger value="sell" className="data-[state=active]:text-red-600">
-                Sell
+                Vender
               </TabsTrigger>
             </TabsList>
           </Tabs>
 
           {/* Outcome Selection */}
           <div className="space-y-2">
-            <Label>Select Outcome</Label>
+            <Label>Seleccionar Resultado</Label>
             <div className="grid grid-cols-2 gap-2 relative">
               {market.outcomes.map((outcome) => (
                 <Button
@@ -528,7 +528,7 @@ export function TradingPanel({ market, userAddress, isConnected, onTradeComplete
 
           {/* Amount Input */}
           <div className="space-y-2">
-            <Label htmlFor="amount">Amount</Label>
+            <Label htmlFor="amount">Monto</Label>
             <Input
               id="amount"
               type="number"
@@ -561,7 +561,7 @@ export function TradingPanel({ market, userAddress, isConnected, onTradeComplete
                 disabled={isExecuting || !isConnected || Number(balance) === 0}
                 className="flex-1"
               >
-                MAX
+                MÁX
               </Button>
             </div>
           </div>
@@ -585,11 +585,11 @@ export function TradingPanel({ market, userAddress, isConnected, onTradeComplete
             {isExecuting ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                Processing...
+                Procesando...
               </>
             ) : (
               <>
-                {tradeType === 'buy' ? 'Buy Shares' : 'Sell Shares'}
+                {tradeType === 'buy' ? 'Comprar Acciones' : 'Vender Acciones'}
               </>
             )}
           </Button>
@@ -606,17 +606,17 @@ export function TradingPanel({ market, userAddress, isConnected, onTradeComplete
           {/* Transaction Summary */}
           {!isCalculating && calculation && !error && (
             <div className="space-y-3 border-t pt-4">
-              <h4 className="font-semibold text-sm">Summary</h4>
+              <h4 className="font-semibold text-sm">Resumen</h4>
               
               {/* Price Changes */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Current Price</span>
+                  <span className="text-muted-foreground">Precio Actual</span>
                   <span className="font-medium">{(calculation.priceFrom * 100).toFixed(2)}%</span>
                 </div>
 
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Your Avg. Price</span>
+                  <span className="text-muted-foreground">Tu Precio Promedio</span>
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{(calculation.avgPrice * 100).toFixed(2)}%</span>
                     <span className={cn(
@@ -630,7 +630,7 @@ export function TradingPanel({ market, userAddress, isConnected, onTradeComplete
 
                 {/* Shares */}
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Shares {tradeType === 'buy' ? 'Received' : 'Sold'}</span>
+                  <span className="text-muted-foreground">Acciones {tradeType === 'buy' ? 'Recibidas' : 'Vendidas'}</span>
                   <span className="font-medium">{calculation.shares.toFixed(2)}</span>
                 </div>
               </div>
@@ -641,21 +641,21 @@ export function TradingPanel({ market, userAddress, isConnected, onTradeComplete
               {/* Fee and Profit */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Fee ({(market.fee * 100).toFixed(2)}%)</span>
+                  <span className="text-muted-foreground">Tarifa ({(market.fee * 100).toFixed(2)}%)</span>
                   <span>{calculation.fee.toFixed(2)} {market.token.symbol}</span>
                 </div>
 
                 {tradeType === 'buy' && (
                   <div className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-1">
-                      <span className="text-muted-foreground">Max Profit</span>
+                      <span className="text-muted-foreground">Ganancia Máxima</span>
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Info className="h-3 w-3 text-muted-foreground cursor-help" />
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p className="text-xs">If this outcome wins (goes to 100%)</p>
+                            <p className="text-xs">Si este resultado gana (llega al 100%)</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -681,33 +681,40 @@ export function TradingPanel({ market, userAddress, isConnected, onTradeComplete
       {isConnected && userPosition && (
         <Card className="w-[320px] border-electric-purple/50">
           <CardContent className="pt-6 space-y-3">
-            <h4 className="font-semibold text-sm">Your Position</h4>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Shares</span>
-                <span className="font-semibold">{userPosition.shares.toFixed(2)}</span>
+            <h4 className="font-semibold text-sm mb-3">Tu Posición</h4>
+            
+            {/* 3 Column Layout */}
+            <div className="grid grid-cols-3 gap-3">
+              {/* Column 1: Acciones */}
+              <div className="flex flex-col items-center text-center">
+                <span className="text-xs text-muted-foreground mb-1">Acciones</span>
+                <span className="font-semibold text-sm">{userPosition.shares.toFixed(2)}</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Value</span>
-                <span className="font-semibold">{userPosition.value.toFixed(2)}</span>
+              
+              {/* Column 2: Valor */}
+              <div className="flex flex-col items-center text-center">
+                <span className="text-xs text-muted-foreground mb-1">Valor</span>
+                <span className="font-semibold text-sm">${userPosition.value.toFixed(2)}</span>
               </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">P&L</span>
-                <div className="flex items-center gap-2">
+              
+              {/* Column 3: Resultado */}
+              <div className="flex flex-col items-center text-center">
+                <span className="text-xs text-muted-foreground mb-1">Resultado</span>
+                <div className="flex flex-col items-center gap-0.5">
                   <span className={cn(
-                    'font-semibold',
+                    'font-semibold text-sm',
                     userPosition.dollarChange >= 0 ? 'text-green-600' : 'text-red-600'
                   )}>
-                    {userPosition.dollarChange >= 0 ? '+' : ''}{userPosition.dollarChange.toFixed(2)}
+                    {userPosition.dollarChange >= 0 ? '+' : ''}${userPosition.dollarChange.toFixed(2)}
                   </span>
                   <span className={cn(
                     'text-xs flex items-center',
                     userPosition.percentChange >= 0 ? 'text-green-600' : 'text-red-600'
                   )}>
                     {userPosition.percentChange >= 0 ? (
-                      <TrendingUp className="h-3 w-3 mr-1" />
+                      <TrendingUp className="h-3 w-3 mr-0.5" />
                     ) : (
-                      <TrendingDown className="h-3 w-3 mr-1" />
+                      <TrendingDown className="h-3 w-3 mr-0.5" />
                     )}
                     {Math.abs(userPosition.percentChange).toFixed(2)}%
                   </span>

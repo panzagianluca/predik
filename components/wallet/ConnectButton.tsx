@@ -17,7 +17,7 @@ export function ConnectButton() {
   if (!mounted) {
     return (
       <Button disabled variant="outline">
-        Loading...
+        Cargando...
       </Button>
     )
   }
@@ -42,11 +42,11 @@ export function ConnectButton() {
             onClick={() => connect({ connector })}
             className={isInjected ? "bg-electric-purple hover:bg-electric-purple/90" : ""}
             variant={isWalletConnect ? "outline" : "default"}
-            title={isInjected ? "Connect with browser extension (MetaMask, Coinbase Wallet, etc.)" : "Connect with mobile wallet via QR code"}
+            title={isInjected ? "Conectar con extensión del navegador (MetaMask, Coinbase Wallet, etc.)" : "Conectar con billetera móvil vía código QR"}
           >
             {isInjected && "🦊 MetaMask"}
-            {isWalletConnect && "📱 Mobile Wallet"}
-            {!isInjected && !isWalletConnect && `Connect ${connector.name}`}
+            {isWalletConnect && "📱 Billetera Móvil"}
+            {!isInjected && !isWalletConnect && `Conectar ${connector.name}`}
           </Button>
         )
       })}

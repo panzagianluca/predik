@@ -59,7 +59,7 @@ export function DepositModal({ isOpen, onClose, walletAddress }: DepositModalPro
           <Tabs defaultValue="cex" className="w-full mt-4">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="cex">Desde CEX</TabsTrigger>
-              <TabsTrigger value="bridge">Bridge</TabsTrigger>
+              <TabsTrigger value="bridge">Puente</TabsTrigger>
             </TabsList>
 
             {/* Tab 1: CEX */}
