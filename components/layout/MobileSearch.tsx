@@ -91,7 +91,7 @@ export const MobileSearch = forwardRef<MobileSearchRef>((props, ref) => {
       <DialogContent
         from="top"
         transition={{ type: 'spring', stiffness: 260, damping: 26 }}
-        className="max-w-full w-full p-0 gap-0 rounded-none md:rounded-2xl border-0 md:border border-border/60 shadow-xl backdrop-blur max-h-screen md:max-h-[85vh] flex flex-col md:max-w-2xl"
+        className="max-w-full md:max-w-2xl w-full p-0 gap-0 rounded-2xl border-0 md:border border-border/60 shadow-xl backdrop-blur max-h-[90vh] flex flex-col"
         showCloseButton={false}
       >
         {/* Hidden title for accessibility */}

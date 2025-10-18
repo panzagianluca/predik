@@ -271,8 +271,8 @@ export default function EditProfileModal({
                 </div>
               </div>
 
-              {/* Username & Wallet Row */}
-              <div className="grid grid-cols-2 gap-4">
+              {/* Username & Wallet Row - Mobile: Stacked, Desktop: Side-by-side */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="username">Nombre de Usuario</Label>
                   <Input

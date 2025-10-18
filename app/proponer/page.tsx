@@ -11,7 +11,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useAccount } from 'wagmi'
 
 type SortFilter = 'most-voted' | 'recent'
-type CategoryFilter = 'all' | 'Deportes' | 'Economía' | 'Política' | 'Crypto' | 'Cultura'
 
 interface Proposal {
   id: string
@@ -30,7 +29,6 @@ export default function ProponerPage() {
   const [proposals, setProposals] = useState<Proposal[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [sortFilter, setSortFilter] = useState<SortFilter>('most-voted')
-  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all')
   const [userVotes, setUserVotes] = useState<Set<string>>(new Set())
   const [topContributors, setTopContributors] = useState<Array<{ address: string; count: number }>>([])
 
@@ -39,14 +37,13 @@ export default function ProponerPage() {
     if (address) {
       fetchUserVotes()
     }
-  }, [sortFilter, categoryFilter, address])
+  }, [sortFilter, address])
 
   const fetchProposals = async () => {
     setIsLoading(true)
     try {
       const params = new URLSearchParams({
-        sort: sortFilter,
-        ...(categoryFilter !== 'all' && { category: categoryFilter })
+        sort: sortFilter
       })
       
       const response = await fetch(`/api/proposals?${params}`)
@@ -107,18 +104,6 @@ export default function ProponerPage() {
     { id: 'recent', label: 'Recientes' },
   ]
 
-  const categoryFilters: Array<{
-    id: CategoryFilter
-    label: string
-  }> = [
-    { id: 'all', label: 'Todos' },
-    { id: 'Deportes', label: 'Deportes' },
-    { id: 'Economía', label: 'Economía' },
-    { id: 'Política', label: 'Política' },
-    { id: 'Crypto', label: 'Crypto' },
-    { id: 'Cultura', label: 'Cultura' },
-  ]
-
   return (
     <div className="pb-12">
       <div className="max-w-7xl mx-auto">
@@ -175,69 +160,35 @@ export default function ProponerPage() {
           {/* Right Column: Filter Banner + Proposals Grid */}
           <div>
             {/* Filter Banner */}
-            <div className="flex flex-wrap items-center gap-4 rounded-lg py-3 mb-6">
-              <div className="flex flex-wrap items-center gap-2">
-                {/* Sort Filters - Ghost buttons */}
-                {sortFilters.map((filter) => {
-                  const isActive = sortFilter === filter.id
-                  return (
-                    <motion.button
-                      key={filter.id}
-                      onClick={() => setSortFilter(filter.id)}
-                      className={cn(
-                        'px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] relative overflow-hidden',
-                        isActive
-                          ? 'text-electric-purple bg-electric-purple/5'
-                          : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                      )}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      transition={{ duration: 0.2, ease: "easeOut" }}
-                    >
-                      {isActive && (
-                        <motion.div
-                          layoutId="activeSortFilter"
-                          className="absolute inset-0 bg-electric-purple/5 rounded-md"
-                          transition={{ duration: 0.3, ease: "easeInOut" }}
-                        />
-                      )}
-                      <span className="relative z-10">{filter.label}</span>
-                    </motion.button>
-                  )
-                })}
-
-                {/* Divider */}
-                <div className="h-8 w-px bg-border mx-2" />
-
-                {/* Category Filters - Ghost buttons */}
-                {categoryFilters.map((filter) => {
-                  const isActive = categoryFilter === filter.id
-                  return (
-                    <motion.button
-                      key={filter.id}
-                      onClick={() => setCategoryFilter(filter.id)}
-                      className={cn(
-                        'px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] relative overflow-hidden',
-                        isActive
-                          ? 'text-electric-purple bg-electric-purple/5'
-                          : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                      )}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      transition={{ duration: 0.2, ease: "easeOut" }}
-                    >
-                      {isActive && (
-                        <motion.div
-                          layoutId="activeCategoryFilter"
-                          className="absolute inset-0 bg-electric-purple/5 rounded-md"
-                          transition={{ duration: 0.3, ease: "easeInOut" }}
-                        />
-                      )}
-                      <span className="relative z-10">{filter.label}</span>
-                    </motion.button>
-                  )
-                })}
-              </div>
+            <div className="flex flex-wrap items-center gap-2 rounded-lg py-3 mb-6">
+              {/* Sort Filters - Ghost buttons */}
+              {sortFilters.map((filter) => {
+                const isActive = sortFilter === filter.id
+                return (
+                  <motion.button
+                    key={filter.id}
+                    onClick={() => setSortFilter(filter.id)}
+                    className={cn(
+                      'px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] relative overflow-hidden',
+                      isActive
+                        ? 'text-electric-purple bg-electric-purple/5'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    )}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                  >
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeSortFilter"
+                        className="absolute inset-0 bg-electric-purple/5 rounded-md"
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                      />
+                    )}
+                    <span className="relative z-10">{filter.label}</span>
+                  </motion.button>
+                )
+              })}
             </div>
 
             {/* Proposals Grid */}
@@ -254,7 +205,7 @@ export default function ProponerPage() {
             ) : (
               <AnimatePresence mode="wait">
                 <motion.div
-                  key={`${sortFilter}-${categoryFilter}`}
+                  key={sortFilter}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}

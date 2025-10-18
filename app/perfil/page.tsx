@@ -290,7 +290,8 @@ export default function ProfilePage() {
                   {/* Resumen Tab */}
                   <TabsContent value="resumen" className="mt-6">
                     <div className="space-y-6">
-                      <div className="grid grid-cols-3 gap-4">
+                      {/* Mobile: 3 rows, Desktop: 3 columns */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="bg-muted p-4 rounded-lg">
                           <p className="text-sm text-muted-foreground">Total Invertido</p>
                           {isLoadingTransactions ? (
@@ -307,7 +308,7 @@ export default function ProfilePage() {
                             <div className="h-8 w-20 bg-background animate-pulse rounded mt-1" />
                           ) : (
                             <p className={`text-2xl font-bold mt-1 ${stats.netPosition >= BigInt(0) ? 'text-green-500' : 'text-red-500'}`}>
-                              ${stats.netPosition >= BigInt(0) ? '+' : ''}${Number(formatUnits(stats.netPosition, 6)).toFixed(2)}
+                              {stats.netPosition >= BigInt(0) ? '+' : ''}${Number(formatUnits(stats.netPosition, 6)).toFixed(2)}
                             </p>
                           )}
                         </div>
