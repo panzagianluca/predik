@@ -46,7 +46,7 @@ export default function MarketDetailPage() {
   const [market, setMarket] = useState<Market | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [selectedTimeframe, setSelectedTimeframe] = useState<'24h' | '7d' | '30d' | 'all'>('24h')
+  const [selectedTimeframe, setSelectedTimeframe] = useState<'24h' | '7d' | '30d' | 'all'>('7d')
   const [showMoreDetails, setShowMoreDetails] = useState(false)
 
   useEffect(() => {
@@ -449,7 +449,7 @@ export default function MarketDetailPage() {
 
             {/* Market Stats */}
             <Card>
-              <CardContent className="p-6 space-y-4">
+              <CardContent className="p-4 space-y-4">
                 <h3 className="text-[14px] font-semibold">Estadísticas</h3>
                 
                 <div className="space-y-3">

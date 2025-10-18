@@ -485,7 +485,7 @@ export function TradingPanel({ market, userAddress, isConnected, onTradeComplete
   return (
     <div className={cn('space-y-4', className)}>
       <Card className="w-[320px]">
-        <CardContent className="pt-6 space-y-4">
+        <CardContent className="p-4 space-y-4">
           {/* Buy/Sell Tabs */}
           <Tabs value={tradeType} onValueChange={(value) => setTradeType(value as 'buy' | 'sell')}>
             <TabsList className="grid w-full grid-cols-2">
@@ -680,41 +680,41 @@ export function TradingPanel({ market, userAddress, isConnected, onTradeComplete
       {/* User Position Box */}
       {isConnected && userPosition && (
         <Card className="w-[320px] border-electric-purple/50">
-          <CardContent className="pt-6 space-y-3">
-            <h4 className="font-semibold text-sm mb-3">Tu Posición</h4>
+          <CardContent className="p-4 space-y-3">
+            <h4 className="font-semibold text-sm mb-4">Tu Posición</h4>
             
-            {/* 3 Column Layout */}
-            <div className="grid grid-cols-3 gap-3">
-              {/* Column 1: Acciones */}
-              <div className="flex flex-col items-center text-center">
-                <span className="text-xs text-muted-foreground mb-1">Acciones</span>
-                <span className="font-semibold text-sm">{userPosition.shares.toFixed(2)}</span>
+            {/* Compact List Style */}
+            <div className="space-y-2">
+              {/* Acciones */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Acciones</span>
+                <span className="font-semibold">{userPosition.shares.toFixed(2)}</span>
               </div>
               
-              {/* Column 2: Valor */}
-              <div className="flex flex-col items-center text-center">
-                <span className="text-xs text-muted-foreground mb-1">Valor</span>
-                <span className="font-semibold text-sm">${userPosition.value.toFixed(2)}</span>
+              {/* Valor */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Valor</span>
+                <span className="font-semibold">${userPosition.value.toFixed(2)}</span>
               </div>
               
-              {/* Column 3: Resultado */}
-              <div className="flex flex-col items-center text-center">
-                <span className="text-xs text-muted-foreground mb-1">Resultado</span>
-                <div className="flex flex-col items-center gap-0.5">
+              {/* Resultado */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Resultado</span>
+                <div className="flex items-center gap-2">
                   <span className={cn(
-                    'font-semibold text-sm',
+                    'font-semibold',
                     userPosition.dollarChange >= 0 ? 'text-green-600' : 'text-red-600'
                   )}>
                     {userPosition.dollarChange >= 0 ? '+' : ''}${userPosition.dollarChange.toFixed(2)}
                   </span>
                   <span className={cn(
-                    'text-xs flex items-center',
+                    'text-sm flex items-center',
                     userPosition.percentChange >= 0 ? 'text-green-600' : 'text-red-600'
                   )}>
                     {userPosition.percentChange >= 0 ? (
-                      <TrendingUp className="h-3 w-3 mr-0.5" />
+                      <TrendingUp className="h-3 w-3 mr-1" />
                     ) : (
-                      <TrendingDown className="h-3 w-3 mr-0.5" />
+                      <TrendingDown className="h-3 w-3 mr-1" />
                     )}
                     {Math.abs(userPosition.percentChange).toFixed(2)}%
                   </span>
