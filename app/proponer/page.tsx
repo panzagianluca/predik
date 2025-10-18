@@ -124,11 +124,8 @@ export default function ProponerPage() {
     <div className="pb-12">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="pb-8 space-y-4">
+        <div className="pb-8">
           <h1 className="text-[24px] font-medium">Proponer Mercados</h1>
-          <p className="text-muted-foreground">
-            Ayudanos a crear mercados de predicción
-          </p>
         </div>
 
         {/* Filter Banner */}

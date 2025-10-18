@@ -154,11 +154,8 @@ export default function RankingPage() {
     <div className="min-h-screen pb-12">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="pb-8 space-y-4">
+        <div className="pb-8">
           <h1 className="text-[24px] font-medium">Rankings</h1>
-          <p className="text-muted-foreground">
-            Los mejores traders, holders y ganadores de la plataforma
-          </p>
         </div>
 
         {/* Timeframe Tabs */}
