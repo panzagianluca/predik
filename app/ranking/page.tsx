@@ -154,7 +154,7 @@ export default function RankingPage() {
     <div className="min-h-screen pb-12">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="pb-8">
+        <div className="pb-4">
           <h1 className="text-[24px] font-medium">Rankings</h1>
         </div>
 
