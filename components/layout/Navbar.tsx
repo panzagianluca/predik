@@ -468,13 +468,13 @@ export function Navbar() {
                           </div>
                         </button>
                         
-                        {/* Hamburger Menu - Only visible when NOT connected */}
+                        {/* Hamburger Menu - Only visible when NOT connected - Hidden on mobile */}
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
                               size="default"
                               variant="ghost"
-                              className="h-10 w-10 p-0 hover:bg-transparent hover:text-electric-purple transition-colors"
+                              className="hidden md:flex h-10 w-10 p-0 hover:bg-transparent hover:text-electric-purple transition-colors"
                             >
                               <Menu className="h-7 w-7" />
                             </Button>
