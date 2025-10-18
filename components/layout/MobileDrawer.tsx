@@ -5,10 +5,22 @@ import { useTheme } from 'next-themes'
 import { useAccount, useDisconnect } from 'wagmi'
 import Link from 'next/link'
 import Image from 'next/image'
-import { X, FileText, Shield, Sun, Moon, LogOut, Bell, AlertCircle } from 'lucide-react'
+import { X, FileText, Shield, Sun, Moon, LogOut, Bell, AlertCircle, MessageSquare, CheckCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getProfilePicture } from '@/lib/profileUtils'
+import { formatDistanceToNow } from 'date-fns'
+import { es } from 'date-fns/locale'
+
+interface Notification {
+  id: string
+  type: 'comment_reply' | 'market_resolved'
+  title: string
+  message: string
+  link: string
+  isRead: boolean
+  createdAt: string
+}
 
 interface MobileDrawerProps {
   isOpen: boolean
@@ -36,6 +48,9 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
   const [mounted, setMounted] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const [userAvatar, setUserAvatar] = useState<string>('')
+  const [notifications, setNotifications] = useState<Notification[]>([])
+  const [unreadCount, setUnreadCount] = useState(0)
+  const [isLoadingNotifications, setIsLoadingNotifications] = useState(false)
 
   // Avoid hydration mismatch
   useEffect(() => {
@@ -69,6 +84,95 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
     loadUserAvatar()
   }, [address])
 
+  // Fetch notifications when user is connected
+  useEffect(() => {
+    if (address && showNotifications) {
+      fetchNotifications()
+    }
+  }, [address, showNotifications])
+
+  // Fetch unread count when drawer opens
+  useEffect(() => {
+    if (address && isOpen && !showNotifications) {
+      fetchUnreadCount()
+    }
+  }, [address, isOpen])
+
+  const fetchUnreadCount = async () => {
+    if (!address) return
+
+    try {
+      const response = await fetch(`/api/notifications?userAddress=${address}`)
+      if (response.ok) {
+        const data = await response.json()
+        setUnreadCount(data.unread_count || 0)
+      }
+    } catch (error) {
+      console.error('Error fetching unread count:', error)
+    }
+  }
+
+  const fetchNotifications = async () => {
+    if (!address) return
+
+    setIsLoadingNotifications(true)
+    try {
+      const response = await fetch(`/api/notifications?userAddress=${address}`)
+      if (response.ok) {
+        const data = await response.json()
+        setNotifications(data.notifications || [])
+        setUnreadCount(data.unread_count || 0)
+      }
+    } catch (error) {
+      console.error('Error fetching notifications:', error)
+    } finally {
+      setIsLoadingNotifications(false)
+    }
+  }
+
+  const markAsRead = async (notificationId: string) => {
+    try {
+      const response = await fetch(`/api/notifications/${notificationId}/mark-read`, {
+        method: 'POST',
+      })
+
+      if (response.ok) {
+        setNotifications(prev =>
+          prev.map(n =>
+            n.id === notificationId ? { ...n, isRead: true } : n
+          )
+        )
+        setUnreadCount(prev => Math.max(0, prev - 1))
+      }
+    } catch (error) {
+      console.error('Error marking notification as read:', error)
+    }
+  }
+
+  const markAllAsRead = async () => {
+    if (!address) return
+
+    try {
+      const response = await fetch(`/api/notifications/mark-all-read?userAddress=${address}`, {
+        method: 'POST',
+      })
+
+      if (response.ok) {
+        setNotifications(prev => prev.map(n => ({ ...n, isRead: true })))
+        setUnreadCount(0)
+      }
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error)
+    }
+  }
+
+  const formatTimeAgo = (dateString: string) => {
+    return formatDistanceToNow(new Date(dateString), {
+      addSuffix: true,
+      locale: es,
+    })
+  }
+
   // Prevent body scroll when drawer is open
   useEffect(() => {
     if (isOpen) {
@@ -92,9 +196,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
   }
 
   const handleNotifications = () => {
-    setShowNotifications(true)
-    // TODO: Implement bottom drawer for notifications
-    console.log('Open notifications bottom drawer')
+    setShowNotifications(!showNotifications)
   }
 
   return (
@@ -169,10 +271,15 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                   <>
                     <button
                       onClick={handleNotifications}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-accent transition-colors min-h-[44px] w-full text-left"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-accent transition-colors min-h-[44px] w-full text-left relative"
                     >
                       <Bell className="h-5 w-5 text-muted-foreground" />
                       <span className="font-medium">Notificaciones</span>
+                      {unreadCount > 0 && (
+                        <span className="ml-auto h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-semibold">
+                          {unreadCount > 9 ? '9+' : unreadCount}
+                        </span>
+                      )}
                     </button>
 
                     <div className="h-px bg-border my-2" />
@@ -278,6 +385,111 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
               </div>
             </div>
           </motion.div>
+
+          {/* Notifications Bottom Drawer */}
+          <AnimatePresence>
+            {showNotifications && address && (
+              <>
+                {/* Backdrop for notifications */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 bg-black/50 z-[60] md:hidden"
+                  onClick={() => setShowNotifications(false)}
+                />
+
+                {/* Notifications Drawer - Slides from bottom */}
+                <motion.div
+                  initial={{ y: '100%' }}
+                  animate={{ y: 0 }}
+                  exit={{ y: '100%' }}
+                  transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+                  className="fixed bottom-0 left-0 right-0 bg-background border-t border-border rounded-t-3xl z-[60] md:hidden max-h-[80vh] flex flex-col"
+                >
+                  {/* Header */}
+                  <div className="flex items-center justify-between p-4 border-b border-border flex-shrink-0">
+                    <h3 className="font-semibold text-lg">Notificaciones</h3>
+                    <div className="flex items-center gap-2">
+                      {unreadCount > 0 && (
+                        <button
+                          onClick={markAllAsRead}
+                          className="text-xs text-electric-purple hover:underline font-medium"
+                        >
+                          Marcar todas
+                        </button>
+                      )}
+                      <button
+                        onClick={() => setShowNotifications(false)}
+                        className="h-10 w-10 rounded-lg flex items-center justify-center hover:bg-accent transition-colors"
+                      >
+                        <X className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Notification List */}
+                  <div className="overflow-y-auto flex-1">
+                    {isLoadingNotifications ? (
+                      <div className="p-8 text-center text-muted-foreground">
+                        <p>Cargando...</p>
+                      </div>
+                    ) : notifications.length === 0 ? (
+                      <div className="p-8 text-center text-muted-foreground">
+                        <Bell className="h-12 w-12 mx-auto mb-2 opacity-20" />
+                        <p>No hay notificaciones</p>
+                      </div>
+                    ) : (
+                      <div className="divide-y divide-border">
+                        {notifications.map(notification => (
+                          <Link
+                            key={notification.id}
+                            href={notification.link}
+                            onClick={() => {
+                              if (!notification.isRead) {
+                                markAsRead(notification.id)
+                              }
+                              setShowNotifications(false)
+                              onClose()
+                            }}
+                            className={cn(
+                              'block px-4 py-4 hover:bg-accent active:bg-accent/80 transition-colors',
+                              !notification.isRead && 'bg-electric-purple/5'
+                            )}
+                          >
+                            <div className="flex items-start gap-3">
+                              {/* Icon based on type */}
+                              {notification.type === 'comment_reply' && (
+                                <MessageSquare className="h-5 w-5 text-electric-purple mt-0.5 flex-shrink-0" />
+                              )}
+                              {notification.type === 'market_resolved' && (
+                                <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                              )}
+
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium text-sm">{notification.title}</p>
+                                <p className="text-sm text-muted-foreground line-clamp-2 mt-0.5">
+                                  {notification.message}
+                                </p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {formatTimeAgo(notification.createdAt)}
+                                </p>
+                              </div>
+
+                              {/* Unread indicator */}
+                              {!notification.isRead && (
+                                <div className="h-2 w-2 rounded-full bg-electric-purple mt-2 flex-shrink-0" />
+                              )}
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
         </>
       )}
     </AnimatePresence>
