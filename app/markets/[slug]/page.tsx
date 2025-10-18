@@ -195,12 +195,15 @@ export default function MarketDetailPage() {
                       </span>
                     )}
 
-                    {/* Category */}
-                    {market.category && (
-                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-muted text-muted-foreground">
-                        {market.category}
+                    {/* Topics/Tags */}
+                    {market.topics && market.topics.length > 0 && market.topics.map((topic, index) => (
+                      <span 
+                        key={index}
+                        className="px-3 py-1 rounded-full text-xs font-semibold bg-muted text-muted-foreground"
+                      >
+                        {topic}
                       </span>
-                    )}
+                    ))}
                   </div>
                 </div>
               </div>

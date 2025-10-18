@@ -30,17 +30,30 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
       if (market.state !== 'open') return false
     }
     
-    // Category filter
+    // Category filter - check both category and topics
     if (categoryFilter !== 'all') {
-      const categoryMap: Record<CategoryFilter, string> = {
-        all: '',
-        sports: 'Deportes',
-        economy: 'Economía',
-        politics: 'Política',
-        crypto: 'Crypto',
-        culture: 'Cultura'
+      const categoryMap: Record<CategoryFilter, string[]> = {
+        all: [],
+        sports: ['Deportes', 'Sports', 'Deporte'],
+        economy: ['Economía', 'Economy', 'Economia'],
+        politics: ['Política', 'Politics', 'Politica'],
+        crypto: ['Crypto', 'Cryptocurrency'],
+        culture: ['Cultura', 'Culture']
       }
-      if (market.category !== categoryMap[categoryFilter]) return false
+      
+      const allowedCategories = categoryMap[categoryFilter]
+      
+      // Check if market.category matches
+      const categoryMatches = market.category && allowedCategories.some(cat => 
+        market.category.toLowerCase().includes(cat.toLowerCase())
+      )
+      
+      // Check if any topic matches
+      const topicMatches = market.topics && market.topics.some(topic =>
+        allowedCategories.some(cat => topic.toLowerCase().includes(cat.toLowerCase()))
+      )
+      
+      if (!categoryMatches && !topicMatches) return false
     }
     
     return true
