@@ -119,3 +119,34 @@ export const proposalVotes = pgTable('proposal_votes', {
   voterAddressIdx: index('proposal_votes_voter_address_idx').on(table.voterAddress),
 }))
 
+// Notifications table
+export const notifications = pgTable('notifications', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userAddress: varchar('user_address', { length: 42 }).notNull(), // Recipient (lowercase)
+  type: varchar('type', { length: 20 }).notNull(), // 'comment_reply' | 'market_resolved'
+  
+  // Display content
+  title: text('title').notNull(),
+  message: text('message').notNull(),
+  link: text('link').notNull(),
+  
+  // Reference data
+  marketSlug: varchar('market_slug', { length: 255 }),
+  commentId: uuid('comment_id').references(() => comments.id, { onDelete: 'cascade' }),
+  fromUserAddress: varchar('from_user_address', { length: 42 }),
+  
+  // State
+  isRead: boolean('is_read').default(false).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  readAt: timestamp('read_at'),
+}, (table) => ({
+  // Index for fetching user's notifications
+  userAddressIdx: index('notifications_user_address_idx').on(table.userAddress),
+  // Index for unread notifications
+  isReadIdx: index('notifications_is_read_idx').on(table.isRead),
+  // Index for sorting by date
+  createdAtIdx: index('notifications_created_at_idx').on(table.createdAt),
+  // Composite index for efficient unread queries
+  userUnreadIdx: index('notifications_user_unread_idx').on(table.userAddress, table.isRead),
+}))
+

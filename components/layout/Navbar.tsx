@@ -8,6 +8,7 @@ import dynamic from 'next/dynamic'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { Button } from '@/components/ui/button'
 import { GlobalSearch } from '@/components/layout/GlobalSearch'
+import { NotificationBell } from '@/components/layout/NotificationBell'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/animate-ui/components/radix/dropdown-menu'
 import { Menu, Activity, Trophy, Lightbulb, FileText, Shield, Sun, Moon, AlertCircle, Bell, ChevronDown, User, LogOut } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -598,17 +599,8 @@ export function Navbar() {
                           </div>
                         </button>
 
-                        {/* Bell Icon (Notifications) */}
-                        <button
-                          className="h-9 w-9 flex items-center justify-center rounded-md hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                          onClick={() => {
-                            // TODO: Implement notifications
-                            alert('Notifications coming soon!')
-                          }}
-                          title="Notifications"
-                        >
-                          <Bell className="h-5 w-5" />
-                        </button>
+                        {/* Notification Bell */}
+                        <NotificationBell />
 
                         {/* Vertical Divider */}
                         <div className="h-6 w-px bg-border"></div>

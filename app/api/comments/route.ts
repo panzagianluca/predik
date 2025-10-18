@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { comments, users, commentVotes } from '@/lib/db/schema'
+import { comments, users, commentVotes, notifications } from '@/lib/db/schema'
 import { eq, and, isNull, desc, inArray } from 'drizzle-orm'
 import { Comment } from '@/types/comment'
 
@@ -195,6 +195,34 @@ export async function POST(request: NextRequest) {
       .limit(1)
 
     console.log('Creating comment - user profile:', userProfile)
+
+    // If this is a reply, create a notification for the parent comment author
+    if (parentId) {
+      const [parentComment] = await db
+        .select()
+        .from(comments)
+        .where(eq(comments.id, parentId))
+        .limit(1)
+
+      // Only create notification if replying to someone else (not yourself)
+      if (parentComment && parentComment.userAddress.toLowerCase() !== userAddress.toLowerCase()) {
+        const replyAuthorName = userProfile?.username || `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`
+        const truncatedContent = content.length > 80 ? content.slice(0, 77) + '...' : content
+
+        await db.insert(notifications).values({
+          userAddress: parentComment.userAddress.toLowerCase(),
+          type: 'comment_reply',
+          title: 'Nueva respuesta a tu comentario',
+          message: `${replyAuthorName} respondió: "${truncatedContent}"`,
+          link: `/markets/${marketId}#comment-${newComment.id}`,
+          marketSlug: marketId,
+          commentId: newComment.id,
+          fromUserAddress: userAddress.toLowerCase(),
+        })
+
+        console.log('✅ Created notification for comment reply')
+      }
+    }
 
     const formattedComment: Comment = {
       id: newComment.id,
