@@ -371,7 +371,7 @@ export function ProbabilityChart({ outcomes, timeframe = '24h', className = '' }
   }
 
   return (
-    <div className={`relative w-full ${className}`}>
+    <div className={`relative w-full overflow-hidden ${className}`}>
       <div ref={chartContainerRef} className="w-full" />
       
       {/* Pulsing dots at current values */}
