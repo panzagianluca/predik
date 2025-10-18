@@ -110,12 +110,13 @@ export function ProposalCard({ proposal, userAddress, userVoted = false, onVote 
             <span className="text-sm font-bold">{voteCount}</span>
           </button>
 
-          {/* Content */}
+          {/* Content - 2 Rows on Mobile, Single Row on Desktop */}
           <div className="flex-1 space-y-2">
-            {/* Title + Meta info on same row */}
-            <div className="flex items-start justify-between gap-4">
+            {/* ROW 1: Title (Mobile) / Title + Meta (Desktop) */}
+            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-2 md:gap-4">
               <h3 className="font-medium leading-tight flex-1">{proposal.title}</h3>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground whitespace-nowrap">
+              {/* Meta info - Hidden on mobile, shown on desktop */}
+              <div className="hidden md:flex items-center gap-2 text-xs text-muted-foreground whitespace-nowrap">
                 <span>por {truncateAddress(proposal.createdBy)}</span>
                 <span>•</span>
                 <span>
@@ -127,23 +128,50 @@ export function ProposalCard({ proposal, userAddress, userVoted = false, onVote 
               </div>
             </div>
 
-            {/* Category Badge + Outcomes */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">
-                {proposal.category}
-              </span>
-              {outcomes.length > 0 && (
-                <span className="text-xs text-muted-foreground">
-                  {outcomes.join(' / ')}
+            {/* ROW 2: Category, Options, Meta (Mobile) / Category, Options, Source (Desktop) */}
+            <div className="space-y-1">
+              {/* Category Badge + Outcomes */}
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">
+                  {proposal.category}
                 </span>
-              )}
-              {/* Source (if provided) */}
+                {outcomes.length > 0 && (
+                  <span className="text-xs text-muted-foreground">
+                    {outcomes.join(' / ')}
+                  </span>
+                )}
+                {/* Source - Desktop only in this row */}
+                {proposal.source && (
+                  <a
+                    href={proposal.source}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hidden md:inline text-xs text-electric-purple hover:underline ml-auto"
+                  >
+                    Fuente →
+                  </a>
+                )}
+              </div>
+
+              {/* Meta info - Mobile only */}
+              <div className="flex md:hidden items-center gap-2 text-xs text-muted-foreground">
+                <span>por {truncateAddress(proposal.createdBy)}</span>
+                <span>•</span>
+                <span>
+                  {formatDistanceToNow(new Date(proposal.createdAt), {
+                    addSuffix: true,
+                    locale: es
+                  })}
+                </span>
+              </div>
+
+              {/* Source - Mobile only */}
               {proposal.source && (
                 <a
                   href={proposal.source}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-electric-purple hover:underline ml-auto"
+                  className="inline md:hidden text-xs text-electric-purple hover:underline"
                 >
                   Fuente →
                 </a>

@@ -11,6 +11,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { getProfilePicture } from '@/lib/profileUtils'
 import { formatDistanceToNow } from 'date-fns'
 import { es } from 'date-fns/locale'
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/animate-ui/components/radix/dialog'
 
 interface Notification {
   id: string
@@ -47,6 +53,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
   const { disconnect } = useDisconnect()
   const [mounted, setMounted] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
+  const [showTutorial, setShowTutorial] = useState(false)
   const [userAvatar, setUserAvatar] = useState<string>('')
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
@@ -200,18 +207,19 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
   }
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop Overlay */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 bg-black/50 z-50 md:hidden"
-            onClick={onClose}
-          />
+    <>
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            {/* Backdrop Overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 bg-black/50 z-50 md:hidden"
+              onClick={onClose}
+            />
 
           {/* Drawer Panel */}
           <motion.div
@@ -363,7 +371,10 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
               <div className="p-4 border-t border-border flex-shrink-0 space-y-2">
                 {/* Como Funciona? */}
                 <button
-                  onClick={handleLinkClick}
+                  onClick={() => {
+                    setShowTutorial(true)
+                    onClose()
+                  }}
                   className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-accent transition-colors min-h-[44px] w-full text-left"
                 >
                   <AlertCircle className="h-5 w-5 text-muted-foreground" />
@@ -493,5 +504,66 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
         </>
       )}
     </AnimatePresence>
+
+    {/* Como Funciona Tutorial Dialog */}
+    <Dialog open={showTutorial} onOpenChange={setShowTutorial}>
+      <DialogContent 
+        className="sm:max-w-md w-[calc(100%-2rem)] md:w-full p-0 gap-0 max-h-[90vh] overflow-hidden"
+        from="top"
+        transition={{ type: 'spring', stiffness: 260, damping: 26 }}
+      >
+        <DialogTitle className="sr-only">Como Funciona Predik</DialogTitle>
+        
+        <div className="p-6 overflow-y-auto max-h-[90vh]">
+          <h2 className="text-xl font-semibold mb-4">¿Cómo Funciona Predik?</h2>
+          
+          <div className="space-y-4 text-sm">
+            <div>
+              <h3 className="font-semibold mb-2 flex items-center gap-2">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-electric-purple text-white text-xs">1</span>
+                Elegí un mercado
+              </h3>
+              <p className="text-muted-foreground ml-8">
+                Explorá los mercados disponibles y elegí uno que te interese. Cada mercado tiene diferentes opciones de resultado.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold mb-2 flex items-center gap-2">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-electric-purple text-white text-xs">2</span>
+                Comprá shares
+              </h3>
+              <p className="text-muted-foreground ml-8">
+                Decidí cuántos shares querés comprar y en qué opción. El precio cambia según la demanda del mercado.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold mb-2 flex items-center gap-2">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-electric-purple text-white text-xs">3</span>
+                Ganá cuando aciertes
+              </h3>
+              <p className="text-muted-foreground ml-8">
+                Si tu predicción es correcta, ganarás según el precio al que compraste tus shares. Podés vender en cualquier momento.
+              </p>
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-border">
+              <p className="text-xs text-muted-foreground">
+                <strong>Tip:</strong> Los precios suben cuando más gente cree en ese resultado. ¡Comprá temprano para mejores oportunidades!
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setShowTutorial(false)}
+            className="mt-6 w-full py-2.5 bg-electric-purple text-white rounded-lg font-medium hover:bg-electric-purple/90 transition-colors"
+          >
+            Entendido
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  </>
   )
 }

@@ -9,6 +9,11 @@ import { Trophy } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAccount } from 'wagmi'
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from '@/components/animate-ui/components/radix/dialog'
 
 type SortFilter = 'most-voted' | 'recent'
 
@@ -31,6 +36,7 @@ export default function ProponerPage() {
   const [sortFilter, setSortFilter] = useState<SortFilter>('most-voted')
   const [userVotes, setUserVotes] = useState<Set<string>>(new Set())
   const [topContributors, setTopContributors] = useState<Array<{ address: string; count: number }>>([])
+  const [showContributors, setShowContributors] = useState(false)
 
   useEffect(() => {
     fetchProposals()
@@ -113,7 +119,7 @@ export default function ProponerPage() {
         </div>
 
         {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-2">
           {/* Left Column: Submit Button + Top Contributors */}
           <div className="space-y-6">
             {/* Submit Button */}
@@ -124,11 +130,11 @@ export default function ProponerPage() {
 
             {/* Top Contributors */}
             {topContributors.length > 0 && (
-              <Card>
+              <Card className="hidden lg:block">
                 <CardHeader className="pb-4">
                   <div className="flex items-center gap-2">
                     <Trophy className="h-5 w-5 text-electric-purple" />
-                    <h3 className="text-[16px] font-medium">Top Contributors</h3>
+                    <h3 className="text-[16px] font-medium">Mejores Contribuidores</h3>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -160,7 +166,7 @@ export default function ProponerPage() {
           {/* Right Column: Filter Banner + Proposals Grid */}
           <div>
             {/* Filter Banner */}
-            <div className="flex flex-wrap items-center gap-2 rounded-lg py-3 mb-6">
+            <div className="flex flex-wrap items-center gap-2 rounded-lg py-3 mb-4">
               {/* Sort Filters - Ghost buttons */}
               {sortFilters.map((filter) => {
                 const isActive = sortFilter === filter.id
@@ -189,6 +195,19 @@ export default function ProponerPage() {
                   </motion.button>
                 )
               })}
+
+              {/* Contribuidores Button - Mobile Only */}
+              {topContributors.length > 0 && (
+                <motion.button
+                  onClick={() => setShowContributors(true)}
+                  className="lg:hidden ml-auto px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] text-muted-foreground hover:text-foreground hover:bg-muted flex items-center gap-2"
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                >
+                  <Trophy className="h-4 w-4" />
+                  <span>Contribuidores</span>
+                </motion.button>
+              )}
             </div>
 
             {/* Proposals Grid */}
@@ -237,6 +256,58 @@ export default function ProponerPage() {
           </div>
         </div>
       </div>
+
+      {/* Contributors Dialog - Mobile Only */}
+      <Dialog open={showContributors} onOpenChange={setShowContributors}>
+        <DialogContent 
+          className="sm:max-w-md w-[calc(100%-2rem)] md:w-full p-0 gap-0 max-h-[90vh] overflow-hidden"
+          from="top"
+          transition={{ type: 'spring', stiffness: 260, damping: 26 }}
+        >
+          <DialogTitle className="sr-only">Mejores Contribuidores</DialogTitle>
+          
+          <div className="p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Trophy className="h-5 w-5 text-electric-purple" />
+              <h3 className="text-[18px] font-semibold">Mejores Contribuidores</h3>
+            </div>
+
+            {topContributors.length > 0 ? (
+              <div className="space-y-3">
+                {topContributors.map((contributor, index) => (
+                  <div key={contributor.address} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-muted-foreground min-w-[1.5ch]">
+                        {index + 1}.
+                      </span>
+                      <a
+                        href={`https://celo-sepolia.blockscout.com/address/${contributor.address}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-mono hover:text-electric-purple transition-colors"
+                      >
+                        {truncateAddress(contributor.address)}
+                      </a>
+                    </div>
+                    <span className="text-sm font-semibold">{contributor.count}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                No hay contribuidores aún
+              </p>
+            )}
+
+            <button
+              onClick={() => setShowContributors(false)}
+              className="mt-6 w-full py-2.5 bg-electric-purple text-white rounded-lg font-medium hover:bg-electric-purple/90 transition-colors"
+            >
+              Cerrar
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

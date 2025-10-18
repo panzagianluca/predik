@@ -95,71 +95,138 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
   return (
     <div className="space-y-4">
       {/* Filter Banner */}
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg py-3">
-        {/* Left side: Time filters + Category filters */}
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Time Filters - Outlined buttons with icons */}
-          {timeFilters.map((filter) => {
-            const Icon = filter.icon
-            const isActive = timeFilter === filter.id
-            return (
-              <motion.button
-                key={filter.id}
-                onClick={() => setTimeFilter(filter.id)}
-                className={cn(
-                  'flex items-center gap-2 px-4 h-[36px] rounded-md border-2 transition-all duration-200 text-[14px] relative overflow-hidden',
-                  isActive
-                    ? 'bg-electric-purple text-white border-electric-purple font-semibold'
-                    : 'bg-background border-border hover:border-electric-purple/50 text-foreground font-medium'
-                )}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ duration: 0.2, ease: "easeOut" }}
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="activeTimeFilter"
-                    className="absolute inset-0 bg-electric-purple rounded-md -z-10"
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                  />
-                )}
-                <Icon className="h-4 w-4 relative z-10" />
-                <span className="relative z-10">{filter.label}</span>
-              </motion.button>
-            )
-          })}
+      <div className="space-y-3 md:space-y-0">
+        {/* Mobile: Two separate scrollable rows */}
+        <div className="md:hidden space-y-3">
+          {/* Time Filters Row - Mobile */}
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide px-1 py-1 -mx-1" style={{ WebkitOverflowScrolling: 'touch' }}>
+            {timeFilters.map((filter) => {
+              const Icon = filter.icon
+              const isActive = timeFilter === filter.id
+              return (
+                <motion.button
+                  key={filter.id}
+                  onClick={() => setTimeFilter(filter.id)}
+                  className={cn(
+                    'flex items-center gap-2 px-4 h-[36px] rounded-md border-2 transition-all duration-200 text-[14px] relative overflow-hidden flex-shrink-0',
+                    isActive
+                      ? 'bg-electric-purple text-white border-electric-purple font-semibold'
+                      : 'bg-background border-border hover:border-electric-purple/50 text-foreground font-medium'
+                  )}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeTimeFilterMobile"
+                      className="absolute inset-0 bg-electric-purple rounded-md -z-10"
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                    />
+                  )}
+                  <Icon className="h-4 w-4 relative z-10" />
+                  <span className="relative z-10">{filter.label}</span>
+                </motion.button>
+              )
+            })}
+          </div>
 
-          {/* Divider */}
-          <div className="h-8 w-px bg-border mx-2" />
+          {/* Category Filters Row - Mobile */}
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide px-1 py-1 -mx-1" style={{ WebkitOverflowScrolling: 'touch' }}>
+            {categoryFilters.map((filter) => {
+              const isActive = categoryFilter === filter.id
+              return (
+                <motion.button
+                  key={filter.id}
+                  onClick={() => setCategoryFilter(filter.id)}
+                  className={cn(
+                    'px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] relative overflow-hidden flex-shrink-0',
+                    isActive
+                      ? 'text-electric-purple bg-electric-purple/5'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                  )}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeCategoryFilterMobile"
+                      className="absolute inset-0 bg-electric-purple/5 rounded-md"
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                    />
+                  )}
+                  <span className="relative z-10">{filter.label}</span>
+                </motion.button>
+              )
+            })}
+          </div>
+        </div>
 
-          {/* Category Filters - Ghost buttons */}
-          {categoryFilters.map((filter) => {
-            const isActive = categoryFilter === filter.id
-            return (
-              <motion.button
-                key={filter.id}
-                onClick={() => setCategoryFilter(filter.id)}
-                className={cn(
-                  'px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] relative overflow-hidden',
-                  isActive
-                    ? 'text-electric-purple bg-electric-purple/5'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                )}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ duration: 0.2, ease: "easeOut" }}
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="activeCategoryFilter"
-                    className="absolute inset-0 bg-electric-purple/5 rounded-md"
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                  />
-                )}
-                <span className="relative z-10">{filter.label}</span>
-              </motion.button>
-            )
-          })}
+        {/* Desktop: Single row with wrapping */}
+        <div className="hidden md:flex flex-wrap items-center gap-4 rounded-lg py-3">
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Time Filters - Desktop */}
+            {timeFilters.map((filter) => {
+              const Icon = filter.icon
+              const isActive = timeFilter === filter.id
+              return (
+                <motion.button
+                  key={filter.id}
+                  onClick={() => setTimeFilter(filter.id)}
+                  className={cn(
+                    'flex items-center gap-2 px-4 h-[36px] rounded-md border-2 transition-all duration-200 text-[14px] relative overflow-hidden',
+                    isActive
+                      ? 'bg-electric-purple text-white border-electric-purple font-semibold'
+                      : 'bg-background border-border hover:border-electric-purple/50 text-foreground font-medium'
+                  )}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeTimeFilter"
+                      className="absolute inset-0 bg-electric-purple rounded-md -z-10"
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                    />
+                  )}
+                  <Icon className="h-4 w-4 relative z-10" />
+                  <span className="relative z-10">{filter.label}</span>
+                </motion.button>
+              )
+            })}
+
+            {/* Divider */}
+            <div className="h-8 w-px bg-border mx-2" />
+
+            {/* Category Filters - Desktop */}
+            {categoryFilters.map((filter) => {
+              const isActive = categoryFilter === filter.id
+              return (
+                <motion.button
+                  key={filter.id}
+                  onClick={() => setCategoryFilter(filter.id)}
+                  className={cn(
+                    'px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] relative overflow-hidden',
+                    isActive
+                      ? 'text-electric-purple bg-electric-purple/5'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                  )}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeCategoryFilter"
+                      className="absolute inset-0 bg-electric-purple/5 rounded-md"
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                    />
+                  )}
+                  <span className="relative z-10">{filter.label}</span>
+                </motion.button>
+              )
+            })}
+          </div>
         </div>
       </div>
 
