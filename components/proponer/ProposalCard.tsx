@@ -128,53 +128,61 @@ export function ProposalCard({ proposal, userAddress, userVoted = false, onVote 
               </div>
             </div>
 
-            {/* ROW 2: Category, Options, Meta (Mobile) / Category, Options, Source (Desktop) */}
-            <div className="space-y-1">
-              {/* Category Badge + Outcomes */}
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">
-                  {proposal.category}
-                </span>
-                {outcomes.length > 0 && (
-                  <span className="text-xs text-muted-foreground">
+            {/* ROW 2: ALL metadata in ONE single row */}
+            <div className="flex items-center gap-2 flex-wrap text-xs">
+              {/* Category Badge */}
+              <span className="px-2 py-0.5 rounded-full font-medium bg-muted text-muted-foreground">
+                {proposal.category}
+              </span>
+              
+              {/* Options */}
+              {outcomes.length > 0 && (
+                <>
+                  <span className="text-muted-foreground">•</span>
+                  <span className="text-muted-foreground">
                     {outcomes.join(' / ')}
                   </span>
-                )}
-                {/* Source - Desktop only in this row */}
-                {proposal.source && (
-                  <a
-                    href={proposal.source}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hidden md:inline text-xs text-electric-purple hover:underline ml-auto"
-                  >
-                    Fuente →
-                  </a>
-                )}
-              </div>
+                </>
+              )}
 
               {/* Meta info - Mobile only */}
-              <div className="flex md:hidden items-center gap-2 text-xs text-muted-foreground">
-                <span>por {truncateAddress(proposal.createdBy)}</span>
-                <span>•</span>
-                <span>
-                  {formatDistanceToNow(new Date(proposal.createdAt), {
-                    addSuffix: true,
-                    locale: es
-                  })}
-                </span>
-              </div>
+              <span className="md:hidden text-muted-foreground">•</span>
+              <span className="md:hidden text-muted-foreground">
+                por {truncateAddress(proposal.createdBy)}
+              </span>
+              <span className="md:hidden text-muted-foreground">•</span>
+              <span className="md:hidden text-muted-foreground">
+                {formatDistanceToNow(new Date(proposal.createdAt), {
+                  addSuffix: true,
+                  locale: es
+                })}
+              </span>
 
-              {/* Source - Mobile only */}
+              {/* Source - Desktop */}
               {proposal.source && (
                 <a
                   href={proposal.source}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline md:hidden text-xs text-electric-purple hover:underline"
+                  className="hidden md:inline text-electric-purple hover:underline ml-auto"
                 >
                   Fuente →
                 </a>
+              )}
+
+              {/* Source - Mobile */}
+              {proposal.source && (
+                <>
+                  <span className="md:hidden text-muted-foreground">•</span>
+                  <a
+                    href={proposal.source}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="md:hidden text-electric-purple hover:underline"
+                  >
+                    Fuente →
+                  </a>
+                </>
               )}
             </div>
           </div>

@@ -15,7 +15,6 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/animate-ui/components/radix/dialog'
 
 interface Notification {
@@ -505,52 +504,33 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
       )}
     </AnimatePresence>
 
-    {/* Como Funciona Tutorial Dialog */}
+    {/* Como Funciona Tutorial Dialog - Opens Navbar tutorial */}
     <Dialog open={showTutorial} onOpenChange={setShowTutorial}>
       <DialogContent 
-        className="sm:max-w-md w-[calc(100%-2rem)] md:w-full p-0 gap-0 max-h-[90vh] overflow-hidden"
+        className="sm:max-w-md p-0 gap-0 max-h-[90vh] overflow-hidden"
         from="top"
         transition={{ type: 'spring', stiffness: 260, damping: 26 }}
       >
         <DialogTitle className="sr-only">Como Funciona Predik</DialogTitle>
         
-        <div className="p-6 overflow-y-auto max-h-[90vh]">
+        <div className="p-6">
           <h2 className="text-xl font-semibold mb-4">¿Cómo Funciona Predik?</h2>
           
-          <div className="space-y-4 text-sm">
-            <div>
-              <h3 className="font-semibold mb-2 flex items-center gap-2">
-                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-electric-purple text-white text-xs">1</span>
-                Elegí un mercado
-              </h3>
-              <p className="text-muted-foreground ml-8">
-                Explorá los mercados disponibles y elegí uno que te interese. Cada mercado tiene diferentes opciones de resultado.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-2 flex items-center gap-2">
-                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-electric-purple text-white text-xs">2</span>
-                Comprá shares
-              </h3>
-              <p className="text-muted-foreground ml-8">
-                Decidí cuántos shares querés comprar y en qué opción. El precio cambia según la demanda del mercado.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-semibold mb-2 flex items-center gap-2">
-                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-electric-purple text-white text-xs">3</span>
-                Ganá cuando aciertes
-              </h3>
-              <p className="text-muted-foreground ml-8">
-                Si tu predicción es correcta, ganarás según el precio al que compraste tus shares. Podés vender en cualquier momento.
-              </p>
-            </div>
+          <div className="space-y-3 text-sm">
+            <p className="text-muted-foreground">
+              Predik es un mercado de predicciones descentralizado donde podés:
+            </p>
+            
+            <ul className="space-y-2 ml-4 list-disc text-muted-foreground">
+              <li>Elegir mercados sobre eventos futuros</li>
+              <li>Comprar shares (acciones) de resultados</li>
+              <li>Ganar USDT cuando aciertes</li>
+              <li>Vender en cualquier momento</li>
+            </ul>
 
             <div className="mt-6 pt-4 border-t border-border">
               <p className="text-xs text-muted-foreground">
-                <strong>Tip:</strong> Los precios suben cuando más gente cree en ese resultado. ¡Comprá temprano para mejores oportunidades!
+                <strong>Tip:</strong> Los precios cambian según la demanda. ¡Comprá temprano para mejores oportunidades!
               </p>
             </div>
           </div>

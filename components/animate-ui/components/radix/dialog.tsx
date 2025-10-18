@@ -68,7 +68,7 @@ function DialogContent({
       <DialogOverlay />
       <DialogContentPrimitive
         className={cn(
-          'bg-background fixed left-[50%] top-[5vh] z-50 grid w-full max-w-[calc(100%-2rem)] max-h-[90vh] -translate-x-[50%] translate-y-0 gap-4 rounded-lg border p-6 shadow-lg sm:max-w-lg overflow-hidden',
+          'bg-background fixed !left-[50%] !top-[5vh] z-50 grid !w-[calc(100%-2rem)] !max-w-[calc(100%-2rem)] max-h-[90vh] !-translate-x-[50%] !translate-y-0 gap-4 rounded-lg border p-6 shadow-lg sm:!max-w-lg overflow-hidden',
           className,
         )}
         {...props}
