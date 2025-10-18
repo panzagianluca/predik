@@ -102,10 +102,16 @@ export function SubmitProposalModal({ userAddress, onProposalCreated }: SubmitPr
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="w-full">
-          <Plus className="h-4 w-4 mr-2" />
-          Proponer Mercado
-        </Button>
+        <button
+          className="group/button relative inline-flex items-center justify-center overflow-hidden rounded-md bg-electric-purple backdrop-blur-lg w-full h-9 my-3 text-sm font-semibold text-white transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl hover:shadow-electric-purple/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          type="button"
+        >
+          <Plus className="h-4 w-4 mr-2 relative z-10" />
+          <span className="relative z-10">Crear</span>
+          <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-13deg)_translateX(-100%)] group-hover/button:duration-1000 group-hover/button:[transform:skew(-13deg)_translateX(100%)]">
+            <div className="relative h-full w-10 bg-white/30"></div>
+          </div>
+        </button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px] !left-1/2 !top-1/2 !-translate-x-1/2 !-translate-y-1/2">
         <DialogTitle>Nueva Propuesta de Mercado</DialogTitle>

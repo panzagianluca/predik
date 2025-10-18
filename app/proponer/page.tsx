@@ -5,7 +5,7 @@ import { ProposalCard } from '@/components/proponer/ProposalCard'
 import { SubmitProposalModal } from '@/components/proponer/SubmitProposalModal'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { LogoSpinner } from '@/components/ui/logo-spinner'
-import { Trophy, TrendingUp, Clock } from 'lucide-react'
+import { Trophy } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAccount } from 'wagmi'
@@ -102,10 +102,9 @@ export default function ProponerPage() {
   const sortFilters: Array<{
     id: SortFilter
     label: string
-    icon: React.ComponentType<{ className?: string }>
   }> = [
-    { id: 'most-voted', label: 'Más Votados', icon: TrendingUp },
-    { id: 'recent', label: 'Recientes', icon: Clock },
+    { id: 'most-voted', label: 'Más Votados' },
+    { id: 'recent', label: 'Recientes' },
   ]
 
   const categoryFilters: Array<{
@@ -128,78 +127,120 @@ export default function ProponerPage() {
           <h1 className="text-[24px] font-medium">Proponer Mercados</h1>
         </div>
 
-        {/* Filter Banner */}
-        <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg py-3 mb-6">
-          <div className="flex flex-wrap items-center gap-2">
-            {/* Sort Filters - Outlined buttons with icons */}
-            {sortFilters.map((filter) => {
-              const Icon = filter.icon
-              const isActive = sortFilter === filter.id
-              return (
-                <motion.button
-                  key={filter.id}
-                  onClick={() => setSortFilter(filter.id)}
-                  className={cn(
-                    'flex items-center gap-2 px-4 h-[36px] rounded-md border-2 transition-all duration-200 text-[14px] relative overflow-hidden',
-                    isActive
-                      ? 'bg-electric-purple text-white border-electric-purple font-semibold'
-                      : 'bg-background border-border hover:border-electric-purple/50 text-foreground font-medium'
-                  )}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
-                >
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeSortFilter"
-                      className="absolute inset-0 bg-electric-purple rounded-md -z-10"
-                      transition={{ duration: 0.3, ease: "easeInOut" }}
-                    />
-                  )}
-                  <Icon className="h-4 w-4 relative z-10" />
-                  <span className="relative z-10">{filter.label}</span>
-                </motion.button>
-              )
-            })}
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-6">
+          {/* Left Column: Submit Button + Top Contributors */}
+          <div className="space-y-6">
+            {/* Submit Button */}
+            <SubmitProposalModal
+              userAddress={address}
+              onProposalCreated={fetchProposals}
+            />
 
-            {/* Divider */}
-            <div className="h-8 w-px bg-border mx-2" />
-
-            {/* Category Filters - Ghost buttons */}
-            {categoryFilters.map((filter) => {
-              const isActive = categoryFilter === filter.id
-              return (
-                <motion.button
-                  key={filter.id}
-                  onClick={() => setCategoryFilter(filter.id)}
-                  className={cn(
-                    'px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] relative overflow-hidden',
-                    isActive
-                      ? 'text-electric-purple bg-electric-purple/5'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                  )}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
-                >
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeCategoryFilter"
-                      className="absolute inset-0 bg-electric-purple/5 rounded-md"
-                      transition={{ duration: 0.3, ease: "easeInOut" }}
-                    />
-                  )}
-                  <span className="relative z-10">{filter.label}</span>
-                </motion.button>
-              )
-            })}
+            {/* Top Contributors */}
+            {topContributors.length > 0 && (
+              <Card>
+                <CardHeader className="pb-4">
+                  <div className="flex items-center gap-2">
+                    <Trophy className="h-5 w-5 text-electric-purple" />
+                    <h3 className="text-[16px] font-medium">Top Contributors</h3>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {topContributors.map((contributor, index) => (
+                      <div key={contributor.address} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-bold text-muted-foreground min-w-[1.5ch]">
+                            {index + 1}.
+                          </span>
+                          <a
+                            href={`https://celo-sepolia.blockscout.com/address/${contributor.address}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm font-mono hover:text-electric-purple transition-colors"
+                          >
+                            {truncateAddress(contributor.address)}
+                          </a>
+                        </div>
+                        <span className="text-sm font-semibold">{contributor.count}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
-        </div>
 
-        {/* Main Layout: Grid + Sidebar */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
-          {/* Left: Proposals Grid */}
+          {/* Right Column: Filter Banner + Proposals Grid */}
           <div>
+            {/* Filter Banner */}
+            <div className="flex flex-wrap items-center gap-4 rounded-lg py-3 mb-6">
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Sort Filters - Ghost buttons */}
+                {sortFilters.map((filter) => {
+                  const isActive = sortFilter === filter.id
+                  return (
+                    <motion.button
+                      key={filter.id}
+                      onClick={() => setSortFilter(filter.id)}
+                      className={cn(
+                        'px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] relative overflow-hidden',
+                        isActive
+                          ? 'text-electric-purple bg-electric-purple/5'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                      )}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      transition={{ duration: 0.2, ease: "easeOut" }}
+                    >
+                      {isActive && (
+                        <motion.div
+                          layoutId="activeSortFilter"
+                          className="absolute inset-0 bg-electric-purple/5 rounded-md"
+                          transition={{ duration: 0.3, ease: "easeInOut" }}
+                        />
+                      )}
+                      <span className="relative z-10">{filter.label}</span>
+                    </motion.button>
+                  )
+                })}
+
+                {/* Divider */}
+                <div className="h-8 w-px bg-border mx-2" />
+
+                {/* Category Filters - Ghost buttons */}
+                {categoryFilters.map((filter) => {
+                  const isActive = categoryFilter === filter.id
+                  return (
+                    <motion.button
+                      key={filter.id}
+                      onClick={() => setCategoryFilter(filter.id)}
+                      className={cn(
+                        'px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] relative overflow-hidden',
+                        isActive
+                          ? 'text-electric-purple bg-electric-purple/5'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                      )}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      transition={{ duration: 0.2, ease: "easeOut" }}
+                    >
+                      {isActive && (
+                        <motion.div
+                          layoutId="activeCategoryFilter"
+                          className="absolute inset-0 bg-electric-purple/5 rounded-md"
+                          transition={{ duration: 0.3, ease: "easeInOut" }}
+                        />
+                      )}
+                      <span className="relative z-10">{filter.label}</span>
+                    </motion.button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Proposals Grid */}
             {isLoading ? (
               <div className="flex items-center justify-center py-20">
                 <LogoSpinner size={60} />
@@ -241,53 +282,6 @@ export default function ProponerPage() {
                   ))}
                 </motion.div>
               </AnimatePresence>
-            )}
-          </div>
-
-          {/* Right: Sidebar */}
-          <div className="space-y-6">
-            {/* Submit Button Card */}
-            <Card>
-              <CardContent className="p-4">
-                <SubmitProposalModal
-                  userAddress={address}
-                  onProposalCreated={fetchProposals}
-                />
-              </CardContent>
-            </Card>
-
-            {/* Top Contributors */}
-            {topContributors.length > 0 && (
-              <Card>
-                <CardHeader className="pb-4">
-                  <div className="flex items-center gap-2">
-                    <Trophy className="h-5 w-5 text-electric-purple" />
-                    <h3 className="text-[16px] font-medium">Top Contributors</h3>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {topContributors.map((contributor, index) => (
-                      <div key={contributor.address} className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-bold text-muted-foreground min-w-[1.5ch]">
-                            {index + 1}.
-                          </span>
-                          <a
-                            href={`https://celo-sepolia.blockscout.com/address/${contributor.address}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm font-mono hover:text-electric-purple transition-colors"
-                          >
-                            {truncateAddress(contributor.address)}
-                          </a>
-                        </div>
-                        <span className="text-sm font-semibold">{contributor.count}</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
             )}
           </div>
         </div>
