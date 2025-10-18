@@ -392,7 +392,7 @@ export default function MarketDetailPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground">Fee:</span>
-                          <p className="font-medium">{(market.fee * 100).toFixed(1)}%</p>
+                          <p className="font-medium">{(market.fee * 100).toFixed(2)}%</p>
                         </div>
                       </div>
                     </div>
@@ -467,11 +467,11 @@ export default function MarketDetailPage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Fee</span>
-                    <span className="font-semibold">{(market.fee * 100).toFixed(1)}%</span>
+                    <span className="font-semibold">{(market.fee * 100).toFixed(2)}%</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Treasury Fee</span>
-                    <span className="font-semibold">{(market.treasury_fee * 100).toFixed(1)}%</span>
+                    <span className="font-semibold">{(market.treasury_fee * 100).toFixed(2)}%</span>
                   </div>
                 </div>
 
@@ -486,7 +486,7 @@ export default function MarketDetailPage() {
                           className="font-bold"
                           style={{ color: index === 0 ? '#22c55e' : '#ef4444' }}
                         >
-                          {(outcome.price * 100).toFixed(1)}%
+                          {(outcome.price * 100).toFixed(2)}%
                         </span>
                       </div>
                     ))}
