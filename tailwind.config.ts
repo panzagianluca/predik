@@ -9,6 +9,15 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      // Mobile-first breakpoints (Tailwind defaults + custom)
+      screens: {
+        'xs': '375px',   // Small phones
+        'sm': '640px',   // Large phones (default)
+        'md': '768px',   // Tablets (default)
+        'lg': '1024px',  // Desktop (default)
+        'xl': '1280px',  // Large desktop (default)
+        '2xl': '1536px', // Extra large (default)
+      },
       fontFamily: {
         sans: ['Satoshi', 'system-ui', 'sans-serif'],
       },

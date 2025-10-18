@@ -113,7 +113,7 @@ export function SubmitProposalModal({ userAddress, onProposalCreated }: SubmitPr
           </div>
         </button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] !left-1/2 !top-1/2 !-translate-x-1/2 !-translate-y-1/2">
+      <DialogContent className="sm:max-w-[500px] w-full max-h-[90vh] overflow-y-auto">
         <DialogTitle>Nueva Propuesta de Mercado</DialogTitle>
         
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">

@@ -101,6 +101,50 @@
   }
 }
 
+/* Mobile-specific utilities - DO NOT AFFECT DESKTOP */
+@layer utilities {
+  /* Safe touch targets for mobile (min 44x44px) */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  /* Mobile-optimized spacing */
+  .mobile-padding {
+    @apply px-4 py-3;
+  }
+  
+  /* Prevent text from being too small on mobile */
+  .mobile-text-base {
+    font-size: clamp(16px, 4vw, 18px);
+  }
+  
+  /* Mobile-safe scrolling */
+  .mobile-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  
+  /* Hide on mobile only */
+  .mobile-hidden {
+    @apply xs:hidden sm:hidden md:block;
+  }
+  
+  /* Show on mobile only */
+  .mobile-only {
+    @apply xs:block sm:block md:hidden;
+  }
+  
+  /* Mobile full width, desktop auto */
+  .mobile-full {
+    @apply w-full md:w-auto;
+  }
+  
+  /* Mobile stacked, desktop flex */
+  .mobile-stack {
+    @apply flex-col md:flex-row;
+  }
+}
+
 @keyframes shimmer {
   0% {
     transform: translateX(-100%);

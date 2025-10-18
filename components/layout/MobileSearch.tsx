@@ -1,26 +1,29 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Search } from 'lucide-react'
+import { useState, useEffect, forwardRef, useImperativeHandle } from 'react'
+import { Search, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import Link from 'next/link'
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-  DialogTitle,
-} from '@/components/animate-ui/components/radix/dialog'
+import { Dialog, DialogContent, DialogTitle } from '@/components/animate-ui/components/radix/dialog'
 import { Input } from '@/components/ui/input'
 import { Market } from '@/types/market'
 
-export function GlobalSearch() {
+export interface MobileSearchRef {
+  open: () => void
+}
+
+export const MobileSearch = forwardRef<MobileSearchRef>((props, ref) => {
   const [open, setOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [markets, setMarkets] = useState<Market[]>([])
   const [filteredMarkets, setFilteredMarkets] = useState<Market[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+
+  // Expose open method to parent
+  useImperativeHandle(ref, () => ({
+    open: () => setOpen(true),
+  }))
 
   // Prefetch market page on hover
   const handleMouseEnter = (slug: string) => {
@@ -31,6 +34,9 @@ export function GlobalSearch() {
   useEffect(() => {
     if (open) {
       fetchMarkets()
+    } else {
+      // Reset search when closed
+      setSearchQuery('')
     }
   }, [open])
 
@@ -46,9 +52,7 @@ export function GlobalSearch() {
       return (
         market.title.toLowerCase().includes(query) ||
         market.category?.toLowerCase().includes(query) ||
-        market.outcomes.some((outcome) =>
-          outcome.title.toLowerCase().includes(query)
-        )
+        market.outcomes.some((outcome) => outcome.title.toLowerCase().includes(query))
       )
     })
 
@@ -61,11 +65,11 @@ export function GlobalSearch() {
       const apiBase = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '')
       const endpoint = apiBase ? `${apiBase}/api/markets` : '/api/markets'
       const response = await fetch(endpoint, { cache: 'no-store' })
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch markets')
       }
-      
+
       const data = await response.json()
       setMarkets(data)
     } catch (error) {
@@ -84,49 +88,49 @@ export function GlobalSearch() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <button className="flex w-full max-w-[360px] items-center gap-2 rounded-md border border-transparent bg-muted/70 px-4 h-9 text-sm text-muted-foreground transition-colors duration-200 hover:bg-muted/90 hover:text-foreground dark:bg-muted/40 dark:hover:bg-muted/60 mr-4 md:mr-6">
-          <Search className="w-4 h-4 text-muted-foreground" />
-          <span className="hidden md:inline whitespace-nowrap">Buscar Mercados</span>
-        </button>
-      </DialogTrigger>
-
       <DialogContent
         from="top"
         transition={{ type: 'spring', stiffness: 260, damping: 26 }}
-        className="max-w-2xl w-full p-0 gap-0 rounded-2xl border border-border/60 shadow-xl backdrop-blur max-h-[85vh] flex flex-col"
-        showCloseButton={true}
+        className="max-w-full w-full p-0 gap-0 rounded-none md:rounded-2xl border-0 md:border border-border/60 shadow-xl backdrop-blur max-h-screen md:max-h-[85vh] flex flex-col md:max-w-2xl"
+        showCloseButton={false}
       >
         {/* Hidden title for accessibility */}
         <DialogTitle className="sr-only">Buscar Mercados</DialogTitle>
-        
-        {/* Search Input */}
-        <div className="border-b flex-shrink-0">
-          <div className="relative h-14">
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Buscar mercados, categorías, resultados..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-full rounded-none border-0 pl-12 text-base focus-visible:ring-0 focus-visible:ring-offset-0"
-              autoFocus
-            />
-          </div>
+
+        {/* Search Header with Close Button */}
+        <div className="border-b flex-shrink-0 flex items-center gap-2 px-4">
+          <Search className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+          <Input
+            placeholder="Buscar mercados..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="h-14 border-0 text-base focus-visible:ring-0 focus-visible:ring-offset-0 flex-1"
+            autoFocus
+          />
+          <button
+            onClick={() => setOpen(false)}
+            className="h-10 w-10 rounded-lg flex items-center justify-center hover:bg-accent transition-colors flex-shrink-0"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
 
         {/* Results */}
         <div className="flex-1 overflow-y-auto p-4 mobile-scroll">
           {isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">
+            <div className="text-center py-12 text-muted-foreground">
+              <div className="animate-spin h-8 w-8 border-2 border-electric-purple border-t-transparent rounded-full mx-auto mb-3" />
               Cargando mercados...
             </div>
           ) : !searchQuery.trim() ? (
-            <div className="text-center py-8 text-muted-foreground">
-              Escribe para buscar mercados
+            <div className="text-center py-12 text-muted-foreground">
+              <Search className="h-12 w-12 mx-auto mb-3 opacity-50" />
+              <p className="text-sm">Escribe para buscar mercados</p>
             </div>
           ) : filteredMarkets.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              No se encontraron mercados
+            <div className="text-center py-12 text-muted-foreground">
+              <p className="text-sm">No se encontraron mercados</p>
+              <p className="text-xs mt-2">Intenta con otros términos de búsqueda</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -135,16 +139,16 @@ export function GlobalSearch() {
                   key={market.id}
                   onClick={() => handleSelectMarket(market)}
                   onMouseEnter={() => handleMouseEnter(market.slug)}
-                  className="w-full flex items-start gap-3 p-3 rounded-lg transition-colors duration-200 text-left hover:bg-electric-purple/20 dark:hover:bg-electric-purple/40"
+                  className="w-full flex items-start gap-3 p-3 rounded-lg transition-colors duration-200 text-left hover:bg-electric-purple/10 active:bg-electric-purple/20"
                 >
                   {/* Market Image */}
                   {market.image_url && (
-                    <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                    <div className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
                       <Image
                         src={market.image_url}
                         alt={market.title}
                         fill
-                        sizes="48px"
+                        sizes="56px"
                         className="object-cover"
                         loading="lazy"
                       />
@@ -153,20 +157,13 @@ export function GlobalSearch() {
 
                   {/* Market Info */}
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-medium line-clamp-2 text-sm">
-                      {market.title}
-                    </h4>
-                    
+                    <h4 className="font-medium line-clamp-2 text-sm mb-1.5">{market.title}</h4>
+
                     {/* Outcomes */}
-                    <div className="flex items-center gap-3 mt-1">
+                    <div className="flex items-center gap-3">
                       {market.outcomes.slice(0, 2).map((outcome) => (
-                        <div
-                          key={outcome.id}
-                          className="flex items-center gap-1 text-xs"
-                        >
-                          <span className="text-muted-foreground">
-                            {outcome.title}:
-                          </span>
+                        <div key={outcome.id} className="flex items-center gap-1 text-xs">
+                          <span className="text-muted-foreground">{outcome.title}:</span>
                           <span
                             className="font-semibold"
                             style={{
@@ -191,4 +188,6 @@ export function GlobalSearch() {
       </DialogContent>
     </Dialog>
   )
-}
+})
+
+MobileSearch.displayName = 'MobileSearch'

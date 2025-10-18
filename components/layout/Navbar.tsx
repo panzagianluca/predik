@@ -83,11 +83,11 @@ export function Navbar() {
 
   return (
     <>
-    <nav className="w-full bg-background">
+    <nav className="w-full bg-background border-b border-border">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 flex-shrink-0">
             {mounted && (
               <Image 
                 src={logoSrc} 
@@ -101,8 +101,8 @@ export function Navbar() {
             )}
           </Link>
 
-          {/* Global Search + Help Icon */}
-          <div className="ml-6 lg:ml-8 flex-1 max-w-xl flex items-center">
+          {/* Desktop: Global Search + Help Icon - Hidden on mobile */}
+          <div className="hidden md:flex ml-6 lg:ml-8 flex-1 max-w-xl items-center">
             <GlobalSearch />
             
             {/* Help Dialog */}
@@ -123,7 +123,7 @@ export function Navbar() {
                 </button>
               </DialogTrigger>
               <DialogContent 
-                className="sm:max-w-md !left-1/2 !top-1/2 !-translate-x-1/2 !-translate-y-1/2 p-0 gap-0"
+                className="sm:max-w-md w-full p-0 gap-0 max-h-[90vh] overflow-hidden"
                 from="top"
                 transition={{ type: 'spring', stiffness: 260, damping: 26 }}
               >
@@ -576,12 +576,12 @@ export function Navbar() {
                       // LOGGED IN STATE
                       <div className="flex items-center gap-3">
                         {/* USDT Balance */}
-                        <div className="flex flex-col items-center justify-center h-9 px-4">
-                          <span className="text-[12px] leading-tight">Balance</span>
+                        <div className="flex flex-col items-center justify-center h-9 px-2 sm:px-4">
+                          <span className="text-[10px] sm:text-[12px] leading-tight">Balance</span>
                           {isLoadingBalance ? (
-                            <div className="h-5 w-16 bg-muted animate-pulse rounded mt-0.5" />
+                            <div className="h-5 w-12 sm:w-16 bg-muted animate-pulse rounded mt-0.5" />
                           ) : (
-                            <span className="text-[16px] font-bold leading-tight">
+                            <span className="text-[14px] sm:text-[16px] font-bold leading-tight">
                               ${parseFloat(usdtBalance).toFixed(2)}
                             </span>
                           )}
@@ -589,7 +589,7 @@ export function Navbar() {
 
                         {/* Depositar Button */}
                         <button
-                          className="group/button relative inline-flex items-center justify-center overflow-hidden rounded-md bg-electric-purple backdrop-blur-lg px-6 h-9 text-sm font-semibold text-white transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl hover:shadow-electric-purple/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                          className="group/button relative inline-flex items-center justify-center overflow-hidden rounded-md bg-electric-purple backdrop-blur-lg px-4 sm:px-6 h-9 text-xs sm:text-sm font-semibold text-white transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl hover:shadow-electric-purple/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                           onClick={() => setShowDepositModal(true)}
                           type="button"
                         >
@@ -599,13 +599,17 @@ export function Navbar() {
                           </div>
                         </button>
 
-                        {/* Notification Bell */}
-                        <NotificationBell />
+                        {/* Desktop Only: Notification Bell + Divider + Profile Dropdown */}
+                        {/* Notification Bell - Desktop Only */}
+                        <div className="hidden md:block">
+                          <NotificationBell />
+                        </div>
 
-                        {/* Vertical Divider */}
-                        <div className="h-6 w-px bg-border"></div>
+                        {/* Vertical Divider - Desktop Only */}
+                        <div className="hidden md:block h-6 w-px bg-border"></div>
 
-                        {/* Profile Dropdown */}
+                        {/* Profile Dropdown - Desktop Only */}
+                        <div className="hidden md:block">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <button className="flex items-center gap-2 hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
@@ -750,6 +754,8 @@ export function Navbar() {
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
+                        </div>
+                        {/* End Desktop Only Profile Dropdown */}
 
                         {/* Deposit Modal */}
                         {account?.address && (

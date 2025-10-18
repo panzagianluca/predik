@@ -43,7 +43,7 @@ export function DepositModal({ isOpen, onClose, walletAddress }: DepositModalPro
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="sm:max-w-[500px] !left-1/2 !top-1/2 !-translate-x-1/2 !-translate-y-1/2 p-0 gap-0 h-[80vh] flex flex-col overflow-hidden"
+        className="sm:max-w-[500px] w-full p-0 gap-0 max-h-[90vh] flex flex-col overflow-hidden"
         from="top"
         transition={{ type: 'spring', stiffness: 260, damping: 26 }}
       >

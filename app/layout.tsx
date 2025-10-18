@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { CookieConsentBanner } from "@/components/layout/CookieConsent";
+import { BottomNav } from "@/components/layout/BottomNav";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,6 +23,12 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Predik - Decentralized Prediction Markets",
   description: "Trade on prediction markets powered by Celo blockchain",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
 };
 
 export default function RootLayout({
@@ -44,12 +51,15 @@ export default function RootLayout({
             <CookieConsentBanner />
             <div className="flex flex-col min-h-screen">
               <Navbar />
-              <main className="flex-1">
+              <main className="flex-1 mb-16 md:mb-0">
+                {/* mb-16 on mobile for bottom nav, md:mb-0 on desktop */}
                 <div className="max-w-7xl mx-auto px-4 py-4">
                   {children}
                 </div>
               </main>
               <Footer />
+              {/* Mobile Bottom Navigation - Hidden on desktop */}
+              <BottomNav />
             </div>
           </Web3Provider>
         </ThemeProvider>
