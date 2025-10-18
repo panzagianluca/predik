@@ -357,26 +357,48 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                     </div>
                   </div>
                 )}
+
+                {/* Como Funciona? - Only shown when NOT logged in */}
+                {!address && (
+                  <>
+                    <div className="h-px bg-border my-2" />
+                    
+                    <button
+                      onClick={() => {
+                        setShowTutorial(true)
+                        onClose()
+                      }}
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-accent transition-colors min-h-[44px] w-full text-left"
+                    >
+                      <AlertCircle className="h-5 w-5 text-muted-foreground" />
+                      <span className="font-medium">¿Cómo Funciona?</span>
+                    </button>
+                  </>
+                )}
               </div>
 
               {/* Spacer to push bottom items down */}
               <div className="flex-1"></div>
 
-              {/* Bottom Section - Como Funciona? & Logout */}
+              {/* Bottom Section - Como Funciona? (logged in only) & Logout */}
               <div className="p-4 border-t border-border flex-shrink-0 space-y-2">
-                {/* Como Funciona? */}
-                <button
-                  onClick={() => {
-                    setShowTutorial(true)
-                    onClose()
-                  }}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-accent transition-colors min-h-[44px] w-full text-left"
-                >
-                  <AlertCircle className="h-5 w-5 text-muted-foreground" />
-                  <span className="font-medium">¿Cómo Funciona?</span>
-                </button>
+                {/* Como Funciona? - Only shown when logged in */}
+                {address && (
+                  <>
+                    <button
+                      onClick={() => {
+                        setShowTutorial(true)
+                        onClose()
+                      }}
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-accent transition-colors min-h-[44px] w-full text-left"
+                    >
+                      <AlertCircle className="h-5 w-5 text-muted-foreground" />
+                      <span className="font-medium">¿Cómo Funciona?</span>
+                    </button>
 
-                <div className="h-px bg-border my-2" />
+                    <div className="h-px bg-border my-2" />
+                  </>
+                )}
 
                 {/* Logout - Only shown when logged in */}
                 {address && (
