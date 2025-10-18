@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/animate-ui/components/radix/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/animate-ui/components/radix/tabs'
 import { Button } from '@/components/ui/button'
-import { Check, Copy, ExternalLink, AlertCircle } from 'lucide-react'
+import { Check, Copy, ExternalLink, ChevronDown, HelpCircle } from 'lucide-react'
 import { QRCodeSVG } from 'qrcode.react'
 import { LiFiWidget } from '@lifi/widget'
 
@@ -16,6 +16,8 @@ interface DepositModalProps {
 
 export function DepositModal({ isOpen, onClose, walletAddress }: DepositModalProps) {
   const [copied, setCopied] = useState(false)
+  const [showInstructions, setShowInstructions] = useState(false)
+  const [showBridgeTooltip, setShowBridgeTooltip] = useState(false)
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(walletAddress)
@@ -41,7 +43,7 @@ export function DepositModal({ isOpen, onClose, walletAddress }: DepositModalPro
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="sm:max-w-[500px] !left-1/2 !top-1/2 !-translate-x-1/2 !-translate-y-1/2 p-0 gap-0 max-h-[90vh] flex flex-col overflow-hidden"
+        className="sm:max-w-[500px] !left-1/2 !top-1/2 !-translate-x-1/2 !-translate-y-1/2 p-0 gap-0 h-[80vh] flex flex-col overflow-hidden"
         from="top"
         transition={{ type: 'spring', stiffness: 260, damping: 26 }}
       >
@@ -50,9 +52,6 @@ export function DepositModal({ isOpen, onClose, walletAddress }: DepositModalPro
         {/* Header */}
         <div className="px-6 pt-6 pb-4 border-b">
           <h2 className="text-xl font-semibold">Depositar USDT</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Agregá fondos para comenzar a predecir
-          </p>
         </div>
 
         {/* Tabs Section - Scrollable */}
@@ -63,25 +62,9 @@ export function DepositModal({ isOpen, onClose, walletAddress }: DepositModalPro
               <TabsTrigger value="bridge">Bridge</TabsTrigger>
             </TabsList>
 
-            {/* Tab 1: CEX (LemonCash + Exchanges) */}
+            {/* Tab 1: CEX */}
             <TabsContent value="cex" className="space-y-4 mt-4">
-              {/* LemonCash Section */}
               <div className="rounded-lg border bg-card p-4">
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="text-2xl">🇦🇷</div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold flex items-center gap-2">
-                      🍋 LemonCash
-                      <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-0.5 rounded-full">
-                        Recomendado ARG
-                      </span>
-                    </h3>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      La forma más fácil desde Argentina
-                    </p>
-                  </div>
-                </div>
-
                 {/* QR Code */}
                 <div className="flex flex-col items-center gap-3 py-4 bg-white dark:bg-muted rounded-lg mb-4">
                   <QRCodeSVG
@@ -93,7 +76,7 @@ export function DepositModal({ isOpen, onClose, walletAddress }: DepositModalPro
                     fgColor="#000000"
                   />
                   <p className="text-xs text-center text-muted-foreground px-4">
-                    Escaneá con LemonCash para enviar USDT a Celo
+                    Escaneá para enviar USDT a Celo
                   </p>
                 </div>
 
@@ -118,72 +101,74 @@ export function DepositModal({ isOpen, onClose, walletAddress }: DepositModalPro
                   </div>
                 </div>
 
-                {/* Instructions */}
-                <div className="space-y-2 mb-4">
-                  <p className="text-sm font-medium">Pasos:</p>
-                  <ol className="text-sm text-muted-foreground space-y-1.5 ml-4">
-                    <li className="flex gap-2">
-                      <span className="font-semibold text-foreground">1.</span>
-                      <span>Abrí LemonCash y comprá USDT</span>
+                <div className="border-t pt-4 mb-4">
+                  <p className="text-sm font-medium mb-3">
+                    Retirá USDT vía Celo desde:
+                  </p>
+                  <ul className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
+                    <li className="flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-electric-purple" />
+                      <span>Lemon Cash</span>
                     </li>
-                    <li className="flex gap-2">
-                      <span className="font-semibold text-foreground">2.</span>
-                      <span>Tocá &quot;Enviar&quot; y escaneá el QR de arriba</span>
+                    <li className="flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-electric-purple" />
+                      <span>Bitget</span>
                     </li>
-                    <li className="flex gap-2">
-                      <span className="font-semibold text-foreground">3.</span>
-                      <span>Seleccioná red <strong>Celo</strong></span>
+                    <li className="flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-electric-purple" />
+                      <span>Binance</span>
                     </li>
-                    <li className="flex gap-2">
-                      <span className="font-semibold text-foreground">4.</span>
-                      <span>Confirmá el envío</span>
+                    <li className="flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-electric-purple" />
+                      <span>Bybit</span>
                     </li>
-                  </ol>
+                    <li className="flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-electric-purple" />
+                      <span>OKX</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-electric-purple" />
+                      <span>Cualquier otro exchange</span>
+                    </li>
+                  </ul>
                 </div>
 
-                <a
-                  href="https://www.lemon.me/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full"
-                >
-                  <Button className="w-full" variant="default">
-                    Abrir LemonCash
-                    <ExternalLink className="ml-2 h-4 w-4" />
-                  </Button>
-                </a>
-              </div>
-
-              {/* Other Exchanges */}
-              <div className="rounded-lg border bg-card p-4">
-                <h3 className="font-semibold flex items-center gap-2 mb-3">
-                  🌎 Otros Exchanges
-                </h3>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Si ya tenés USDT en un exchange, podés retirarlo a Celo:
-                </p>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-electric-purple" />
-                    <span>Binance (retiro a Celo)</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-electric-purple" />
-                    <span>OKX (retiro a Celo)</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-electric-purple" />
-                    <span>Bitget (retiro a Celo)</span>
-                  </li>
-                </ul>
-
-                <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 rounded-md">
-                  <div className="flex gap-2">
-                    <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-500 shrink-0 mt-0.5" />
-                    <p className="text-xs text-amber-900 dark:text-amber-200">
-                      <strong>Importante:</strong> Asegurate de seleccionar la red <strong>Celo</strong> al retirar.
-                    </p>
-                  </div>
+                {/* Instructions Accordion */}
+                <div className="border-t pt-4">
+                  <button
+                    onClick={() => setShowInstructions(!showInstructions)}
+                    className="w-full flex items-center justify-between text-sm font-medium py-2 hover:text-electric-purple transition-colors"
+                  >
+                    <span>¿Cómo retirar?</span>
+                    <ChevronDown 
+                      className={`h-4 w-4 transition-transform ${showInstructions ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+                  
+                  {showInstructions && (
+                    <ol className="text-sm text-muted-foreground space-y-1.5 ml-4 mt-2">
+                      <li className="flex gap-2">
+                        <span className="font-semibold text-foreground">1.</span>
+                        <span>Abrí tu exchange</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="font-semibold text-foreground">2.</span>
+                        <span>Buscá USDT y tocá &quot;Retirar&quot;</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="font-semibold text-foreground">3.</span>
+                        <span>Seleccioná red <strong>Celo</strong></span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="font-semibold text-foreground">4.</span>
+                        <span>Pegá la dirección de arriba</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="font-semibold text-foreground">5.</span>
+                        <span>Confirmá el retiro</span>
+                      </li>
+                    </ol>
+                  )}
                 </div>
               </div>
             </TabsContent>
@@ -191,12 +176,26 @@ export function DepositModal({ isOpen, onClose, walletAddress }: DepositModalPro
             {/* Tab 2: Bridge (Li.Fi Widget) */}
             <TabsContent value="bridge" className="space-y-4 mt-4">
               <div className="rounded-lg border bg-card p-4">
-                <h3 className="font-semibold flex items-center gap-2 mb-2">
-                  🔄 Transferir desde otra red
-                </h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Si ya tenés USDT en otra blockchain (Ethereum, Polygon, etc.), podés hacer bridge a Celo:
-                </p>
+                <div className="flex items-center gap-2 mb-4">
+                  <h3 className="font-semibold">
+                    Transferir desde otra red
+                  </h3>
+                  <div className="relative">
+                    <button
+                      onMouseEnter={() => setShowBridgeTooltip(true)}
+                      onMouseLeave={() => setShowBridgeTooltip(false)}
+                      onClick={() => setShowBridgeTooltip(!showBridgeTooltip)}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <HelpCircle className="h-4 w-4" />
+                    </button>
+                    {showBridgeTooltip && (
+                      <div className="absolute left-0 top-6 z-50 w-64 p-3 bg-popover border rounded-md shadow-lg text-xs text-popover-foreground">
+                        Si ya tenés USDT en otra blockchain (Ethereum, Polygon, etc.), podés hacer bridge a Celo
+                      </div>
+                    )}
+                  </div>
+                </div>
 
                 {/* Li.Fi Widget */}
                 <div className="rounded-lg overflow-hidden">
