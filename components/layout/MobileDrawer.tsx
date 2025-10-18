@@ -11,11 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { getProfilePicture } from '@/lib/profileUtils'
 import { formatDistanceToNow } from 'date-fns'
 import { es } from 'date-fns/locale'
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from '@/components/animate-ui/components/radix/dialog'
+import { TutorialDialog } from './TutorialDialog'
 
 interface Notification {
   id: string
@@ -504,46 +500,8 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
       )}
     </AnimatePresence>
 
-    {/* Como Funciona Tutorial Dialog - Opens Navbar tutorial */}
-    <Dialog open={showTutorial} onOpenChange={setShowTutorial}>
-      <DialogContent 
-        className="sm:max-w-md p-0 gap-0 max-h-[90vh] overflow-hidden"
-        from="top"
-        transition={{ type: 'spring', stiffness: 260, damping: 26 }}
-      >
-        <DialogTitle className="sr-only">Como Funciona Predik</DialogTitle>
-        
-        <div className="p-6">
-          <h2 className="text-xl font-semibold mb-4">¿Cómo Funciona Predik?</h2>
-          
-          <div className="space-y-3 text-sm">
-            <p className="text-muted-foreground">
-              Predik es un mercado de predicciones descentralizado donde podés:
-            </p>
-            
-            <ul className="space-y-2 ml-4 list-disc text-muted-foreground">
-              <li>Elegir mercados sobre eventos futuros</li>
-              <li>Comprar shares (acciones) de resultados</li>
-              <li>Ganar USDT cuando aciertes</li>
-              <li>Vender en cualquier momento</li>
-            </ul>
-
-            <div className="mt-6 pt-4 border-t border-border">
-              <p className="text-xs text-muted-foreground">
-                <strong>Tip:</strong> Los precios cambian según la demanda. ¡Comprá temprano para mejores oportunidades!
-              </p>
-            </div>
-          </div>
-
-          <button
-            onClick={() => setShowTutorial(false)}
-            className="mt-6 w-full py-2.5 bg-electric-purple text-white rounded-lg font-medium hover:bg-electric-purple/90 transition-colors"
-          >
-            Entendido
-          </button>
-        </div>
-      </DialogContent>
-    </Dialog>
+    {/* Como Funciona Tutorial Dialog - Shared component */}
+    <TutorialDialog isOpen={showTutorial} onClose={() => setShowTutorial(false)} />
   </>
   )
 }
