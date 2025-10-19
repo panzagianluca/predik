@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { ProposalCard } from '@/components/proponer/ProposalCard'
 import { SubmitProposalModal } from '@/components/proponer/SubmitProposalModal'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { LogoSpinner } from '@/components/ui/logo-spinner'
+import { ProponerSkeleton } from '@/components/ui/skeletons/ProponerSkeleton'
 import { Trophy } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -118,8 +118,12 @@ export default function ProponerPage() {
           <h1 className="text-[24px] font-medium">Proponer Mercados</h1>
         </div>
 
-        {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-2">
+        {isLoading ? (
+          <ProponerSkeleton />
+        ) : (
+          <>
+            {/* Two Column Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-2">
           {/* Left Column: Submit Button + Top Contributors */}
           <div className="space-y-6">
             {/* Submit Button */}
@@ -211,11 +215,7 @@ export default function ProponerPage() {
             </div>
 
             {/* Proposals Grid */}
-            {isLoading ? (
-              <div className="flex items-center justify-center py-20">
-                <LogoSpinner size={60} />
-              </div>
-            ) : proposals.length === 0 ? (
+            {proposals.length === 0 ? (
               <div className="text-center py-20">
                 <p className="text-muted-foreground text-lg">
                   No hay propuestas aún. ¡Sé el primero en proponer un mercado!
@@ -255,6 +255,8 @@ export default function ProponerPage() {
             )}
           </div>
         </div>
+          </>
+        )}
       </div>
 
       {/* Contributors Dialog - Mobile Only */}

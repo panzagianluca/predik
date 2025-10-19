@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from '@/components/animate-ui/components/radix/tabs'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { LogoSpinner } from '@/components/ui/logo-spinner'
+import { RankingSkeleton } from '@/components/ui/skeletons/RankingSkeleton'
 import { Trophy, TrendingUp, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -168,9 +168,7 @@ export default function RankingPage() {
           <TabsContents>
             <TabsContent value="month">
               {isLoading ? (
-                <div className="flex items-center justify-center py-20">
-                  <LogoSpinner size={60} />
-                </div>
+                <RankingSkeleton />
               ) : error || !data ? (
                 <div className="py-20 text-center">
                   <p className="text-red-500 mb-4">{error || 'Failed to load rankings'}</p>
@@ -212,9 +210,7 @@ export default function RankingPage() {
 
             <TabsContent value="all">
               {isLoading ? (
-                <div className="flex items-center justify-center py-20">
-                  <LogoSpinner size={60} />
-                </div>
+                <RankingSkeleton />
               ) : error || !data ? (
                 <div className="py-20 text-center">
                   <p className="text-red-500 mb-4">{error || 'Failed to load rankings'}</p>
