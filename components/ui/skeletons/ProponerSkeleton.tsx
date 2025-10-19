@@ -6,22 +6,22 @@
 export function ProponerSkeleton() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-2">
-      {/* Left Column: Submit Button + Top Contributors */}
-  <div className="space-y-4">
+    {/* Left Column: Submit Button + Top Contributors */}
+      <div className="space-y-6">
         {/* Submit Button Skeleton */}
         <div className="w-full h-9 my-3 bg-electric-purple/20 rounded-md relative overflow-hidden">
           <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
         </div>
 
         {/* Top Contributors Skeleton - Desktop Only */}
-        <div className="hidden lg:block bg-card border border-border rounded-xl p-4">
-          <div className="flex items-center gap-2 mb-4">
+        <div className="hidden lg:block rounded-xl border bg-card text-card-foreground shadow">
+          <div className="flex items-center gap-2 p-6 pb-4">
             <div className="h-5 w-5 bg-muted rounded" />
             <div className="h-5 w-40 bg-muted rounded relative overflow-hidden">
               <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
             </div>
           </div>
-          <div className="space-y-3">
+          <div className="px-6 pb-6 space-y-3">
             {[...Array(5)].map((_, i) => (
               <div key={i} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -51,9 +51,9 @@ export function ProponerSkeleton() {
         </div>
 
         {/* Proposals Grid Skeleton */}
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 gap-4">
           {[...Array(5)].map((_, i) => (
-            <div 
+            <div
               key={i}
               className="bg-card border border-border rounded-xl p-4 relative overflow-hidden"
               style={{
@@ -62,30 +62,42 @@ export function ProponerSkeleton() {
             >
               {/* Shimmer effect */}
               <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-              
-              {/* Header */}
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex-1">
-                  <div className="h-6 bg-muted rounded w-3/4 mb-2" />
-                  <div className="flex items-center gap-2">
-                    <div className="h-5 w-20 bg-muted rounded-full" />
-                    <div className="h-5 w-24 bg-muted rounded" />
+
+              <div className="flex gap-3">
+                {/* Upvote button placeholder */}
+                <div className="flex flex-col items-center gap-2 px-2 py-1 rounded-md bg-muted/40 min-w-[50px]">
+                  <div className="h-5 w-5 bg-muted rounded" />
+                  <div className="h-4 w-8 bg-muted rounded" />
+                </div>
+
+                {/* Proposal content placeholder */}
+                <div className="flex-1 space-y-3">
+                  <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-2 md:gap-4">
+                    <div className="h-5 w-full md:w-3/4 bg-muted rounded" />
+                    <div className="hidden md:flex items-center gap-2">
+                      <div className="h-3 w-24 bg-muted rounded" />
+                      <div className="h-2 w-2 bg-muted rounded-full" />
+                      <div className="h-3 w-28 bg-muted rounded" />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <div className="h-4 w-20 bg-muted rounded-full" />
+                    <div className="h-2 w-2 bg-muted rounded-full" />
+                    <div className="h-3 w-32 bg-muted rounded" />
+                    <div className="md:hidden h-2 w-2 bg-muted rounded-full" />
+                    <div className="md:hidden h-3 w-32 bg-muted rounded" />
+                    <div className="md:hidden h-2 w-2 bg-muted rounded-full" />
+                    <div className="md:hidden h-3 w-24 bg-muted rounded" />
+                    <div className="hidden md:inline-flex ml-auto h-3 w-16 bg-muted rounded" />
+                  </div>
+
+                  <div className="md:hidden flex items-center gap-2">
+                    <div className="h-3 w-28 bg-muted rounded" />
+                    <div className="h-2 w-2 bg-muted rounded-full" />
+                    <div className="h-3 w-24 bg-muted rounded" />
                   </div>
                 </div>
-              </div>
-
-              {/* Content */}
-              <div className="space-y-2 mb-3">
-                <div className="h-4 bg-muted rounded w-full" />
-                <div className="h-4 bg-muted rounded w-5/6" />
-              </div>
-
-              {/* Footer */}
-              <div className="flex items-center justify-between pt-3 border-t border-border">
-                <div className="flex items-center gap-2">
-                  <div className="h-4 w-16 bg-muted rounded" />
-                </div>
-                <div className="h-9 w-24 bg-muted rounded-md" />
               </div>
             </div>
           ))}
