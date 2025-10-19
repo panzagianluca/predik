@@ -24,7 +24,7 @@ export function ProponerSkeleton() {
           <div className="px-6 pb-6 space-y-3">
             {[...Array(5)].map((_, i) => (
               <div key={i} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                   <div className="h-4 w-6 bg-muted rounded" />
                   <div className="h-4 w-24 bg-muted rounded" />
                 </div>
@@ -39,13 +39,13 @@ export function ProponerSkeleton() {
       <div>
         {/* Filter Buttons Skeleton */}
         <div className="flex flex-wrap items-center gap-2 rounded-lg py-3 mb-4">
-          <div className="h-[36px] min-w-[140px] bg-electric-purple/10 rounded-md relative overflow-hidden">
+          <div className="h-[36px] w-[80px] bg-electric-purple/10 rounded-md relative overflow-hidden">
             <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
           </div>
-          <div className="h-[36px] min-w-[120px] bg-muted rounded-md relative overflow-hidden">
+          <div className="h-[36px] w-[60px] bg-muted rounded-md relative overflow-hidden">
             <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
           </div>
-          <div className="lg:hidden ml-auto h-[36px] min-w-[140px] bg-muted rounded-md relative overflow-hidden">
+          <div className="lg:hidden ml-auto h-[36px] w-[120px] bg-muted rounded-md relative overflow-hidden">
             <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
           </div>
         </div>
