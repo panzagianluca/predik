@@ -5,7 +5,7 @@ import { useTheme } from 'next-themes'
 import { useAccount, useDisconnect } from 'wagmi'
 import Link from 'next/link'
 import Image from 'next/image'
-import { X, FileText, Shield, Sun, Moon, LogOut, Bell, AlertCircle, MessageSquare, CheckCircle } from 'lucide-react'
+import { X, FileText, Shield, Sun, Moon, LogOut, Bell, AlertCircle, MessageSquare, CheckCircle, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getProfilePicture } from '@/lib/profileUtils'
@@ -269,6 +269,18 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
 
               {/* Main Navigation Links */}
               <div className="p-4 space-y-2 flex-shrink-0">
+                {/* Profile (logged in) */}
+                {address && (
+                  <Link
+                    href="/perfil"
+                    onClick={handleLinkClick}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors min-h-[44px] hover:bg-electric-purple/10 active:bg-electric-purple/20"
+                  >
+                    <User className="h-5 w-5 text-muted-foreground" />
+                    <span className="font-medium">Perfil</span>
+                  </Link>
+                )}
+
                 {/* Notifications */}
                 {address && (
                   <>
