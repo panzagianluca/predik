@@ -7,7 +7,7 @@ export function ProponerSkeleton() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-2">
       {/* Left Column: Submit Button + Top Contributors */}
-      <div className="space-y-6">
+  <div className="space-y-4">
         {/* Submit Button Skeleton */}
         <div className="w-full h-9 my-3 bg-electric-purple/20 rounded-md relative overflow-hidden">
           <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
