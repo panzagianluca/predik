@@ -779,7 +779,7 @@ export function Navbar() {
     {/* Confetti Effect - Rendered outside dialog for proper display */}
     {showTutorial && tutorialStep === 3 && (
       <Confetti
-        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[600px] pointer-events-none z-[100]"
+        className="fixed left-1/2 top-[calc(50%-200px)] -translate-x-1/2 -translate-y-1/2 w-[500px] h-[600px] pointer-events-none z-[100]"
         manualstart={triggerConfetti}
       />
     )}

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { X, Cookie, Settings } from 'lucide-react'
 import { initAnalyticsIfConsented } from '@/lib/analytics'
+import { haptics } from '@/lib/haptics'
 
 type ConsentState = {
   necessary: boolean
@@ -83,11 +84,13 @@ export function CookieConsentBanner() {
 
   const acceptAll = () => {
     console.log('🟢 ACEPTAR TODO clicked - enabling ALL cookies')
+    haptics.success()
     saveConsent(true, true, true)
   }
 
   const acceptNecessary = () => {
     console.log('🟡 SOLO NECESARIAS clicked - disabling analytics')
+    haptics.medium()
     saveConsent(true, false, false)
   }
 

@@ -7,6 +7,7 @@ import { TrendingUp, Clock, Calendar, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TooltipProvider } from '@/components/animate-ui/primitives/animate/tooltip'
 import { motion, AnimatePresence } from 'framer-motion'
+import { haptics } from '@/lib/haptics'
 
 type TimeFilter = 'trending' | 'recent' | 'closing-soon' | 'closed'
 type CategoryFilter = 'all' | 'sports' | 'economy' | 'politics' | 'crypto' | 'culture'
@@ -119,7 +120,10 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
               return (
                 <motion.button
                   key={filter.id}
-                  onClick={() => setTimeFilter(filter.id)}
+                  onClick={() => {
+                    haptics.selection()
+                    setTimeFilter(filter.id)
+                  }}
                   className={cn(
                     'flex items-center gap-2 px-4 h-[36px] rounded-md border-2 transition-all duration-200 text-[14px] relative overflow-hidden flex-shrink-0',
                     isActive
@@ -150,7 +154,10 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
               return (
                 <motion.button
                   key={filter.id}
-                  onClick={() => setCategoryFilter(filter.id)}
+                  onClick={() => {
+                    haptics.selection()
+                    setCategoryFilter(filter.id)
+                  }}
                   className={cn(
                     'px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] relative overflow-hidden flex-shrink-0',
                     isActive
@@ -184,7 +191,10 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
               return (
                 <motion.button
                   key={filter.id}
-                  onClick={() => setTimeFilter(filter.id)}
+                  onClick={() => {
+                    haptics.selection()
+                    setTimeFilter(filter.id)
+                  }}
                   className={cn(
                     'flex items-center gap-2 px-4 h-[36px] rounded-md border-2 transition-all duration-200 text-[14px] relative overflow-hidden',
                     isActive
@@ -217,7 +227,10 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
               return (
                 <motion.button
                   key={filter.id}
-                  onClick={() => setCategoryFilter(filter.id)}
+                  onClick={() => {
+                    haptics.selection()
+                    setCategoryFilter(filter.id)
+                  }}
                   className={cn(
                     'px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] relative overflow-hidden',
                     isActive

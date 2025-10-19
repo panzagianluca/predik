@@ -8,6 +8,8 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
+import CountUp from 'react-countup'
+import { haptics } from '@/lib/haptics'
 
 interface MarketCardProps {
   market: Market
@@ -76,6 +78,7 @@ export function MarketCard({ market }: MarketCardProps) {
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={() => haptics.light()}
     >
       {/* Header Section */}
       <CardHeader className="p-4 pb-3">
@@ -123,7 +126,14 @@ export function MarketCard({ market }: MarketCardProps) {
                     className="font-bold"
                     style={{ color: outcomeColor }}
                   >
-                    {probability.toFixed(2)}%
+                    <CountUp
+                      start={probability > 10 ? probability - 5 : 0}
+                      end={probability}
+                      duration={0.8}
+                      decimals={2}
+                      suffix="%"
+                      preserveValue
+                    />
                   </span>
                 </div>
                 

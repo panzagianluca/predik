@@ -11,7 +11,7 @@ import { RelatedMarketCard } from '@/components/market/RelatedMarketCard'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from '@/components/animate-ui/components/radix/tabs'
 import { ToggleGroup, ToggleGroupItem } from '@/components/animate-ui/components/radix/toggle-group'
-import { LogoSpinner } from '@/components/ui/logo-spinner'
+import { MarketDetailSkeleton } from '@/components/ui/skeletons/MarketDetailSkeleton'
 import { CommentSection } from '@/components/market/comments/CommentSection'
 import { HoldersList } from '@/components/market/HoldersList'
 import { ActivityList } from '@/components/market/ActivityList'
@@ -20,6 +20,8 @@ import Image from 'next/image'
 import { Calendar, Users, TrendingUp, ExternalLink, CheckCircle2, XCircle, Clock, ChevronDown, ChevronUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { TooltipProvider } from '@/components/animate-ui/primitives/animate/tooltip'
+import CountUp from 'react-countup'
+import { haptics } from '@/lib/haptics'
 
 // Helper function to format description with bold markdown
 const formatDescription = (text: string) => {
@@ -109,11 +111,7 @@ export default function MarketDetailPage() {
   }
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LogoSpinner size={60} />
-      </div>
-    )
+    return <MarketDetailSkeleton />
   }
 
   if (error || !market) {
@@ -237,7 +235,10 @@ export default function MarketDetailPage() {
                     type="single" 
                     value={selectedTimeframe}
                     onValueChange={(value) => {
-                      if (value) setSelectedTimeframe(value as '24h' | '7d' | '30d' | 'all')
+                      if (value) {
+                        haptics.selection()
+                        setSelectedTimeframe(value as '24h' | '7d' | '30d' | 'all')
+                      }
                     }}
                     className="p-1 ml-2"
                   >
@@ -407,9 +408,9 @@ export default function MarketDetailPage() {
             {/* Tabs: Comments | Holders | Activity */}
             <Tabs defaultValue="comments" className="w-full">
               <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="comments">Comentarios</TabsTrigger>
-                <TabsTrigger value="holders">Holders</TabsTrigger>
-                <TabsTrigger value="activity">Actividad</TabsTrigger>
+                <TabsTrigger value="comments" onClick={() => haptics.selection()}>Comentarios</TabsTrigger>
+                <TabsTrigger value="holders" onClick={() => haptics.selection()}>Holders</TabsTrigger>
+                <TabsTrigger value="activity" onClick={() => haptics.selection()}>Actividad</TabsTrigger>
               </TabsList>
 
               <TabsContents 
@@ -458,15 +459,35 @@ export default function MarketDetailPage() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Liquidez</span>
-                    <span className="font-semibold">${market.liquidity.toLocaleString()}</span>
+                    <span className="font-semibold">
+                      $<CountUp
+                        end={market.liquidity}
+                        duration={1}
+                        separator=","
+                        preserveValue
+                      />
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Volumen</span>
-                    <span className="font-semibold">${market.volume_eur.toLocaleString()}</span>
+                    <span className="font-semibold">
+                      $<CountUp
+                        end={market.volume_eur}
+                        duration={1}
+                        separator=","
+                        preserveValue
+                      />
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Operadores</span>
-                    <span className="font-semibold">{market.users}</span>
+                    <span className="font-semibold">
+                      <CountUp
+                        end={market.users}
+                        duration={0.8}
+                        preserveValue
+                      />
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Fee</span>
@@ -489,7 +510,13 @@ export default function MarketDetailPage() {
                           className="font-bold"
                           style={{ color: index === 0 ? '#22c55e' : '#ef4444' }}
                         >
-                          {(outcome.price * 100).toFixed(2)}%
+                          <CountUp
+                            end={outcome.price * 100}
+                            duration={0.8}
+                            decimals={2}
+                            suffix="%"
+                            preserveValue
+                          />
                         </span>
                       </div>
                     ))}
