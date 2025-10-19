@@ -654,7 +654,7 @@ export function Navbar() {
                             <Link href="/perfil" prefetch={true}>
                               <DropdownMenuItem className="justify-start">
                                 <User className="mr-2 h-4 w-4" />
-                                <span>Profile</span>
+                                <span>Perfil</span>
                               </DropdownMenuItem>
                             </Link>
                             

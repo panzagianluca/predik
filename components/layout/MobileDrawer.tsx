@@ -229,7 +229,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
               <h2 className="text-lg font-semibold">Menú</h2>
               <button
                 onClick={onClose}
-                className="h-10 w-10 rounded-lg flex items-center justify-center hover:bg-accent transition-colors"
+                className="h-10 w-10 rounded-lg flex items-center justify-center transition-colors hover:bg-electric-purple/10 active:bg-electric-purple/20"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -274,7 +274,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                   <>
                     <button
                       onClick={handleNotifications}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-accent transition-colors min-h-[44px] w-full text-left relative"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors min-h-[44px] w-full text-left relative hover:bg-electric-purple/10 active:bg-electric-purple/20"
                     >
                       <Bell className="h-5 w-5 text-muted-foreground" />
                       <span className="font-medium">Notificaciones</span>
@@ -293,7 +293,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                 <Link
                   href="/terminos"
                   onClick={handleLinkClick}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-accent transition-colors min-h-[44px]"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors min-h-[44px] hover:bg-electric-purple/10 active:bg-electric-purple/20"
                 >
                   <FileText className="h-5 w-5 text-muted-foreground" />
                   <span className="font-medium">Términos</span>
@@ -303,7 +303,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                 <Link
                   href="/privacidad"
                   onClick={handleLinkClick}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-accent transition-colors min-h-[44px]"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors min-h-[44px] hover:bg-electric-purple/10 active:bg-electric-purple/20"
                 >
                   <Shield className="h-5 w-5 text-muted-foreground" />
                   <span className="font-medium">Privacidad</span>
@@ -368,7 +368,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                         setShowTutorial(true)
                         onClose()
                       }}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-accent transition-colors min-h-[44px] w-full text-left"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors min-h-[44px] w-full text-left hover:bg-electric-purple/10 active:bg-electric-purple/20"
                     >
                       <AlertCircle className="h-5 w-5 text-muted-foreground" />
                       <span className="font-medium">¿Cómo Funciona?</span>
@@ -390,7 +390,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                         setShowTutorial(true)
                         onClose()
                       }}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-accent transition-colors min-h-[44px] w-full text-left"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors min-h-[44px] w-full text-left hover:bg-electric-purple/10 active:bg-electric-purple/20"
                     >
                       <AlertCircle className="h-5 w-5 text-muted-foreground" />
                       <span className="font-medium">¿Cómo Funciona?</span>
@@ -449,7 +449,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                       )}
                       <button
                         onClick={() => setShowNotifications(false)}
-                        className="h-10 w-10 rounded-lg flex items-center justify-center hover:bg-accent transition-colors"
+                        className="h-10 w-10 rounded-lg flex items-center justify-center transition-colors hover:bg-electric-purple/10 active:bg-electric-purple/20"
                       >
                         <X className="h-5 w-5" />
                       </button>
@@ -481,7 +481,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                               onClose()
                             }}
                             className={cn(
-                              'block px-4 py-4 hover:bg-accent active:bg-accent/80 transition-colors',
+                              'block px-4 py-4 transition-colors hover:bg-electric-purple/10 active:bg-electric-purple/20',
                               !notification.isRead && 'bg-electric-purple/5'
                             )}
                           >

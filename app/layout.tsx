@@ -21,8 +21,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Predik - Decentralized Prediction Markets",
-  description: "Trade on prediction markets powered by Celo blockchain",
+  title: "Predik - El futuro tiene precio",
+  description: "Opera mercados de predicción en la red de Celo, impulsados por Myriad Markets.",
   viewport: {
     width: "device-width",
     initialScale: 1,

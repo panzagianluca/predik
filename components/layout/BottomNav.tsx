@@ -82,9 +82,8 @@ export function BottomNav() {
                   onClick={item.onClick}
                   className={cn(
                     'flex flex-col items-center justify-center gap-1 min-w-[60px] min-h-[44px] rounded-lg transition-all duration-200',
-                    'hover:bg-accent/50 active:scale-95',
-                    isActive && 'text-electric-purple',
-                    !isActive && 'text-muted-foreground'
+                    'hover:bg-electric-purple/10 active:bg-electric-purple/20 active:scale-95',
+                    isActive ? 'text-electric-purple bg-electric-purple/10' : 'text-muted-foreground'
                   )}
                 >
                   <Icon className={cn('h-5 w-5', isActive && 'fill-electric-purple/20')} />
@@ -99,9 +98,8 @@ export function BottomNav() {
                 href={item.href}
                 className={cn(
                   'flex flex-col items-center justify-center gap-1 min-w-[60px] min-h-[44px] rounded-lg transition-all duration-200',
-                  'hover:bg-accent/50 active:scale-95',
-                  isActive && 'text-electric-purple',
-                  !isActive && 'text-muted-foreground'
+                  'hover:bg-electric-purple/10 active:bg-electric-purple/20 active:scale-95',
+                  isActive ? 'text-electric-purple bg-electric-purple/10' : 'text-muted-foreground'
                 )}
               >
                 <Icon className={cn('h-5 w-5', isActive && 'fill-electric-purple/20')} />
