@@ -125,7 +125,7 @@ export default function ProponerPage() {
             {/* Two Column Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-2">
           {/* Left Column: Submit Button + Top Contributors */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Submit Button */}
             <SubmitProposalModal
               userAddress={address}
