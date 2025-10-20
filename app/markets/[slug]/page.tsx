@@ -154,7 +154,7 @@ export default function MarketDetailPage() {
             
             {/* Market Title and Info - Now part of left column */}
             <div className="space-y-3">
-              <div className="flex items-start gap-3">
+              <div className="flex items-center md:items-start gap-3">
                 {market.image_url && (
                   <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
                     <Image
@@ -168,13 +168,13 @@ export default function MarketDetailPage() {
                 )}
                 
                 <div className="flex-1 min-w-0">
-                  <h1 className="text-[20px] md:text-[24px] font-medium mb-1">{market.title}</h1>
+                  <h1 className="text-[20px] md:text-[24px] font-medium">{market.title}</h1>
                   
-                  {/* Badges */}
-                  <div className="flex items-center gap-2 flex-wrap">
+                  {/* Badges - Desktop only */}
+                  <div className="hidden md:flex items-center gap-2 flex-wrap">
                     {/* State Badge */}
                     <span className={cn(
-                      "px-3 py-1 rounded-full text-[12px] md:text-xs font-semibold uppercase flex items-center gap-1",
+                      "px-3 py-1 rounded-full text-xs font-semibold uppercase flex items-center gap-1",
                       market.state === 'open' && "bg-green-500/20 text-green-700 dark:text-green-400",
                       market.state === 'closed' && "bg-orange-500/20 text-orange-700 dark:text-orange-400",
                       market.state === 'resolved' && "bg-blue-500/20 text-blue-700 dark:text-blue-400"
@@ -187,7 +187,7 @@ export default function MarketDetailPage() {
 
                     {/* Verified Badge */}
                     {market.verified && (
-                      <span className="px-3 py-1 rounded-full text-[12px] md:text-xs font-semibold bg-electric-purple/20 text-electric-purple flex items-center gap-1">
+                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-electric-purple/20 text-electric-purple flex items-center gap-1">
                         <CheckCircle2 className="h-3 w-3" />
                         Verificado
                       </span>
@@ -197,7 +197,7 @@ export default function MarketDetailPage() {
                     {market.topics && market.topics.length > 0 && market.topics.map((topic, index) => (
                       <span 
                         key={index}
-                        className="px-3 py-1 rounded-full text-[12px] md:text-xs font-semibold bg-muted text-muted-foreground"
+                        className="px-3 py-1 rounded-full text-xs font-semibold bg-muted text-muted-foreground"
                       >
                         {topic}
                       </span>
@@ -206,10 +206,44 @@ export default function MarketDetailPage() {
                 </div>
               </div>
 
+              {/* Badges - Mobile only, below image */}
+              <div className="flex md:hidden items-center gap-2 flex-wrap">
+                {/* State Badge */}
+                <span className={cn(
+                  "px-3 py-1 rounded-full text-[12px] font-semibold uppercase flex items-center gap-1",
+                  market.state === 'open' && "bg-green-500/20 text-green-700 dark:text-green-400",
+                  market.state === 'closed' && "bg-orange-500/20 text-orange-700 dark:text-orange-400",
+                  market.state === 'resolved' && "bg-blue-500/20 text-blue-700 dark:text-blue-400"
+                )}>
+                  {market.state === 'open' && <Clock className="h-3 w-3" />}
+                  {market.state === 'closed' && <XCircle className="h-3 w-3" />}
+                  {market.state === 'resolved' && <CheckCircle2 className="h-3 w-3" />}
+                  {market.state}
+                </span>
+
+                {/* Verified Badge */}
+                {market.verified && (
+                  <span className="px-3 py-1 rounded-full text-[12px] font-semibold bg-electric-purple/20 text-electric-purple flex items-center gap-1">
+                    <CheckCircle2 className="h-3 w-3" />
+                    Verificado
+                  </span>
+                )}
+
+                {/* Topics/Tags */}
+                {market.topics && market.topics.length > 0 && market.topics.map((topic, index) => (
+                  <span 
+                    key={index}
+                    className="px-3 py-1 rounded-full text-[12px] font-semibold bg-muted text-muted-foreground"
+                  >
+                    {topic}
+                  </span>
+                ))}
+              </div>
+
               {/* Metadata Bar with Period Selector */}
-              <div className="flex items-center justify-between text-sm text-muted-foreground flex-wrap gap-4">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between text-sm text-muted-foreground gap-4">
                 {/* Left side: Metadata grouped together */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 flex-wrap">
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
                     <span>
@@ -229,8 +263,8 @@ export default function MarketDetailPage() {
                   </div>
                 </div>
                 
-                {/* Right side: Period Selector - ToggleGroup */}
-                <div className="flex items-center">
+                {/* Right side: Period Selector - ToggleGroup - Desktop only */}
+                <div className="hidden md:flex items-center">
                   <ToggleGroup 
                     type="single" 
                     value={selectedTimeframe}
@@ -260,7 +294,7 @@ export default function MarketDetailPage() {
             </div>
             
             {/* Probability Chart */}
-            <div>
+            <div className="space-y-4">
               {/* Chart - Full width, no card wrapper */}
               {market.outcomes && market.outcomes.length > 0 ? (
                 <ProbabilityChart 
@@ -273,6 +307,34 @@ export default function MarketDetailPage() {
                   <p className="text-muted-foreground">No hay datos del gráfico disponibles</p>
                 </div>
               )}
+
+              {/* Period Selector - Mobile only, below chart */}
+              <div className="flex md:hidden items-center justify-center">
+                <ToggleGroup 
+                  type="single" 
+                  value={selectedTimeframe}
+                  onValueChange={(value) => {
+                    if (value) {
+                      haptics.selection()
+                      setSelectedTimeframe(value as '24h' | '7d' | '30d' | 'all')
+                    }
+                  }}
+                  className="p-1"
+                >
+                  <ToggleGroupItem value="24h" aria-label="24 hours" className="text-xs px-3 py-1 h-7">
+                    24h
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="7d" aria-label="7 days" className="text-xs px-3 py-1 h-7">
+                    7d
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="30d" aria-label="30 days" className="text-xs px-3 py-1 h-7">
+                    30d
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="all" aria-label="All time" className="text-xs px-3 py-1 h-7">
+                    Todo
+                  </ToggleGroupItem>
+                </ToggleGroup>
+              </div>
             </div>
 
             {/* Description Section */}
