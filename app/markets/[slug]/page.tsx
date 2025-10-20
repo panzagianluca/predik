@@ -168,13 +168,13 @@ export default function MarketDetailPage() {
                 )}
                 
                 <div className="flex-1 min-w-0">
-                  <h1 className="text-[24px] font-medium mb-1">{market.title}</h1>
+                  <h1 className="text-[20px] md:text-[24px] font-medium mb-1">{market.title}</h1>
                   
                   {/* Badges */}
                   <div className="flex items-center gap-2 flex-wrap">
                     {/* State Badge */}
                     <span className={cn(
-                      "px-3 py-1 rounded-full text-xs font-semibold uppercase flex items-center gap-1",
+                      "px-3 py-1 rounded-full text-[12px] md:text-xs font-semibold uppercase flex items-center gap-1",
                       market.state === 'open' && "bg-green-500/20 text-green-700 dark:text-green-400",
                       market.state === 'closed' && "bg-orange-500/20 text-orange-700 dark:text-orange-400",
                       market.state === 'resolved' && "bg-blue-500/20 text-blue-700 dark:text-blue-400"
@@ -187,7 +187,7 @@ export default function MarketDetailPage() {
 
                     {/* Verified Badge */}
                     {market.verified && (
-                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-electric-purple/20 text-electric-purple flex items-center gap-1">
+                      <span className="px-3 py-1 rounded-full text-[12px] md:text-xs font-semibold bg-electric-purple/20 text-electric-purple flex items-center gap-1">
                         <CheckCircle2 className="h-3 w-3" />
                         Verificado
                       </span>
@@ -197,7 +197,7 @@ export default function MarketDetailPage() {
                     {market.topics && market.topics.length > 0 && market.topics.map((topic, index) => (
                       <span 
                         key={index}
-                        className="px-3 py-1 rounded-full text-xs font-semibold bg-muted text-muted-foreground"
+                        className="px-3 py-1 rounded-full text-[12px] md:text-xs font-semibold bg-muted text-muted-foreground"
                       >
                         {topic}
                       </span>

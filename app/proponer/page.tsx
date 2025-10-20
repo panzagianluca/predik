@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { ProposalCard } from '@/components/proponer/ProposalCard'
 import { SubmitProposalModal } from '@/components/proponer/SubmitProposalModal'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { ProponerSkeleton } from '@/components/ui/skeletons/ProponerSkeleton'
+import { ProponerSkeleton, ProponerCardsSkeleton } from '@/components/ui/skeletons/ProponerSkeleton'
 import { Trophy } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -33,20 +33,28 @@ export default function ProponerPage() {
   const { address } = useAccount()
   const [proposals, setProposals] = useState<Proposal[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isListLoading, setIsListLoading] = useState(false)
   const [sortFilter, setSortFilter] = useState<SortFilter>('most-voted')
   const [userVotes, setUserVotes] = useState<Set<string>>(new Set())
   const [topContributors, setTopContributors] = useState<Array<{ address: string; count: number }>>([])
   const [showContributors, setShowContributors] = useState(false)
+  const hasLoadedRef = useRef(false)
 
   useEffect(() => {
-    fetchProposals()
+    const isInitialLoad = !hasLoadedRef.current
+    fetchProposals({ initial: isInitialLoad })
+    hasLoadedRef.current = true
     if (address) {
       fetchUserVotes()
     }
   }, [sortFilter, address])
 
-  const fetchProposals = async () => {
-    setIsLoading(true)
+  const fetchProposals = async ({ initial = false }: { initial?: boolean } = {}) => {
+    if (initial) {
+      setIsLoading(true)
+    } else {
+      setIsListLoading(true)
+    }
     try {
       const params = new URLSearchParams({
         sort: sortFilter
@@ -73,7 +81,10 @@ export default function ProponerPage() {
     } catch (error) {
       console.error('Error fetching proposals:', error)
     } finally {
-      setIsLoading(false)
+      if (initial) {
+        setIsLoading(false)
+      }
+      setIsListLoading(false)
     }
   }
 
@@ -124,137 +135,139 @@ export default function ProponerPage() {
           <>
             {/* Two Column Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-2">
-          {/* Left Column: Submit Button + Top Contributors */}
-          <div className="space-y-4">
-            {/* Submit Button */}
-            <SubmitProposalModal
-              userAddress={address}
-              onProposalCreated={fetchProposals}
-            />
+              {/* Left Column: Submit Button + Top Contributors */}
+              <div className="space-y-4">
+                {/* Submit Button */}
+                <SubmitProposalModal
+                  userAddress={address}
+                  onProposalCreated={fetchProposals}
+                />
 
-            {/* Top Contributors */}
-            {topContributors.length > 0 && (
-              <Card className="hidden lg:block">
-                <CardHeader className="pb-4">
-                  <div className="flex items-center gap-2">
-                    <Trophy className="h-5 w-5 text-electric-purple" />
-                    <h3 className="text-[16px] font-medium">Mejores Contribuidores</h3>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {topContributors.map((contributor, index) => (
-                      <div key={contributor.address} className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-bold text-muted-foreground min-w-[1.5ch]">
-                            {index + 1}.
-                          </span>
-                          <a
-                            href={`https://celo-sepolia.blockscout.com/address/${contributor.address}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm font-mono hover:text-electric-purple transition-colors"
-                          >
-                            {truncateAddress(contributor.address)}
-                          </a>
-                        </div>
-                        <span className="text-sm font-semibold">{contributor.count}</span>
+                {/* Top Contributors */}
+                {topContributors.length > 0 && (
+                  <Card className="hidden lg:block">
+                    <CardHeader className="pb-4">
+                      <div className="flex items-center gap-2">
+                        <Trophy className="h-5 w-5 text-electric-purple" />
+                        <h3 className="text-[16px] font-medium">Mejores Contribuidores</h3>
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-
-          {/* Right Column: Filter Banner + Proposals Grid */}
-          <div>
-            {/* Filter Banner */}
-            <div className="flex flex-wrap items-center gap-2 rounded-lg py-3 mb-4">
-              {/* Sort Filters - Ghost buttons */}
-              {sortFilters.map((filter) => {
-                const isActive = sortFilter === filter.id
-                return (
-                  <motion.button
-                    key={filter.id}
-                    onClick={() => setSortFilter(filter.id)}
-                    className={cn(
-                      'px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] relative overflow-hidden',
-                      isActive
-                        ? 'text-electric-purple bg-electric-purple/5'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                    )}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    transition={{ duration: 0.2, ease: "easeOut" }}
-                  >
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeSortFilter"
-                        className="absolute inset-0 bg-electric-purple/5 rounded-md"
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
-                      />
-                    )}
-                    <span className="relative z-10">{filter.label}</span>
-                  </motion.button>
-                )
-              })}
-
-              {/* Contribuidores Button - Mobile Only */}
-              {topContributors.length > 0 && (
-                <motion.button
-                  onClick={() => setShowContributors(true)}
-                  className="lg:hidden ml-auto px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] text-muted-foreground hover:text-foreground hover:bg-muted flex items-center gap-2"
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
-                >
-                  <Trophy className="h-4 w-4" />
-                  <span>Contribuidores</span>
-                </motion.button>
-              )}
-            </div>
-
-            {/* Proposals Grid */}
-            {proposals.length === 0 ? (
-              <div className="text-center py-20">
-                <p className="text-muted-foreground text-lg">
-                  No hay propuestas aún. ¡Sé el primero en proponer un mercado!
-                </p>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {topContributors.map((contributor, index) => (
+                          <div key={contributor.address} className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-bold text-muted-foreground min-w-[1.5ch]">
+                                {index + 1}.
+                              </span>
+                              <a
+                                href={`https://celo-sepolia.blockscout.com/address/${contributor.address}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm font-mono hover:text-electric-purple transition-colors"
+                              >
+                                {truncateAddress(contributor.address)}
+                              </a>
+                            </div>
+                            <span className="text-sm font-semibold">{contributor.count}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
-            ) : (
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={sortFilter}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                  className="grid grid-cols-1 gap-4"
-                >
-                  {proposals.map((proposal, index) => (
-                    <motion.div
-                      key={proposal.id}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{
-                        duration: 0.2,
-                        delay: index * 0.05,
-                        ease: "easeOut"
-                      }}
+
+              {/* Right Column: Filter Banner + Proposals Grid */}
+              <div>
+                {/* Filter Banner */}
+                <div className="flex flex-wrap items-center gap-2 rounded-lg py-3 mb-4">
+                  {/* Sort Filters - Ghost buttons */}
+                  {sortFilters.map((filter) => {
+                    const isActive = sortFilter === filter.id
+                    return (
+                      <motion.button
+                        key={filter.id}
+                        onClick={() => setSortFilter(filter.id)}
+                        className={cn(
+                          'px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] relative overflow-hidden',
+                          isActive
+                            ? 'text-electric-purple bg-electric-purple/5'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                        )}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                      >
+                        {isActive && (
+                          <motion.div
+                            layoutId="activeSortFilter"
+                            className="absolute inset-0 bg-electric-purple/5 rounded-md"
+                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                          />
+                        )}
+                        <span className="relative z-10">{filter.label}</span>
+                      </motion.button>
+                    )
+                  })}
+
+                  {/* Contribuidores Button - Mobile Only */}
+                  {topContributors.length > 0 && (
+                    <motion.button
+                      onClick={() => setShowContributors(true)}
+                      className="lg:hidden ml-auto px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] text-muted-foreground hover:text-foreground hover:bg-muted flex items-center gap-2"
+                      whileTap={{ scale: 0.95 }}
+                      transition={{ duration: 0.2, ease: "easeOut" }}
                     >
-                      <ProposalCard
-                        proposal={proposal}
-                        userAddress={address}
-                        userVoted={userVotes.has(proposal.id)}
-                        onVote={handleVote}
-                      />
+                      <Trophy className="h-4 w-4" />
+                      <span>Contribuidores</span>
+                    </motion.button>
+                  )}
+                </div>
+
+                {/* Proposals Grid */}
+                {isListLoading ? (
+                  <ProponerCardsSkeleton />
+                ) : proposals.length === 0 ? (
+                  <div className="text-center py-20">
+                    <p className="text-muted-foreground text-lg">
+                      No hay propuestas aún. ¡Sé el primero en proponer un mercado!
+                    </p>
+                  </div>
+                ) : (
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={sortFilter}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      className="grid grid-cols-1 gap-4"
+                    >
+                      {proposals.map((proposal, index) => (
+                        <motion.div
+                          key={proposal.id}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{
+                            duration: 0.2,
+                            delay: index * 0.05,
+                            ease: "easeOut"
+                          }}
+                        >
+                          <ProposalCard
+                            proposal={proposal}
+                            userAddress={address}
+                            userVoted={userVotes.has(proposal.id)}
+                            onVote={handleVote}
+                          />
+                        </motion.div>
+                      ))}
                     </motion.div>
-                  ))}
-                </motion.div>
-              </AnimatePresence>
-            )}
-          </div>
-        </div>
+                  </AnimatePresence>
+                )}
+              </div>
+            </div>
           </>
         )}
       </div>

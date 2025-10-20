@@ -100,7 +100,7 @@ export function CookieConsentBanner() {
     <>
       {/* Cookie Banner */}
       {showBanner && !showPreferences && (
-        <div className="fixed bottom-4 right-4 z-50 w-full max-w-sm">
+        <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 z-50 md:w-full md:max-w-sm">
           <div className="bg-card border border-border rounded-lg shadow-2xl p-4 backdrop-blur-sm">
             <div className="flex items-start gap-2 mb-3">
               <Cookie className="w-5 h-5 text-electric-purple shrink-0 mt-0.5" />
