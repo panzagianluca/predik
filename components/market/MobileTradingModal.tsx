@@ -399,27 +399,34 @@ export function MobileTradingModal({
             onClick={handleClose}
           />
 
-          {/* Modal - Slides from bottom */}
+          {/* Modal - Slides from bottom, ALIGNED TO TOP for keyboard */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 bg-background border-t border-border rounded-t-3xl z-[60] lg:hidden max-h-[90vh] flex flex-col"
+            className="fixed bottom-0 left-0 right-0 bg-background border-t border-border rounded-t-3xl z-[60] lg:hidden h-[90vh] flex flex-col"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-border flex-shrink-0">
-              <h3 className="font-semibold text-lg">Operar</h3>
+            <div className="flex items-center justify-between p-4 border-b border-border flex-shrink-0 gap-3">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <img
+                  src={market.image_url}
+                  alt={market.title}
+                  className="w-9 h-9 rounded-lg object-cover flex-shrink-0"
+                />
+                <h3 className="font-semibold text-[16px] leading-tight truncate">{market.title}</h3>
+              </div>
               <button
                 onClick={handleClose}
-                className="h-10 w-10 rounded-lg flex items-center justify-center transition-colors hover:bg-electric-purple/10 active:bg-electric-purple/20"
+                className="h-10 w-10 rounded-lg flex items-center justify-center transition-colors hover:bg-electric-purple/10 active:bg-electric-purple/20 flex-shrink-0"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            {/* Content - Scrollable */}
-            <div className="overflow-y-auto flex-1 p-4 space-y-4">
+            {/* Content - Scrollable, starts at TOP */}
+            <div className="overflow-y-auto flex-1 p-4 pb-24 space-y-4">
               {/* Buy/Sell Tabs */}
               <Tabs value={tradeType} onValueChange={(value) => setTradeType(value as 'buy' | 'sell')}>
                 <TabsList className="grid w-full grid-cols-2">
