@@ -7,6 +7,7 @@ import { fetchMarket } from '@/lib/myriad/api'
 import { Market } from '@/types/market'
 import { ProbabilityChart } from '@/components/market/ProbabilityChart'
 import { TradingPanel } from '@/components/market/TradingPanel'
+import { MobileTradingModal } from '@/components/market/MobileTradingModal'
 import { RelatedMarketCard } from '@/components/market/RelatedMarketCard'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from '@/components/animate-ui/components/radix/tabs'
@@ -50,6 +51,8 @@ export default function MarketDetailPage() {
   const [error, setError] = useState<string | null>(null)
   const [selectedTimeframe, setSelectedTimeframe] = useState<'24h' | '7d' | '30d' | 'all'>('7d')
   const [showMoreDetails, setShowMoreDetails] = useState(false)
+  const [showMobileTrade, setShowMobileTrade] = useState(false)
+  const [selectedOutcomeId, setSelectedOutcomeId] = useState<string | null>(null)
 
   useEffect(() => {
     const loadMarket = async () => {
@@ -80,6 +83,12 @@ export default function MarketDetailPage() {
     } catch (err) {
       console.error('Failed to reload market:', err)
     }
+  }
+
+  const handleMobileTradeOpen = (outcomeId: string) => {
+    setSelectedOutcomeId(outcomeId)
+    setShowMobileTrade(true)
+    haptics.selection()
   }
 
   // Format date
@@ -577,15 +586,17 @@ export default function MarketDetailPage() {
           {/* RIGHT COLUMN */}
           <div className="space-y-6">
             
-            {/* Trading Panel */}
-            <TooltipProvider>
-              <TradingPanel
-                market={market}
-                userAddress={address}
-                isConnected={isConnected}
-                onTradeComplete={handleTradeComplete}
-              />
-            </TooltipProvider>
+            {/* Trading Panel - Desktop Only */}
+            <div className="hidden lg:block">
+              <TooltipProvider>
+                <TradingPanel
+                  market={market}
+                  userAddress={address}
+                  isConnected={isConnected}
+                  onTradeComplete={handleTradeComplete}
+                />
+              </TooltipProvider>
+            </div>
 
             {/* Market Stats - Desktop Only */}
             <Card className="hidden lg:block">
@@ -673,6 +684,38 @@ export default function MarketDetailPage() {
               </div>
             )}
           </div>
+        </div>
+      </div>
+
+      {/* Mobile Trading Modal */}
+      <MobileTradingModal
+        isOpen={showMobileTrade}
+        onClose={() => setShowMobileTrade(false)}
+        market={market}
+        preselectedOutcomeId={selectedOutcomeId || undefined}
+        userAddress={address}
+        isConnected={isConnected}
+        onTradeComplete={handleTradeComplete}
+      />
+
+      {/* Mobile Fixed Bottom Action Bar */}
+      <div className="lg:hidden fixed bottom-16 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border z-40">
+        <div className="flex gap-2 max-w-7xl mx-auto">
+          {market.outcomes.map((outcome, index) => (
+            <button
+              key={outcome.id}
+              onClick={() => handleMobileTradeOpen(String(outcome.id))}
+              className={cn(
+                "flex-1 h-12 rounded-lg font-semibold text-sm transition-all duration-200 flex flex-col items-center justify-center",
+                index === 0 
+                  ? "bg-green-600/75 hover:bg-green-700/75 text-white" 
+                  : "bg-red-600/75 hover:bg-red-700/75 text-white"
+              )}
+            >
+              <span>{outcome.title}</span>
+              <span className="text-xs opacity-90">{(outcome.price * 100).toFixed(1)}%</span>
+            </button>
+          ))}
         </div>
       </div>
     </div>
