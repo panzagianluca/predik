@@ -467,6 +467,80 @@ export default function MarketDetailPage() {
               </div>
             </div>
 
+            {/* Market Stats - Mobile Only (shown before tabs) */}
+            <Card className="lg:hidden">
+              <CardContent className="p-4 space-y-4">
+                <h3 className="text-[14px] font-semibold">Estadísticas</h3>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Liquidez</span>
+                    <span className="font-semibold">
+                      $<CountUp
+                        end={market.liquidity}
+                        duration={1}
+                        separator=","
+                        preserveValue
+                      />
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Volumen</span>
+                    <span className="font-semibold">
+                      $<CountUp
+                        end={market.volume_eur}
+                        duration={1}
+                        separator=","
+                        preserveValue
+                      />
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Operadores</span>
+                    <span className="font-semibold">
+                      <CountUp
+                        end={market.users}
+                        duration={0.8}
+                        preserveValue
+                      />
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Fee</span>
+                    <span className="font-semibold">{(market.fee * 100).toFixed(2)}%</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Treasury Fee</span>
+                    <span className="font-semibold">{(market.treasury_fee * 100).toFixed(2)}%</span>
+                  </div>
+                </div>
+
+                {/* Current Outcomes */}
+                <div className="border-t pt-4 mt-4">
+                  <h4 className="font-semibold text-sm mb-3">Probabilidades Actuales</h4>
+                  <div className="space-y-2">
+                    {market.outcomes.map((outcome, index) => (
+                      <div key={outcome.id} className="flex items-center justify-between">
+                        <span className="text-sm">{outcome.title}</span>
+                        <span 
+                          className="font-bold"
+                          style={{ color: index === 0 ? '#22c55e' : '#ef4444' }}
+                        >
+                          <CountUp
+                            end={outcome.price * 100}
+                            duration={0.8}
+                            decimals={2}
+                            suffix="%"
+                            preserveValue
+                          />
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Tabs: Comments | Holders | Activity */}
             <Tabs defaultValue="comments" className="w-full">
               <TabsList className="grid w-full grid-cols-3">
@@ -513,8 +587,8 @@ export default function MarketDetailPage() {
               />
             </TooltipProvider>
 
-            {/* Market Stats */}
-            <Card>
+            {/* Market Stats - Desktop Only */}
+            <Card className="hidden lg:block">
               <CardContent className="p-4 space-y-4">
                 <h3 className="text-[14px] font-semibold">Estadísticas</h3>
                 
