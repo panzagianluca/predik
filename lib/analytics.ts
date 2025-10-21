@@ -8,6 +8,29 @@ type ConsentState = {
   timestamp: number
 }
 
+// Detect if ad blocker is preventing analytics
+async function detectAdBlocker(): Promise<boolean> {
+  if (typeof window === 'undefined') return false
+  
+  try {
+    // Try to fetch PostHog decide endpoint via reverse proxy
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 1500) // 1.5s timeout
+    
+    await fetch('/ingest/decide', { 
+      method: 'HEAD',
+      signal: controller.signal,
+      cache: 'no-store'
+    })
+    
+    clearTimeout(timeoutId)
+    return false // Not blocked
+  } catch (error) {
+    console.log('🛡️ Ad blocker or privacy tool detected - analytics disabled')
+    return true // Blocked
+  }
+}
+
 // Initialize Google Analytics
 export function initGoogleAnalytics(measurementId: string) {
   if (typeof window === 'undefined') return
@@ -41,9 +64,18 @@ export async function initPostHog(apiKey: string, host: string) {
   
   posthog.default.init(apiKey, {
     api_host: host,
+    ui_host: 'https://us.posthog.com', // Keep UI on PostHog domain
     person_profiles: 'identified_only',
     capture_pageview: true,
     capture_pageleave: true,
+    // Optimize for performance
+    autocapture: false, // Reduce unnecessary events
+    disable_session_recording: true, // Reduce blocked requests
+    persistence: 'localStorage+cookie',
+    // Reduce retry spam in console
+    loaded: (ph) => {
+      console.log('📊 PostHog loaded successfully via reverse proxy')
+    },
   })
   
   console.log('📊 PostHog initialized:', apiKey)
@@ -72,6 +104,13 @@ export async function initAnalyticsIfConsented() {
     return
   }
   
+  // Check for ad blocker before initializing
+  const isBlocked = await detectAdBlocker()
+  if (isBlocked) {
+    console.log('⚠️ Analytics blocked by privacy tools - respecting user privacy')
+    return
+  }
+  
   const consent = localStorage.getItem('cookie-consent')
   if (!consent) return
   
@@ -92,7 +131,8 @@ export async function initAnalyticsIfConsented() {
     // PostHog - only if behavioral accepted
     if (parsed.behavioral) {
       const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY
-      const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com'
+      // Use reverse proxy endpoint instead of direct PostHog URL
+      const POSTHOG_HOST = '/ingest'
       
       if (POSTHOG_KEY) {
         await initPostHog(POSTHOG_KEY, POSTHOG_HOST)
