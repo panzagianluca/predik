@@ -3,7 +3,7 @@
 import { Market } from '@/types/market'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/animate-ui/components/animate/tooltip'
-import { Calendar, Users, TrendingUp } from 'lucide-react'
+import { Calendar, TrendingUp, Droplet } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
@@ -49,7 +49,8 @@ export function MarketCard({ market }: MarketCardProps) {
   }
 
   // Format volume with K/M suffix
-  const formatVolume = (volume: number) => {
+  const formatVolume = (volume?: number) => {
+    if (!volume) return '$0.00'
     if (volume >= 1000000) {
       return `$${(volume / 1000000).toFixed(2)}M`
     }
@@ -60,8 +61,27 @@ export function MarketCard({ market }: MarketCardProps) {
   }
 
   // Format full volume for tooltip
-  const formatFullVolume = (volume: number) => {
+  const formatFullVolume = (volume?: number) => {
+    if (!volume) return '$0.00'
     return `$${volume.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+  }
+
+  // Format liquidity with K/M suffix
+  const formatLiquidity = (liquidity?: number) => {
+    if (!liquidity) return '$0.00'
+    if (liquidity >= 1000000) {
+      return `$${(liquidity / 1000000).toFixed(2)}M`
+    }
+    if (liquidity >= 1000) {
+      return `$${(liquidity / 1000).toFixed(2)}K`
+    }
+    return `$${liquidity.toFixed(2)}`
+  }
+
+  // Format full liquidity for tooltip
+  const formatFullLiquidity = (liquidity?: number) => {
+    if (!liquidity) return '$0.00'
+    return `$${liquidity.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
   }
 
   // Get outcome color
@@ -83,11 +103,11 @@ export function MarketCard({ market }: MarketCardProps) {
       {/* Header Section */}
       <CardHeader className="p-4 pb-3">
         <div className="flex items-start gap-3">
-          {/* Market Image */}
-          {market.image_url && (
+          {/* Market Image - V2 uses imageUrl */}
+          {market.imageUrl && (
             <div className="relative w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
               <Image
-                src={market.image_url}
+                src={market.imageUrl}
                 alt={market.title}
                 fill
                 sizes="48px"
@@ -155,33 +175,18 @@ export function MarketCard({ market }: MarketCardProps) {
           )
         })}
 
-        {/* Footer Metadata */}
+        {/* Footer Metadata - Expires | Volume | Liquidity */}
         <div className="flex items-center justify-between text-xs text-muted-foreground pt-3 border-t border-border mt-4 gap-1">
           {/* Close Date with Tooltip */}
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="flex items-center justify-center gap-1 flex-1 hover:text-foreground transition-colors duration-200">
                 <Calendar className="w-3 h-3" />
-                <span>{formatRelativeDate(market.expires_at)}</span>
+                <span>{formatRelativeDate(market.expiresAt)}</span>
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              Closes: {formatAbsoluteDate(market.expires_at)}
-            </TooltipContent>
-          </Tooltip>
-
-          <span className="text-muted-foreground/50">|</span>
-
-          {/* Traders with Tooltip */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="flex items-center justify-center gap-1 flex-1 hover:text-foreground transition-colors duration-200">
-                <Users className="w-3 h-3" />
-                <span>{market.users}</span>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              Traders: {market.users.toLocaleString()}
+              Cierra: {formatAbsoluteDate(market.expiresAt)}
             </TooltipContent>
           </Tooltip>
 
@@ -192,11 +197,26 @@ export function MarketCard({ market }: MarketCardProps) {
             <TooltipTrigger asChild>
               <div className="flex items-center justify-center gap-1 flex-1 hover:text-foreground transition-colors duration-200">
                 <TrendingUp className="w-3 h-3" />
-                <span>{formatVolume(market.volume_eur)}</span>
+                <span>{formatVolume(market.volume)}</span>
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              Volume: {formatFullVolume(market.volume_eur)}
+              Volumen: {formatFullVolume(market.volume)}
+            </TooltipContent>
+          </Tooltip>
+
+          <span className="text-muted-foreground/50">|</span>
+
+          {/* Liquidity with Tooltip */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center justify-center gap-1 flex-1 hover:text-foreground transition-colors duration-200">
+                <Droplet className="w-3 h-3" />
+                <span>{formatLiquidity(market.liquidity)}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              Liquidez: {formatFullLiquidity(market.liquidity)}
             </TooltipContent>
           </Tooltip>
         </div>

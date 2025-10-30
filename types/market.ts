@@ -1,51 +1,37 @@
-// Market types based on Myriad API
+// Market types based on Myriad V2 API
 export interface Market {
   id: number
-  network_id: number
+  networkId: number
   slug: string
   title: string
   description: string
-  created_at: string
-  expires_at: string
-  scheduled_at: string | null
-  fee: number
-  treasury_fee: number
-  treasury: string
+  createdAt?: string
+  expiresAt: string
+  publishedAt: string
+  fees: number
   state: 'open' | 'closed' | 'resolved'
-  verified: boolean
-  category: string
-  subcategory: string
   topics: string[]
-  resolution_source: string
-  resolution_title: string
-  token: Token
-  image_url: string
-  banner_url: string
-  og_image_url: string
-  image_ipfs_hash: string
+  resolutionSource?: string
+  resolutionTitle?: string
+  tokenAddress: string
+  imageUrl: string
   liquidity: number
-  liquidity_eur: number
-  liquidity_price: number
+  liquidityPrice: number
   volume: number
-  volume_eur: number
+  volume24h?: number
   shares: number
-  question_id: string
-  resolved_outcome_id: number | null
-  voided: boolean
-  trading_view_symbol: string | null
-  news: any[]
-  votes: { up: number; down: number }
-  users: number
-  likes: number
-  comments: number
-  featured: boolean
-  featured_at: string | null
-  publish_status: string
-  edit_history: any[]
-  tournaments: any[]
+  resolvedOutcomeId?: number | null
+  voided?: boolean
+  users?: number // V2 doesn't provide this
   outcomes: Outcome[]
-  liked: boolean
-  related_markets?: Market[]
+  relatedMarkets?: Market[]
+  
+  // Legacy fields for backward compatibility
+  network_id?: number
+  expires_at?: string
+  image_url?: string
+  volume_eur?: number
+  liquidity_eur?: number
 }
 
 export interface Token {
@@ -58,15 +44,22 @@ export interface Token {
 
 export interface Outcome {
   id: number
-  market_id: number
+  marketId?: number
   title: string
   shares: number
-  shares_held?: number
+  sharesHeld?: number
   price: number
-  closing_price: number | null
+  closingPrice?: number | null
+  priceChange24h?: number
+  imageUrl?: string | null
+  priceCharts?: PriceChart[]
+  
+  // Legacy fields
+  market_id?: number
+  shares_held?: number
+  closing_price?: number | null
   price_change_24h?: number
-  image_url: string | null
-  image_ipfs_hash: string | null
+  image_url?: string | null
   price_charts?: PriceChart[]
 }
 

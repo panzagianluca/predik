@@ -655,13 +655,13 @@ export function Navbar() {
                           >
                             {/* Wallet Address */}
                             <div className="px-2 py-2 text-sm font-satoshi text-muted-foreground flex items-center gap-2">
-                              <div className="relative w-3 h-3 p-1 rounded bg-[#FCFF52] flex items-center justify-center">
+                              <div className="relative w-4 h-4 flex items-center justify-center">
                                 <Image 
-                                  src="/BNB Chain_Symbol_Yellow.png" 
+                                  src="/bnb-seeklogo.svg" 
                                   alt="BNB Chain" 
                                   fill 
-                                  sizes="12px" 
-                                  className="object-contain p-[2px]" 
+                                  sizes="16px" 
+                                  className="object-contain" 
                                 />
                               </div>
                               {`${account.address.slice(0, 6)}...${account.address.slice(-6)}`}

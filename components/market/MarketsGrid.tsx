@@ -31,7 +31,7 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
       if (market.state !== 'open') return false
     }
     
-    // Category filter - check both category and topics
+    // Category filter - V2 uses topics array only (no category field)
     if (categoryFilter !== 'all') {
       const categoryMap: Record<CategoryFilter, string[]> = {
         all: [],
@@ -44,17 +44,12 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
       
       const allowedCategories = categoryMap[categoryFilter]
       
-      // Check if market.category matches
-      const categoryMatches = market.category && allowedCategories.some(cat => 
-        market.category.toLowerCase().includes(cat.toLowerCase())
-      )
-      
-      // Check if any topic matches
+      // V2 only has topics array
       const topicMatches = market.topics && market.topics.some(topic =>
         allowedCategories.some(cat => topic.toLowerCase().includes(cat.toLowerCase()))
       )
       
-      if (!categoryMatches && !topicMatches) return false
+      if (!topicMatches) return false
     }
     
     return true
@@ -64,21 +59,27 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
   const sortedMarkets = [...filteredMarkets].sort((a, b) => {
     if (timeFilter === 'trending') {
       // Trending: Most volume first
-      return b.volume - a.volume
+      return (b.volume || 0) - (a.volume || 0)
     }
     if (timeFilter === 'recent') {
-      // Recientes: Most recently created first
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      // Recientes: Most recently created first (V2 uses publishedAt)
+      const aDate = a.publishedAt || a.createdAt || ''
+      const bDate = b.publishedAt || b.createdAt || ''
+      return new Date(bDate).getTime() - new Date(aDate).getTime()
     }
     if (timeFilter === 'closing-soon') {
       // Cierra Pronto: Soonest to expire first (only open markets)
       if (a.state !== 'open' || b.state !== 'open') return 0
-      if (!a.expires_at || !b.expires_at) return 0
-      return new Date(a.expires_at).getTime() - new Date(b.expires_at).getTime()
+      const aExpires = a.expiresAt || a.expires_at || ''
+      const bExpires = b.expiresAt || b.expires_at || ''
+      if (!aExpires || !bExpires) return 0
+      return new Date(aExpires).getTime() - new Date(bExpires).getTime()
     }
     if (timeFilter === 'closed') {
       // Cerrados: Most recently closed first
-      return new Date(b.expires_at).getTime() - new Date(a.expires_at).getTime()
+      const aExpires = a.expiresAt || a.expires_at || ''
+      const bExpires = b.expiresAt || b.expires_at || ''
+      return new Date(bExpires).getTime() - new Date(aExpires).getTime()
     }
     return 0
   })

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import Web3 from 'web3'
-import { PREDICTION_MARKET_ABI, MarketAction } from '@/lib/abis/PredictionMarketV3_4'
 
-const PM_CONTRACT = process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS as string
-const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || 'https://bsc-dataseed.binance.org/'
+const MYRIAD_API_URL = process.env.NEXT_PUBLIC_MYRIAD_API_URL || 'https://api-v2.myriadprotocol.com'
+const MYRIAD_API_KEY = process.env.MYRIAD_API_KEY!
+const NETWORK_ID = '56' // BNB
+const TOKEN_ADDRESS = process.env.NEXT_PUBLIC_USDT_TOKEN_ADDRESS!
 
 // Cache for 1 hour
 const cache = new Map<string, { data: any; timestamp: number }>()
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const timeframe = searchParams.get('timeframe') || 'month'
-    const cacheKey = `holders-${timeframe}`
+    const cacheKey = `holders-v2-${timeframe}`
 
     // Check cache
     const cached = cache.get(cacheKey)
@@ -26,83 +26,74 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    console.log(`💎 Fetching holders ranking for timeframe: ${timeframe}`)
+    console.log(`💎 Fetching holders ranking from Myriad V2 API`)
 
-    // Initialize Web3
-    const web3 = new Web3(RPC_URL)
-    const contract = new web3.eth.Contract(PREDICTION_MARKET_ABI as any, PM_CONTRACT)
+    // Step 1: Get all open markets
+    const marketsResponse = await fetch(
+      `${MYRIAD_API_URL}/markets?network_id=${NETWORK_ID}&token_address=${TOKEN_ADDRESS}&state=open&limit=100`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': MYRIAD_API_KEY,
+        },
+      }
+    )
 
-    // Calculate from block (if month)
-    let fromBlock = '0'
-    if (timeframe === 'month') {
-      const currentBlock = await web3.eth.getBlockNumber()
-      const blocksPerDay = (24 * 60 * 60) / 5 // Celo ~5 sec block time
-      const blocksToGoBack = Math.floor(30 * blocksPerDay)
-      fromBlock = Math.max(0, Number(currentBlock) - blocksToGoBack).toString()
+    if (!marketsResponse.ok) {
+      throw new Error(`Myriad API error: ${marketsResponse.statusText}`)
     }
 
-    console.log(`📊 Scanning from block ${fromBlock}...`)
+    const marketsData = await marketsResponse.json()
+    const markets = marketsData.data || []
 
-    // Get ALL MarketActionTx events across all markets
-    const events = await contract.getPastEvents('MarketActionTx', {
-      fromBlock,
-      toBlock: 'latest'
+    console.log(`📊 Fetching holders from ${markets.length} markets`)
+
+    // Step 2: Aggregate holders across all markets
+    const userShares: Record<string, number> = {}
+
+    // Fetch holders for each market (limit to avoid rate limits)
+    const holdersPromises = markets.slice(0, 20).map(async (market: any) => {
+      try {
+        const holdersResponse = await fetch(
+          `${MYRIAD_API_URL}/markets/${market.id}/holders?network_id=${NETWORK_ID}&limit=50`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': MYRIAD_API_KEY,
+            },
+          }
+        )
+
+        if (!holdersResponse.ok) return null
+
+        const holdersData = await holdersResponse.json()
+        return holdersData
+      } catch (err) {
+        console.error(`Error fetching holders for market ${market.id}:`, err)
+        return null
+      }
     })
 
-    console.log(`📊 Found ${events.length} total transactions`)
+    const holdersResults = await Promise.all(holdersPromises)
 
-    // Calculate current balances per user across all markets
-    const userBalances: Record<string, Record<number, Record<number, bigint>>> = {}
+    // Aggregate shares per user
+    for (const holdersData of holdersResults) {
+      if (!holdersData) continue
 
-    // Process events chronologically to calculate current holdings
-    for (const event of events) {
-      const { user, action, marketId, outcomeId, shares } = event.returnValues as any
-      const userAddress = (user as string).toLowerCase()
-      const marketIdNum = Number(marketId)
-      const outcomeIdNum = Number(outcomeId)
-      const shareAmount = BigInt(shares)
-
-      // Initialize nested structure
-      if (!userBalances[userAddress]) {
-        userBalances[userAddress] = {}
-      }
-      if (!userBalances[userAddress][marketIdNum]) {
-        userBalances[userAddress][marketIdNum] = {}
-      }
-      if (!userBalances[userAddress][marketIdNum][outcomeIdNum]) {
-        userBalances[userAddress][marketIdNum][outcomeIdNum] = BigInt(0)
-      }
-
-      // Update balance based on action
-      if (Number(action) === MarketAction.BUY) {
-        userBalances[userAddress][marketIdNum][outcomeIdNum] += shareAmount
-      } else if (Number(action) === MarketAction.SELL) {
-        userBalances[userAddress][marketIdNum][outcomeIdNum] -= shareAmount
-      }
-    }
-
-    // Aggregate total shares per user
-    const userTotalShares: Record<string, bigint> = {}
-
-    for (const [userAddress, markets] of Object.entries(userBalances)) {
-      let totalShares = BigInt(0)
-      for (const [marketId, outcomes] of Object.entries(markets)) {
-        for (const [outcomeId, shares] of Object.entries(outcomes)) {
-          if (shares > BigInt(0)) {
-            totalShares += shares
-          }
+      for (const outcome of holdersData.data || []) {
+        for (const holder of outcome.holders || []) {
+          const address = holder.user.toLowerCase()
+          const shares = Number(holder.shares) || 0
+          userShares[address] = (userShares[address] || 0) + shares
         }
-      }
-      if (totalShares > BigInt(0)) {
-        userTotalShares[userAddress] = totalShares
       }
     }
 
     // Convert to ranked list
-    const rankedHolders = Object.entries(userTotalShares)
+    const rankedHolders = Object.entries(userShares)
       .map(([address, shares]) => ({
         address,
-        value: (Number(shares) / 1e18).toFixed(2) // Using 18 decimals for internal contract representation
+        value: shares.toFixed(2)
       }))
       .sort((a, b) => parseFloat(b.value) - parseFloat(a.value))
       .slice(0, 10) // Top 10
@@ -111,7 +102,7 @@ export async function GET(request: NextRequest) {
         rank: index + 1
       }))
 
-    console.log(`💎 Top holders:`, rankedHolders.slice(0, 3))
+    console.log(`💎 Top ${rankedHolders.length} holders calculated`)
 
     // Cache the result
     cache.set(cacheKey, { data: rankedHolders, timestamp: Date.now() })

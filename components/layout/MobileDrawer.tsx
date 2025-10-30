@@ -252,13 +252,13 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                     </div>
                     {/* BNB Icon + Wallet Address */}
                     <div className="flex items-center gap-2 text-sm font-mono text-muted-foreground">
-                      <div className="relative w-3 h-3 p-1 rounded bg-[#FCFF52] flex items-center justify-center flex-shrink-0">
+                      <div className="relative w-4 h-4 flex items-center justify-center flex-shrink-0">
                         <Image 
-                          src="/BNB Chain_Symbol_Yellow.png" 
+                          src="/bnb-seeklogo.svg" 
                           alt="BNB Chain" 
                           fill 
-                          sizes="12px" 
-                          className="object-contain p-[2px]" 
+                          sizes="16px" 
+                          className="object-contain" 
                         />
                       </div>
                       {`${address.slice(0, 6)}...${address.slice(-6)}`}

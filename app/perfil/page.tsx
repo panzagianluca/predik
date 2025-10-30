@@ -187,13 +187,13 @@ export default function ProfilePage() {
                       <>
                         <h2 className="font-bold text-lg">{username || shortAddress}</h2>
                         <div className="flex items-center gap-2 mt-1">
-                          <div className="relative w-4 h-4 p-1 rounded bg-[#FCFF52] flex items-center justify-center flex-shrink-0">
+                          <div className="relative w-5 h-5 flex items-center justify-center flex-shrink-0">
                             <Image
-                              src="/BNB Chain_Symbol_Yellow.png"
+                              src="/bnb-seeklogo.svg"
                               alt="BNB Chain"
                               fill
-                              sizes="16px"
-                              className="object-contain p-[2px]"
+                              sizes="20px"
+                              className="object-contain"
                             />
                           </div>
                           <code className="text-xs text-muted-foreground font-mono truncate max-w-[120px]">{address}</code>
