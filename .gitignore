@@ -1,0 +1,16 @@
+
+
+#Ignore vscode AI rules
+.github/instructions/codacy.instructions.md
+.next
+node_modules
+
+# Environment variables - NEVER COMMIT THESE
+.env
+.env.local
+.env*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+scripts/seed-proposals.mjs
