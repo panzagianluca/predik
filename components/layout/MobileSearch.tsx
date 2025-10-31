@@ -1,96 +1,102 @@
-'use client'
+"use client";
 
-import { useState, useEffect, forwardRef, useImperativeHandle } from 'react'
-import { Search, X } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import Image from 'next/image'
-import { Dialog, DialogContent, DialogTitle } from '@/components/animate-ui/components/radix/dialog'
-import { Input } from '@/components/ui/input'
-import { Market } from '@/types/market'
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
+import { Search, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@/components/animate-ui/components/radix/dialog";
+import { Input } from "@/components/ui/input";
+import { Market } from "@/types/market";
 
 export interface MobileSearchRef {
-  open: () => void
+  open: () => void;
 }
 
 export const MobileSearch = forwardRef<MobileSearchRef>((props, ref) => {
-  const [open, setOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [markets, setMarkets] = useState<Market[]>([])
-  const [filteredMarkets, setFilteredMarkets] = useState<Market[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
+  const [open, setOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [markets, setMarkets] = useState<Market[]>([]);
+  const [filteredMarkets, setFilteredMarkets] = useState<Market[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   // Expose open method to parent
   useImperativeHandle(ref, () => ({
     open: () => setOpen(true),
-  }))
+  }));
 
   // Prefetch market page on hover
   const handleMouseEnter = (slug: string) => {
-    router.prefetch(`/markets/${slug}`)
-  }
+    router.prefetch(`/markets/${slug}`);
+  };
 
   // Fetch markets on dialog open
   useEffect(() => {
     if (open) {
-      fetchMarkets()
+      fetchMarkets();
     } else {
       // Reset search when closed
-      setSearchQuery('')
+      setSearchQuery("");
     }
-  }, [open])
+  }, [open]);
 
   // Filter markets based on search query
   useEffect(() => {
     if (!searchQuery.trim()) {
-      setFilteredMarkets([])
-      return
+      setFilteredMarkets([]);
+      return;
     }
 
-    const query = searchQuery.toLowerCase()
+    const query = searchQuery.toLowerCase();
     const filtered = markets.filter((market) => {
       return (
         market.title.toLowerCase().includes(query) ||
-        market.category?.toLowerCase().includes(query) ||
-        market.outcomes.some((outcome) => outcome.title.toLowerCase().includes(query))
-      )
-    })
+        market.topics?.some((topic) => topic.toLowerCase().includes(query)) ||
+        market.outcomes.some((outcome) =>
+          outcome.title.toLowerCase().includes(query),
+        )
+      );
+    });
 
-    setFilteredMarkets(filtered.slice(0, 10)) // Show max 10 results
-  }, [searchQuery, markets])
+    setFilteredMarkets(filtered.slice(0, 10)); // Show max 10 results
+  }, [searchQuery, markets]);
 
   const fetchMarkets = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const apiBase = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '')
-      const endpoint = apiBase ? `${apiBase}/api/markets` : '/api/markets'
-      const response = await fetch(endpoint, { cache: 'no-store' })
+      const apiBase = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
+      const endpoint = apiBase ? `${apiBase}/api/markets` : "/api/markets";
+      const response = await fetch(endpoint, { cache: "no-store" });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch markets')
+        throw new Error("Failed to fetch markets");
       }
 
-      const data = await response.json()
-      setMarkets(data)
+      const data = await response.json();
+      setMarkets(data);
     } catch (error) {
-      console.error('Error fetching markets:', error)
-      setMarkets([])
+      console.error("Error fetching markets:", error);
+      setMarkets([]);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleSelectMarket = (market: Market) => {
-    setOpen(false)
-    setSearchQuery('')
-    router.push(`/markets/${market.slug}`)
-  }
+    setOpen(false);
+    setSearchQuery("");
+    router.push(`/markets/${market.slug}`);
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
         from="top"
-        transition={{ type: 'spring', stiffness: 260, damping: 26 }}
+        transition={{ type: "spring", stiffness: 260, damping: 26 }}
         className="max-w-full md:max-w-2xl w-full p-0 gap-0 rounded-2xl border-0 md:border border-border/60 shadow-xl backdrop-blur max-h-[90vh] flex flex-col"
         showCloseButton={false}
       >
@@ -130,7 +136,9 @@ export const MobileSearch = forwardRef<MobileSearchRef>((props, ref) => {
           ) : filteredMarkets.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <p className="text-sm">No se encontraron mercados</p>
-              <p className="text-xs mt-2">Intenta con otros términos de búsqueda</p>
+              <p className="text-xs mt-2">
+                Intenta con otros términos de búsqueda
+              </p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -142,10 +150,10 @@ export const MobileSearch = forwardRef<MobileSearchRef>((props, ref) => {
                   className="w-full flex items-start gap-3 p-3 rounded-lg transition-colors duration-200 text-left hover:bg-electric-purple/10 active:bg-electric-purple/20"
                 >
                   {/* Market Image */}
-                  {market.image_url && (
+                  {market.imageUrl && (
                     <div className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
                       <Image
-                        src={market.image_url}
+                        src={market.imageUrl}
                         alt={market.title}
                         fill
                         sizes="56px"
@@ -157,21 +165,28 @@ export const MobileSearch = forwardRef<MobileSearchRef>((props, ref) => {
 
                   {/* Market Info */}
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-medium line-clamp-2 text-sm mb-1.5">{market.title}</h4>
+                    <h4 className="font-medium line-clamp-2 text-sm mb-1.5">
+                      {market.title}
+                    </h4>
 
                     {/* Outcomes */}
                     <div className="flex items-center gap-3">
                       {market.outcomes.slice(0, 2).map((outcome) => (
-                        <div key={outcome.id} className="flex items-center gap-1 text-xs">
-                          <span className="text-muted-foreground">{outcome.title}:</span>
+                        <div
+                          key={outcome.id}
+                          className="flex items-center gap-1 text-xs"
+                        >
+                          <span className="text-muted-foreground">
+                            {outcome.title}:
+                          </span>
                           <span
                             className="font-semibold"
                             style={{
                               color:
-                                outcome.title.toLowerCase() === 'yes' ||
-                                outcome.title.toLowerCase() === 'si'
-                                  ? '#22c55e'
-                                  : '#ef4444',
+                                outcome.title.toLowerCase() === "yes" ||
+                                outcome.title.toLowerCase() === "si"
+                                  ? "#22c55e"
+                                  : "#ef4444",
                             }}
                           >
                             {(outcome.price * 100).toFixed(1)}%
@@ -187,7 +202,7 @@ export const MobileSearch = forwardRef<MobileSearchRef>((props, ref) => {
         </div>
       </DialogContent>
     </Dialog>
-  )
-})
+  );
+});
 
-MobileSearch.displayName = 'MobileSearch'
+MobileSearch.displayName = "MobileSearch";

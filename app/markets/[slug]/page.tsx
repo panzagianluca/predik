@@ -184,10 +184,10 @@ export default function MarketDetailPage() {
             {/* Market Title and Info - Now part of left column */}
             <div className="space-y-3">
               <div className="flex items-center md:items-start gap-3">
-                {market.image_url && (
+                {market.imageUrl && (
                   <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
                     <Image
-                      src={market.image_url}
+                      src={market.imageUrl}
                       alt={market.title}
                       fill
                       sizes="64px"

@@ -11,24 +11,7 @@ import {
 } from "lightweight-charts";
 import { useTheme } from "next-themes";
 import { LogoSpinner } from "@/components/ui/logo-spinner";
-
-interface PricePoint {
-  value: number;
-  timestamp: number;
-  date: string;
-}
-
-interface PriceChart {
-  timeframe: string;
-  prices: PricePoint[];
-}
-
-interface Outcome {
-  id: number;
-  title: string;
-  price: number;
-  price_charts?: PriceChart[];
-}
+import { Outcome } from "@/types/market";
 
 interface ProbabilityChartProps {
   outcomes: Outcome[];
@@ -154,7 +137,7 @@ export function ProbabilityChart({
       });
 
       // Find the price chart for the selected timeframe
-      const priceChart = outcome.price_charts?.find(
+      const priceChart = outcome.priceCharts?.find(
         (pc) => pc.timeframe === timeframe,
       );
 
@@ -322,7 +305,7 @@ export function ProbabilityChart({
 
       outcomes.forEach((outcome, index) => {
         const series = seriesRefs.current.get(outcome.id);
-        const priceChart = outcome.price_charts?.find(
+        const priceChart = outcome.priceCharts?.find(
           (pc) => pc.timeframe === timeframe,
         );
 
@@ -388,7 +371,7 @@ export function ProbabilityChart({
         const series = seriesRefs.current.get(outcome.id);
         if (!series) return;
 
-        const priceChart = outcome.price_charts?.find(
+        const priceChart = outcome.priceCharts?.find(
           (pc) => pc.timeframe === timeframe,
         );
         if (!priceChart || priceChart.prices.length === 0) return;

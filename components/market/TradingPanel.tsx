@@ -82,14 +82,15 @@ export function TradingPanel({
       !isConnected ||
       !userAddress ||
       typeof window === "undefined" ||
-      !window.ethereum
+      !window.ethereum ||
+      !market.token
     ) {
       setBalance(0);
       return;
     }
 
     loadBalance();
-  }, [isConnected, userAddress, market.token.address]);
+  }, [isConnected, userAddress, market.token?.address]);
 
   // Load user position for this market
   useEffect(() => {
@@ -113,6 +114,11 @@ export function TradingPanel({
 
   const loadBalance = async () => {
     try {
+      if (!market.token) {
+        setBalance(0);
+        return;
+      }
+
       const polkamarketsjs = await import("polkamarkets-js");
       const web3Module = await import("web3");
       const Web3 = web3Module.default || web3Module;
@@ -184,6 +190,11 @@ export function TradingPanel({
 
   const loadUserPosition = async () => {
     try {
+      if (!market.token) {
+        setUserPosition(null);
+        return;
+      }
+
       const polkamarketsjs = await import("polkamarkets-js");
       const web3Module = await import("web3");
       const Web3 = web3Module.default || web3Module;
@@ -244,7 +255,7 @@ export function TradingPanel({
   };
 
   const calculateTrade = async () => {
-    if (!selectedOutcome || !amount) return;
+    if (!selectedOutcome || !amount || !market.token) return;
 
     setIsCalculating(true);
     setError(null);
@@ -316,7 +327,11 @@ export function TradingPanel({
       const avgPrice = tradeAmount / shares;
 
       // Fee calculation
-      const fee = tradeAmount * market.fee;
+      const fee =
+        tradeAmount *
+        (tradeType === "buy"
+          ? market.fees?.buy?.fee || 0
+          : market.fees?.sell?.fee || 0);
 
       // Max profit calculation for buys: if outcome wins (goes to 1.0 = 100%)
       // You receive 1 token per share, so profit = (shares * 1) - amount spent - fee
@@ -358,7 +373,13 @@ export function TradingPanel({
   };
 
   const handleExecuteTrade = async () => {
-    if (!isConnected || !userAddress || !selectedOutcome || !amount) {
+    if (
+      !isConnected ||
+      !userAddress ||
+      !selectedOutcome ||
+      !amount ||
+      !market.token
+    ) {
       setError("Please connect your wallet and enter an amount");
       return;
     }
@@ -754,10 +775,17 @@ export function TradingPanel({
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">
-                    Tarifa ({(market.fee * 100).toFixed(2)}%)
+                    Tarifa (
+                    {(
+                      (tradeType === "buy"
+                        ? market.fees?.buy?.fee || 0
+                        : market.fees?.sell?.fee || 0) * 100
+                    ).toFixed(2)}
+                    %)
                   </span>
                   <span>
-                    {calculation.fee.toFixed(2)} {market.token.symbol}
+                    {calculation.fee.toFixed(2)}{" "}
+                    {market.token?.symbol || "USDT"}
                   </span>
                 </div>
 
@@ -783,7 +811,7 @@ export function TradingPanel({
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-green-600">
                         +{calculation.maxProfit.toFixed(2)}{" "}
-                        {market.token.symbol}
+                        {market.token?.symbol || "USDT"}
                       </span>
                       <span className="text-xs text-green-600">
                         ({calculation.maxProfitPercent.toFixed(2)}%)

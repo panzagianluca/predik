@@ -45,7 +45,7 @@ export function GlobalSearch() {
     const filtered = markets.filter((market) => {
       return (
         market.title.toLowerCase().includes(query) ||
-        market.category?.toLowerCase().includes(query) ||
+        market.topics?.some((topic) => topic.toLowerCase().includes(query)) ||
         market.outcomes.some((outcome) =>
           outcome.title.toLowerCase().includes(query),
         )
@@ -140,10 +140,10 @@ export function GlobalSearch() {
                   className="w-full flex items-start gap-3 p-3 rounded-lg transition-colors duration-200 text-left hover:bg-electric-purple/20 dark:hover:bg-electric-purple/40"
                 >
                   {/* Market Image */}
-                  {market.image_url && (
+                  {market.imageUrl && (
                     <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                       <Image
-                        src={market.image_url}
+                        src={market.imageUrl}
                         alt={market.title}
                         fill
                         sizes="48px"

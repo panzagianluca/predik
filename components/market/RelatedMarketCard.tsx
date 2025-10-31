@@ -31,10 +31,10 @@ export function RelatedMarketCard({ market }: RelatedMarketCardProps) {
     >
       <div className="flex items-start gap-3">
         {/* Market Image */}
-        {market.image_url && (
+        {market.imageUrl && (
           <div className="relative w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
             <Image
-              src={market.image_url}
+              src={market.imageUrl}
               alt={market.title}
               fill
               sizes="48px"

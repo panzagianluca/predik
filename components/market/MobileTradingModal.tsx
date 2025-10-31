@@ -85,13 +85,14 @@ export function MobileTradingModal({
       !userAddress ||
       !isOpen ||
       typeof window === "undefined" ||
-      !window.ethereum
+      !window.ethereum ||
+      !market.token
     ) {
       setBalance(0);
       return;
     }
     loadBalance();
-  }, [isConnected, userAddress, isOpen, market.token.address]);
+  }, [isConnected, userAddress, isOpen, market.token?.address]);
 
   // Calculate trade
   useEffect(() => {
@@ -118,6 +119,11 @@ export function MobileTradingModal({
 
       if (window.ethereum) {
         await window.ethereum.request({ method: "eth_requestAccounts" });
+      }
+
+      if (!market.token) {
+        setBalance(0);
+        return;
       }
 
       const erc20 = polkamarkets.getERC20Contract({
@@ -196,7 +202,7 @@ export function MobileTradingModal({
         if (tradeAmount > Number(balance)) {
           setError(
             `Saldo insuficiente. Tienes ${Number(balance).toFixed(2)} ${
-              market.token.symbol
+              market.token?.symbol || "USDT"
             }`,
           );
           setCalculation(null);
@@ -213,7 +219,7 @@ export function MobileTradingModal({
         const shares = Number(calcResult);
         const priceTo = tradeAmount / shares;
         const avgPrice = (selectedOutcome.price + priceTo) / 2;
-        const fee = tradeAmount * market.fee;
+        const fee = tradeAmount * (market.fees?.buy?.fee || 0);
         const maxProfit = shares - tradeAmount;
         const priceImpact =
           ((priceTo - selectedOutcome.price) / selectedOutcome.price) * 100;
@@ -250,7 +256,7 @@ export function MobileTradingModal({
         const returnAmount = Number(calcResult);
         const priceTo = returnAmount / tradeAmount;
         const avgPrice = (selectedOutcome.price + priceTo) / 2;
-        const fee = returnAmount * market.fee;
+        const fee = returnAmount * (market.fees?.sell?.fee || 0);
         const priceImpact =
           ((priceTo - selectedOutcome.price) / selectedOutcome.price) * 100;
 
@@ -286,7 +292,14 @@ export function MobileTradingModal({
   };
 
   const handleExecuteTrade = async () => {
-    if (!isConnected || !userAddress || !selectedOutcome || !amount) return;
+    if (
+      !isConnected ||
+      !userAddress ||
+      !selectedOutcome ||
+      !amount ||
+      !market.token
+    )
+      return;
 
     setIsExecuting(true);
     setError(null);
@@ -458,7 +471,7 @@ export function MobileTradingModal({
             <div className="flex items-center justify-between p-4 border-b border-border flex-shrink-0 gap-3">
               <div className="flex items-center gap-3 flex-1 min-w-0">
                 <img
-                  src={market.image_url}
+                  src={market.imageUrl}
                   alt={market.title}
                   className="w-9 h-9 rounded-lg object-cover flex-shrink-0"
                 />
@@ -496,7 +509,8 @@ export function MobileTradingModal({
                 <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                   <span className="text-sm text-muted-foreground">Balance</span>
                   <span className="font-semibold">
-                    {Number(balance).toFixed(2)} {market.token.symbol}
+                    {Number(balance).toFixed(2)}{" "}
+                    {market.token?.symbol || "USDT"}
                   </span>
                 </div>
               )}
@@ -616,7 +630,8 @@ export function MobileTradingModal({
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Tarifa</span>
                       <span>
-                        {calculation.fee.toFixed(2)} {market.token.symbol}
+                        {calculation.fee.toFixed(2)}{" "}
+                        {market.token?.symbol || "USDT"}
                       </span>
                     </div>
 
@@ -643,7 +658,7 @@ export function MobileTradingModal({
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-green-600">
                             +{calculation.maxProfit.toFixed(2)}{" "}
-                            {market.token.symbol}
+                            {market.token?.symbol || "USDT"}
                           </span>
                           <span className="text-xs text-green-600">
                             ({calculation.maxProfitPercent.toFixed(2)}%)
