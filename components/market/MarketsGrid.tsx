@@ -16,7 +16,9 @@ type CategoryFilter =
   | "economy"
   | "politics"
   | "crypto"
-  | "culture";
+  | "culture"
+  | "gaming"
+  | "other";
 
 interface MarketsGridProps {
   markets: Market[];
@@ -47,6 +49,8 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
         politics: ["Política", "Politics", "Politica"],
         crypto: ["Crypto", "Cryptocurrency"],
         culture: ["Cultura", "Culture"],
+        gaming: ["Gaming"],
+        other: ["Other", "Otros", "Otro"],
       };
 
       const allowedCategories = categoryMap[categoryFilter];
@@ -116,6 +120,8 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
     { id: "politics", label: "Política" },
     { id: "crypto", label: "Crypto" },
     { id: "culture", label: "Cultura" },
+    { id: "gaming", label: "Gaming" },
+    { id: "other", label: "Otros" },
   ];
 
   return (

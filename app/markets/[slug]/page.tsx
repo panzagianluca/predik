@@ -225,14 +225,6 @@ export default function MarketDetailPage() {
                       {market.state}
                     </span>
 
-                    {/* Verified Badge */}
-                    {market.verified && (
-                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-electric-purple/20 text-electric-purple flex items-center gap-1">
-                        <CheckCircle2 className="h-3 w-3" />
-                        Verificado
-                      </span>
-                    )}
-
                     {/* Topics/Tags */}
                     {market.topics &&
                       market.topics.length > 0 &&
@@ -270,14 +262,6 @@ export default function MarketDetailPage() {
                   {market.state}
                 </span>
 
-                {/* Verified Badge */}
-                {market.verified && (
-                  <span className="px-3 py-1 rounded-full text-[12px] font-semibold bg-electric-purple/20 text-electric-purple flex items-center gap-1">
-                    <CheckCircle2 className="h-3 w-3" />
-                    Verificado
-                  </span>
-                )}
-
                 {/* Topics/Tags */}
                 {market.topics &&
                   market.topics.length > 0 &&
@@ -299,8 +283,8 @@ export default function MarketDetailPage() {
                     <Calendar className="h-4 w-4" />
                     <span>
                       {market.state === "open"
-                        ? `Cierra en ${getTimeRemaining(market.expires_at)}`
-                        : `Cerrado el ${formatDate(market.expires_at)}`}
+                        ? `Cierra en ${getTimeRemaining(market.expiresAt)}`
+                        : `Cerrado el ${formatDate(market.expiresAt)}`}
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
@@ -309,7 +293,9 @@ export default function MarketDetailPage() {
                   </div>
                   <div className="flex items-center gap-1">
                     <TrendingUp className="h-4 w-4" />
-                    <span>${market.volume_eur.toLocaleString()} volumen</span>
+                    <span>
+                      ${(market.volume || 0).toLocaleString()} volumen
+                    </span>
                   </div>
                 </div>
 
@@ -533,18 +519,18 @@ export default function MarketDetailPage() {
                       )}
 
                     {/* Resolution Source */}
-                    {market.resolution_source && (
+                    {market.resolutionSource && (
                       <div>
                         <h3 className="font-semibold mb-2">
                           Fuente de Resolución
                         </h3>
                         <a
-                          href={market.resolution_source}
+                          href={market.resolutionSource}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-electric-purple hover:underline flex items-center gap-1"
                         >
-                          {market.resolution_title || market.resolution_source}
+                          {market.resolutionTitle || market.resolutionSource}
                           <ExternalLink className="h-3 w-3" />
                         </a>
                       </div>
@@ -559,23 +545,25 @@ export default function MarketDetailPage() {
                         <div>
                           <span className="text-muted-foreground">Creado:</span>
                           <p className="font-medium">
-                            {formatDate(market.created_at)}
+                            {formatDate(market.createdAt || market.publishedAt)}
                           </p>
                         </div>
                         <div>
                           <span className="text-muted-foreground">Cierra:</span>
                           <p className="font-medium">
-                            {formatDate(market.expires_at)}
+                            {formatDate(market.expiresAt)}
                           </p>
                         </div>
                         <div>
                           <span className="text-muted-foreground">Token:</span>
-                          <p className="font-medium">{market.token.symbol}</p>
+                          <p className="font-medium">
+                            {market.token?.symbol || "N/A"}
+                          </p>
                         </div>
                         <div>
                           <span className="text-muted-foreground">Fee:</span>
                           <p className="font-medium">
-                            {(market.fee * 100).toFixed(2)}%
+                            {((market.fees?.buy?.fee || 0) * 100).toFixed(2)}%
                           </p>
                         </div>
                       </div>
@@ -612,7 +600,7 @@ export default function MarketDetailPage() {
                     <span className="font-semibold">
                       $
                       <CountUp
-                        end={market.volume_eur}
+                        end={market.volume || 0}
                         duration={1}
                         separator=","
                         preserveValue
@@ -625,7 +613,7 @@ export default function MarketDetailPage() {
                     </span>
                     <span className="font-semibold">
                       <CountUp
-                        end={market.users}
+                        end={market.users || 0}
                         duration={0.8}
                         preserveValue
                       />
@@ -634,7 +622,7 @@ export default function MarketDetailPage() {
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Fee</span>
                     <span className="font-semibold">
-                      {(market.fee * 100).toFixed(2)}%
+                      {((market.fees?.buy?.fee || 0) * 100).toFixed(2)}%
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
@@ -642,7 +630,8 @@ export default function MarketDetailPage() {
                       Treasury Fee
                     </span>
                     <span className="font-semibold">
-                      {(market.treasury_fee * 100).toFixed(2)}%
+                      {((market.fees?.buy?.treasury_fee || 0) * 100).toFixed(2)}
+                      %
                     </span>
                   </div>
                 </div>
@@ -767,7 +756,7 @@ export default function MarketDetailPage() {
                     <span className="font-semibold">
                       $
                       <CountUp
-                        end={market.volume_eur}
+                        end={market.volume || 0}
                         duration={1}
                         separator=","
                         preserveValue
@@ -780,7 +769,7 @@ export default function MarketDetailPage() {
                     </span>
                     <span className="font-semibold">
                       <CountUp
-                        end={market.users}
+                        end={market.users || 0}
                         duration={0.8}
                         preserveValue
                       />
@@ -789,7 +778,7 @@ export default function MarketDetailPage() {
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Fee</span>
                     <span className="font-semibold">
-                      {(market.fee * 100).toFixed(2)}%
+                      {((market.fees?.buy?.fee || 0) * 100).toFixed(2)}%
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
@@ -797,7 +786,8 @@ export default function MarketDetailPage() {
                       Treasury Fee
                     </span>
                     <span className="font-semibold">
-                      {(market.treasury_fee * 100).toFixed(2)}%
+                      {((market.fees?.buy?.treasury_fee || 0) * 100).toFixed(2)}
+                      %
                     </span>
                   </div>
                 </div>
@@ -834,13 +824,13 @@ export default function MarketDetailPage() {
             </Card>
 
             {/* Related Markets */}
-            {market.related_markets && market.related_markets.length > 0 && (
+            {market.relatedMarkets && market.relatedMarkets.length > 0 && (
               <div className="space-y-4">
                 <h3 className="text-[14px] font-semibold">
                   Mercados Relacionados
                 </h3>
                 <div className="space-y-3">
-                  {market.related_markets.slice(0, 3).map((relatedMarket) => (
+                  {market.relatedMarkets.slice(0, 3).map((relatedMarket) => (
                     <RelatedMarketCard
                       key={relatedMarket.id}
                       market={relatedMarket}

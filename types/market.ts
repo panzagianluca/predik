@@ -8,12 +8,18 @@ export interface Market {
   createdAt?: string;
   expiresAt: string;
   publishedAt: string;
-  fees: number;
+  fees: {
+    buy: { fee: number; treasury_fee: number; distributor_fee: number };
+    sell: { fee: number; treasury_fee: number; distributor_fee: number };
+    treasury?: string;
+    distributor?: string;
+  };
   state: "open" | "closed" | "resolved";
   topics: string[];
   resolutionSource?: string;
   resolutionTitle?: string;
   tokenAddress: string;
+  token?: Token;
   imageUrl: string;
   bannerUrl?: string;
   liquidity: number;
