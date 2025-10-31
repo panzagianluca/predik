@@ -1,8 +1,8 @@
 [Skip to content](https://help.myriad.markets/Polkamarkets-SDK-1b5c9e49da8280bbaa95f0fd7bfccec4#main)
 
-![🔨 Page icon](<Base64-Image-Removed>)![🔨 Page icon](https://notion-emojis.s3-us-west-2.amazonaws.com/prod/svg-twitter/1f528.svg)
+![🔨 Page icon](Base64-Image-Removed)![🔨 Page icon](https://notion-emojis.s3-us-west-2.amazonaws.com/prod/svg-twitter/1f528.svg)
 
-# Polkamarkets SDK
+# Polkamarkets SDK -
 
 Myriad leverages [Polkamarkets](https://www.polkamarkets.com/) infrastructure for placing predictions.
 
@@ -64,12 +64,12 @@ can be used throughout your app to interact with Polkamarkets smart contracts, h
 
 The table below describes each field you see in the initialization object above. Many values are derived from environment variables in this example, but you can hardcode them if you prefer.
 
-|     |     |     |
-| --- | --- | --- |
-| Field | Type | Description |
-| web3Provider | string | Primary Web3 provider endpoint or an instantiated provider object for RPC calls (e.g. MetaMask, Alchemy, Infura). |
-| web3PrivateKey | string | (Optional) private key of wallet to use, if you want to bypass wallet/social login authentication |
-| web3EventsProvider | string | (Optional) polkamarkets-rpc web3 endpoint specifically for event subscriptions. |
+|                    |        |                                                                                                                   |
+| ------------------ | ------ | ----------------------------------------------------------------------------------------------------------------- |
+| Field              | Type   | Description                                                                                                       |
+| web3Provider       | string | Primary Web3 provider endpoint or an instantiated provider object for RPC calls (e.g. MetaMask, Alchemy, Infura). |
+| web3PrivateKey     | string | (Optional) private key of wallet to use, if you want to bypass wallet/social login authentication                 |
+| web3EventsProvider | string | (Optional) polkamarkets-rpc web3 endpoint specifically for event subscriptions.                                   |
 
 ### Logging in Polkamarkets-js
 
@@ -126,18 +126,18 @@ Below you can find the relevant contract addresses for each chain:
 
 #### Abstract
 
-|  | Mainnet | Testnet |
-| --- | --- | --- |
-| PredictionMarket | [0x3e0F5F8F5Fb043aBFA475C0308417Bf72c463289](https://abscan.org/address/0x3e0F5F8F5Fb043aBFA475C0308417Bf72c463289) | [0x6c44Abf72085E5e71EeB7C951E3079073B1E7312](https://sepolia.abscan.org/address/0x6c44Abf72085E5e71EeB7C951E3079073B1E7312) |
+|                         | Mainnet                                                                                                             | Testnet                                                                                                                     |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| PredictionMarket        | [0x3e0F5F8F5Fb043aBFA475C0308417Bf72c463289](https://abscan.org/address/0x3e0F5F8F5Fb043aBFA475C0308417Bf72c463289) | [0x6c44Abf72085E5e71EeB7C951E3079073B1E7312](https://sepolia.abscan.org/address/0x6c44Abf72085E5e71EeB7C951E3079073B1E7312) |
 | PredictionMarketQuerier | [0x1d5773Cd0dC74744C1F7a19afEeECfFE64f233Ff](https://abscan.org/address/0x1d5773Cd0dC74744C1F7a19afEeECfFE64f233Ff) | [0xa30c60107f9011dd49fc9e04ebe15963064eecc1](https://sepolia.abscan.org/address/0xa30c60107f9011dd49fc9e04ebe15963064eecc1) |
 
 #### Linea
 
 Deployed Contracts
 
-|  | Mainnet | Testnet |
-| --- | --- | --- |
-| PredictionMarket | [0x39e66ee6b2ddaf4defded3038e0162180dbef340](https://lineascan.build/address/0x39e66ee6b2ddaf4defded3038e0162180dbef340) | [0xED5CCb260f80A7EB1E5779B02115b4dc25aA3cDE](https://sepolia.lineascan.build/address/0xED5CCb260f80A7EB1E5779B02115b4dc25aA3cDE) |
+|                         | Mainnet                                                                                                                  | Testnet                                                                                                                          |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| PredictionMarket        | [0x39e66ee6b2ddaf4defded3038e0162180dbef340](https://lineascan.build/address/0x39e66ee6b2ddaf4defded3038e0162180dbef340) | [0xED5CCb260f80A7EB1E5779B02115b4dc25aA3cDE](https://sepolia.lineascan.build/address/0xED5CCb260f80A7EB1E5779B02115b4dc25aA3cDE) |
 | PredictionMarketQuerier | [0x503c9f98398dc3433ABa819BF3eC0b97e02B8D04](https://lineascan.build/address/0x503c9f98398dc3433ABa819BF3eC0b97e02B8D04) | [0x90916C3C1a070ED31f6CdFCD42807a38B563392F](https://sepolia.lineascan.build/address/0x90916C3C1a070ED31f6CdFCD42807a38B563392F) |
 
 All subsequent calls in this guide assume you have a valid
@@ -302,7 +302,7 @@ JavaScript
 
 Copy
 
-const erc20 = polkamarkets.getERC20Contract({contractAddress:'0xYOUR\_ERC20\_TOKEN\_ADDRESS'});
+const erc20 = polkamarkets.getERC20Contract({contractAddress:'0xYOUR_ERC20_TOKEN_ADDRESS'});
 
 ​
 
