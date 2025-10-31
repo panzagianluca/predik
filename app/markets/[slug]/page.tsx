@@ -164,10 +164,10 @@ export default function MarketDetailPage() {
       {/* Container with same max-width as navbar - NO extra padding */}
       <div className="max-w-7xl mx-auto">
         {/* Banner Image (if available) - Full width */}
-        {market.banner_url && (
+        {market.bannerUrl && (
           <div className="w-full h-48 rounded-xl overflow-hidden bg-gradient-to-br from-electric-purple/20 to-blue-500/20 my-6">
             <Image
-              src={market.banner_url}
+              src={market.bannerUrl}
               alt={market.title}
               width={1200}
               height={192}

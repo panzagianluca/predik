@@ -15,6 +15,7 @@ export interface Market {
   resolutionTitle?: string;
   tokenAddress: string;
   imageUrl: string;
+  bannerUrl?: string;
   liquidity: number;
   liquidityPrice: number;
   volume: number;
