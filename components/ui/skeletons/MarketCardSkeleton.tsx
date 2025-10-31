@@ -10,7 +10,7 @@ export function MarketCardSkeleton() {
         <div className="flex items-start gap-3">
           {/* Image Skeleton */}
           <div className="relative w-12 h-12 rounded-xl bg-muted flex-shrink-0" />
-          
+
           {/* Title Skeleton */}
           <div className="flex-1 space-y-2">
             <div className="h-4 bg-muted rounded w-full" />
@@ -47,7 +47,7 @@ export function MarketCardSkeleton() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 /**
@@ -60,5 +60,5 @@ export function MarketGridSkeleton({ count = 8 }: { count?: number }) {
         <MarketCardSkeleton key={index} />
       ))}
     </div>
-  )
+  );
 }

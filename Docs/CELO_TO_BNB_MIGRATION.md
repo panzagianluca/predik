@@ -1,8 +1,8 @@
 # 🚀 PREDIK: CELO → BNB COMPLETE MIGRATION PLAN
 
-**Date:** October 30, 2025  
-**Migration Type:** Full Platform Infrastructure Change  
-**Estimated Duration:** 5-7 Days  
+**Date:** October 30, 2025
+**Migration Type:** Full Platform Infrastructure Change
+**Estimated Duration:** 5-7 Days
 **Risk Level:** 🔴 **HIGH** (Mainnet-only, no testnet validation)
 
 ---
@@ -26,13 +26,13 @@
 
 ### What We're Migrating
 
-| Component | FROM (Current) | TO (Target) |
-|-----------|----------------|-------------|
+| Component      | FROM (Current)                    | TO (Target)                            |
+| -------------- | --------------------------------- | -------------------------------------- |
 | **Blockchain** | Celo Sepolia (Chain ID: 11142220) | BNB Smart Chain Mainnet (Chain ID: 56) |
-| **API** | Myriad V1 (staging) | Myriad V2 (production) |
-| **Wallet** | Reown AppKit + RainbowKit | Dynamic Wallet Connector |
-| **Token** | USDT Celo (0xf74B1...6eae6f) | USDT BNB (0x39E66...2180dbeF340) |
-| **Contracts** | Celo Polkamarkets | BNB Polkamarkets (⏳ pending) |
+| **API**        | Myriad V1 (staging)               | Myriad V2 (production)                 |
+| **Wallet**     | Reown AppKit + RainbowKit         | Dynamic Wallet Connector               |
+| **Token**      | USDT Celo (0xf74B1...6eae6f)      | USDT BNB (0x39E66...2180dbeF340)       |
+| **Contracts**  | Celo Polkamarkets                 | BNB Polkamarkets (⏳ pending)          |
 
 ### Why This Migration
 
@@ -83,6 +83,7 @@ Rate Limit: 5 requests/second per IP/API key
 ```
 
 **Breaking Changes V1 → V2:**
+
 - ❌ `token` param → ✅ `token_address` param
 - ❌ No auth → ✅ `x-api-key` header required
 - ❌ String outcome IDs → ✅ Numeric outcome IDs
@@ -126,17 +127,20 @@ Referral Code: "predik" ✅ MUST BE ADDED TO ALL BUY TRANSACTIONS
 **Status:** ⏳ **WAITING**
 
 **What We Need:**
+
 ```typescript
 NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS=0x??? // ← REQUIRED
 NEXT_PUBLIC_PREDICTION_MARKET_QUERIER=0x??? // ← REQUIRED
 ```
 
 **Why It's Blocking:**
+
 - Cannot test trading functionality
 - Cannot deploy or build without these addresses
 - All trading components depend on these
 
 **Action Required:**
+
 - Contact Polkamarkets team
 - Request BNB Mainnet (Chain ID 56) contract addresses
 - Verify addresses on BSCScan
@@ -150,17 +154,20 @@ NEXT_PUBLIC_PREDICTION_MARKET_QUERIER=0x??? // ← REQUIRED
 **Status:** ⚠️ **NEEDS TESTING**
 
 **What We Need to Verify:**
+
 - Actual V2 response schemas match documentation
 - All markets on BNB (network_id=56) return valid data
 - Price charts format is correct
 - Outcome IDs are truly numeric (not strings)
 
 **Action Required:**
+
 - Make test API call to `/markets?network_id=56&token_address=0x39E66eE6b2ddaf4DEfDEd3038E0162180dbeF340`
 - Validate response schema
 - Check if any BNB markets exist yet
 
 **Test Command:**
+
 ```bash
 curl -X GET "https://api-v2.myriadprotocol.com/markets?network_id=56&token_address=0x39E66eE6b2ddaf4DEfDEd3038E0162180dbeF340" \
   -H "x-api-key: myr_sk_live_cwkloxyzeq47cjlorm29irdvgzynlfyxqu3bfu8g60"
@@ -175,12 +182,14 @@ curl -X GET "https://api-v2.myriadprotocol.com/markets?network_id=56&token_addre
 **Status:** ✅ **READY** (credentials confirmed, but needs integration testing)
 
 **What We Need to Verify:**
+
 - Dynamic SDK works with BNB Chain
 - Email/social login flow
 - Wallet connection UX meets requirements
 - Multi-wallet switching works
 
 **Action Required:**
+
 - Install `@dynamic-labs/sdk-react-core`
 - Create test page with Dynamic integration
 - Test on BNB mainnet (no testnet available)
@@ -199,17 +208,18 @@ curl -X GET "https://api-v2.myriadprotocol.com/markets?network_id=56&token_addre
 
 **Tables Analyzed:**
 
-| Table | Chain-Specific Fields? | Migration Needed? |
-|-------|----------------------|-------------------|
-| `users` | ❌ No (only wallet addresses) | ✅ **NO** |
-| `userStats` | ❌ No (generic trading stats) | ✅ **NO** |
-| `comments` | ❌ No (market slugs are chain-agnostic) | ✅ **NO** |
-| `commentVotes` | ❌ No | ✅ **NO** |
-| `marketProposals` | ❌ No | ✅ **NO** |
-| `proposalVotes` | ❌ No | ✅ **NO** |
-| `notifications` | ❌ No | ✅ **NO** |
+| Table             | Chain-Specific Fields?                  | Migration Needed? |
+| ----------------- | --------------------------------------- | ----------------- |
+| `users`           | ❌ No (only wallet addresses)           | ✅ **NO**         |
+| `userStats`       | ❌ No (generic trading stats)           | ✅ **NO**         |
+| `comments`        | ❌ No (market slugs are chain-agnostic) | ✅ **NO**         |
+| `commentVotes`    | ❌ No                                   | ✅ **NO**         |
+| `marketProposals` | ❌ No                                   | ✅ **NO**         |
+| `proposalVotes`   | ❌ No                                   | ✅ **NO**         |
+| `notifications`   | ❌ No                                   | ✅ **NO**         |
 
 **Key Findings:**
+
 - ✅ No `chainId` or `networkId` fields
 - ✅ No transaction hashes stored
 - ✅ No contract addresses in database
@@ -219,6 +229,7 @@ curl -X GET "https://api-v2.myriadprotocol.com/markets?network_id=56&token_addre
 **Conclusion:** **ZERO database migrations required!** 🎉
 
 **Action Items:**
+
 - ✅ No schema changes
 - ✅ No data migration scripts
 - ✅ No cleanup needed
@@ -231,10 +242,12 @@ curl -X GET "https://api-v2.myriadprotocol.com/markets?network_id=56&token_addre
 ### TIER 1: CRITICAL (Must Change - Breaks Without Updates)
 
 #### 1. `.env.local` ✅ **COMPLETED**
-**Status:** Already updated  
+
+**Status:** Already updated
 **Lines Changed:** 20/40 (50%)
 
 **Changes Made:**
+
 ```diff
 - NEXT_PUBLIC_CHAIN_ID=11142220
 + NEXT_PUBLIC_CHAIN_ID=56
@@ -269,10 +282,12 @@ curl -X GET "https://api-v2.myriadprotocol.com/markets?network_id=56&token_addre
 ---
 
 #### 2. `lib/wagmi.ts` ⏳ **PENDING**
-**Current:** Celo + RainbowKit connectors  
+
+**Current:** Celo + RainbowKit connectors
 **Required:** BNB + Dynamic (NO RainbowKit)
 
 **Current Code (62 lines):**
+
 ```typescript
 import { http, createConfig } from 'wagmi'
 import { celo } from 'wagmi/chains'
@@ -296,40 +311,46 @@ export const config = createConfig({
 ```
 
 **New Code (simplified - Dynamic handles wallets):**
+
 ```typescript
-import { http, createConfig } from 'wagmi'
-import { bsc } from 'wagmi/chains'
+import { http, createConfig } from "wagmi";
+import { bsc } from "wagmi/chains";
 
 export const config = createConfig({
   chains: [bsc],
   transports: {
-    [bsc.id]: http(process.env.NEXT_PUBLIC_RPC_URL || 'https://bsc-dataseed.binance.org/')
+    [bsc.id]: http(
+      process.env.NEXT_PUBLIC_RPC_URL || "https://bsc-dataseed.binance.org/",
+    ),
   },
   // No connectors - Dynamic SDK handles this
-})
+});
 
-declare module 'wagmi' {
+declare module "wagmi" {
   interface Register {
-    config: typeof config
+    config: typeof config;
   }
 }
 ```
 
-**Impact:** 🔴 **CRITICAL**  
+**Impact:** 🔴 **CRITICAL**
 **Dependencies to Remove:**
+
 - `@rainbow-me/rainbowkit/wallets`
 - `@rainbow-me/rainbowkit` (wallet connector part - keep Provider for now if needed)
 
-**Lines Changed:** ~40 lines removed, 15 lines added  
+**Lines Changed:** ~40 lines removed, 15 lines added
 **Complexity:** Low (simplification)
 
 ---
 
 #### 3. `components/providers/Web3Provider.tsx` ⏳ **PENDING**
-**Current:** RainbowKitProvider wrapper  
+
+**Current:** RainbowKitProvider wrapper
 **Required:** DynamicContextProvider wrapper
 
 **Current Code (85 lines):**
+
 ```typescript
 import { RainbowKitProvider, darkTheme, lightTheme } from '@rainbow-me/rainbowkit'
 import '@rainbow-me/rainbowkit/styles.css'
@@ -348,9 +369,13 @@ export function Web3Provider({ children }: { children: ReactNode }) {
 ```
 
 **New Code:**
+
 ```typescript
-import { DynamicContextProvider, DynamicWagmiConnector } from '@dynamic-labs/sdk-react-core'
-import { EthereumWalletConnectors } from '@dynamic-labs/ethereum'
+import {
+  DynamicContextProvider,
+  DynamicWagmiConnector,
+} from "@dynamic-labs/sdk-react-core";
+import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 
 export function Web3Provider({ children }: { children: ReactNode }) {
   return (
@@ -358,18 +383,20 @@ export function Web3Provider({ children }: { children: ReactNode }) {
       settings={{
         environmentId: process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID!,
         walletConnectors: [EthereumWalletConnectors],
-        evmNetworks: [{
-          blockExplorerUrls: ['https://bscscan.com'],
-          chainId: 56,
-          name: 'BNB Smart Chain',
-          rpcUrls: ['https://bsc-dataseed.binance.org/'],
-          nativeCurrency: {
-            decimals: 18,
-            name: 'BNB',
-            symbol: 'BNB',
+        evmNetworks: [
+          {
+            blockExplorerUrls: ["https://bscscan.com"],
+            chainId: 56,
+            name: "BNB Smart Chain",
+            rpcUrls: ["https://bsc-dataseed.binance.org/"],
+            nativeCurrency: {
+              decimals: 18,
+              name: "BNB",
+              symbol: "BNB",
+            },
+            networkId: 56,
           },
-          networkId: 56,
-        }],
+        ],
       }}
     >
       <DynamicWagmiConnector>
@@ -380,36 +407,40 @@ export function Web3Provider({ children }: { children: ReactNode }) {
         </WagmiProvider>
       </DynamicWagmiConnector>
     </DynamicContextProvider>
-  )
+  );
 }
 ```
 
-**Impact:** 🔴 **CRITICAL**  
+**Impact:** 🔴 **CRITICAL**
 **Dependencies to Install:**
+
 ```bash
 npm install @dynamic-labs/sdk-react-core @dynamic-labs/ethereum
 ```
 
 **Dependencies to Remove:**
+
 ```bash
 npm uninstall @rainbow-me/rainbowkit @reown/appkit @reown/appkit-adapter-wagmi
 ```
 
-**Lines Changed:** Complete rewrite (85 → ~60 lines)  
+**Lines Changed:** Complete rewrite (85 → ~60 lines)
 **Complexity:** Medium
 
 ---
 
 #### 4. `lib/myriad/api.ts` ⏳ **PENDING**
-**Current:** V1 API client (no auth, `token` param)  
+
+**Current:** V1 API client (no auth, `token` param)
 **Required:** V2 API client (with `x-api-key`, `token_address` param)
 
 **Current Code (45 lines):**
+
 ```typescript
 export interface FetchMarketsParams {
-  state?: 'open' | 'closed' | 'resolved'
-  token?: string // ❌ V1 param name
-  network_id?: string
+  state?: "open" | "closed" | "resolved";
+  token?: string; // ❌ V1 param name
+  network_id?: string;
 }
 
 export async function fetchMarkets(params: FetchMarketsParams = {}) {
@@ -417,225 +448,254 @@ export async function fetchMarkets(params: FetchMarketsParams = {}) {
     ...(params.network_id && { network_id: params.network_id }),
     ...(params.state && { state: params.state }),
     ...(params.token && { token: params.token }), // ❌ Wrong param
-  })
+  });
 
   const response = await fetch(`/api/markets?${searchParams}`, {
     next: { revalidate: 30 },
-  })
+  });
   // ... no auth header
 }
 ```
 
 **New Code:**
+
 ```typescript
 export interface FetchMarketsParams {
-  state?: 'open' | 'closed' | 'resolved'
-  token_address?: string // ✅ V2 param name
-  network_id?: number // ✅ Numeric in V2
-  keyword?: string // ✅ NEW in V2
-  topics?: string // ✅ NEW in V2
-  sort?: 'volume' | 'volume_24h' | 'liquidity' | 'expires_at' | 'published_at' // ✅ NEW
-  order?: 'asc' | 'desc' // ✅ NEW
-  page?: number // ✅ NEW (pagination)
-  limit?: number // ✅ NEW (pagination)
+  state?: "open" | "closed" | "resolved";
+  token_address?: string; // ✅ V2 param name
+  network_id?: number; // ✅ Numeric in V2
+  keyword?: string; // ✅ NEW in V2
+  topics?: string; // ✅ NEW in V2
+  sort?: "volume" | "volume_24h" | "liquidity" | "expires_at" | "published_at"; // ✅ NEW
+  order?: "asc" | "desc"; // ✅ NEW
+  page?: number; // ✅ NEW (pagination)
+  limit?: number; // ✅ NEW (pagination)
 }
 
 export async function fetchMarkets(params: FetchMarketsParams = {}) {
-  const searchParams = new URLSearchParams()
-  
-  if (params.state) searchParams.set('state', params.state)
-  if (params.token_address) searchParams.set('token_address', params.token_address) // ✅ Correct param
-  if (params.network_id) searchParams.set('network_id', String(params.network_id))
-  if (params.keyword) searchParams.set('keyword', params.keyword)
-  if (params.topics) searchParams.set('topics', params.topics)
-  if (params.sort) searchParams.set('sort', params.sort)
-  if (params.order) searchParams.set('order', params.order)
-  if (params.page) searchParams.set('page', String(params.page))
-  if (params.limit) searchParams.set('limit', String(params.limit))
+  const searchParams = new URLSearchParams();
+
+  if (params.state) searchParams.set("state", params.state);
+  if (params.token_address)
+    searchParams.set("token_address", params.token_address); // ✅ Correct param
+  if (params.network_id)
+    searchParams.set("network_id", String(params.network_id));
+  if (params.keyword) searchParams.set("keyword", params.keyword);
+  if (params.topics) searchParams.set("topics", params.topics);
+  if (params.sort) searchParams.set("sort", params.sort);
+  if (params.order) searchParams.set("order", params.order);
+  if (params.page) searchParams.set("page", String(params.page));
+  if (params.limit) searchParams.set("limit", String(params.limit));
 
   const response = await fetch(`/api/markets?${searchParams}`, {
     next: { revalidate: 30 },
     // Auth handled in API route
-  })
-  
+  });
+
   if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.error || `Failed to fetch markets: ${response.statusText}`)
+    const error = await response.json();
+    throw new Error(
+      error.error || `Failed to fetch markets: ${response.statusText}`,
+    );
   }
 
-  return response.json()
+  return response.json();
 }
 
 export async function fetchMarket(slug: string) {
   // V2 supports both slug and id+network_id lookup
   const response = await fetch(`/api/markets/${slug}`, {
     next: { revalidate: 30 },
-  })
-  
+  });
+
   if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.error || `Failed to fetch market: ${response.statusText}`)
+    const error = await response.json();
+    throw new Error(
+      error.error || `Failed to fetch market: ${response.statusText}`,
+    );
   }
 
-  return response.json()
+  return response.json();
 }
 
 // ✅ NEW V2 endpoint
 export async function fetchMarketEvents(marketId: number, networkId: number) {
-  const response = await fetch(`/api/markets/${marketId}/events?network_id=${networkId}`, {
-    next: { revalidate: 10 }, // Faster revalidation for activity
-  })
-  
-  if (!response.ok) throw new Error('Failed to fetch market events')
-  return response.json()
+  const response = await fetch(
+    `/api/markets/${marketId}/events?network_id=${networkId}`,
+    {
+      next: { revalidate: 10 }, // Faster revalidation for activity
+    },
+  );
+
+  if (!response.ok) throw new Error("Failed to fetch market events");
+  return response.json();
 }
 
 // ✅ NEW V2 endpoint
 export async function fetchMarketHolders(marketId: number, networkId: number) {
-  const response = await fetch(`/api/markets/${marketId}/holders?network_id=${networkId}`, {
-    next: { revalidate: 30 },
-  })
-  
-  if (!response.ok) throw new Error('Failed to fetch holders')
-  return response.json()
+  const response = await fetch(
+    `/api/markets/${marketId}/holders?network_id=${networkId}`,
+    {
+      next: { revalidate: 30 },
+    },
+  );
+
+  if (!response.ok) throw new Error("Failed to fetch holders");
+  return response.json();
 }
 
 // ✅ NEW V2 endpoint
 export async function fetchUserPortfolio(address: string) {
   const response = await fetch(`/api/users/${address}/portfolio`, {
     next: { revalidate: 10 },
-  })
-  
-  if (!response.ok) throw new Error('Failed to fetch portfolio')
-  return response.json()
+  });
+
+  if (!response.ok) throw new Error("Failed to fetch portfolio");
+  return response.json();
 }
 ```
 
-**Impact:** 🔴 **CRITICAL**  
-**Lines Changed:** 45 → 120 lines  
+**Impact:** 🔴 **CRITICAL**
+**Lines Changed:** 45 → 120 lines
 **Complexity:** Medium
 
 ---
 
 #### 5. `app/api/markets/route.ts` ⏳ **PENDING**
-**Current:** Proxies to V1 API with `token` param  
+
+**Current:** Proxies to V1 API with `token` param
 **Required:** Proxies to V2 API with `token_address` param + auth header
 
 **Current Code (50 lines):**
+
 ```typescript
-const MYRIAD_API_URL = process.env.NEXT_PUBLIC_MYRIAD_API_URL || 'https://api-v1.staging.myriadprotocol.com'
+const MYRIAD_API_URL =
+  process.env.NEXT_PUBLIC_MYRIAD_API_URL ||
+  "https://api-v1.staging.myriadprotocol.com";
 
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams
-  const token = searchParams.get('token') || 'USDT' // ❌ V1 param
-  const network_id = searchParams.get('network_id') || '11142220' // ❌ Celo default
+  const searchParams = request.nextUrl.searchParams;
+  const token = searchParams.get("token") || "USDT"; // ❌ V1 param
+  const network_id = searchParams.get("network_id") || "11142220"; // ❌ Celo default
 
   const params = new URLSearchParams({
     network_id,
     token, // ❌ Wrong param name
     ...(state && { state }),
-  })
+  });
 
   const response = await fetch(`${MYRIAD_API_URL}/markets?${params}`, {
-    headers: { 'Content-Type': 'application/json' }, // ❌ No API key
+    headers: { "Content-Type": "application/json" }, // ❌ No API key
     next: { revalidate: 30 },
-  })
+  });
   // ...
 }
 ```
 
 **New Code:**
+
 ```typescript
-const MYRIAD_API_URL = process.env.NEXT_PUBLIC_MYRIAD_API_URL || 'https://api-v2.myriadprotocol.com'
-const MYRIAD_API_KEY = process.env.NEXT_PUBLIC_MYRIAD_API_KEY!
+const MYRIAD_API_URL =
+  process.env.NEXT_PUBLIC_MYRIAD_API_URL || "https://api-v2.myriadprotocol.com";
+const MYRIAD_API_KEY = process.env.NEXT_PUBLIC_MYRIAD_API_KEY!;
 
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams
-    
+    const searchParams = request.nextUrl.searchParams;
+
     // Build V2 params
-    const params = new URLSearchParams()
-    
+    const params = new URLSearchParams();
+
     // Required params (defaults for BNB)
-    params.set('network_id', searchParams.get('network_id') || '56') // ✅ BNB default
-    params.set('token_address', searchParams.get('token_address') || process.env.NEXT_PUBLIC_USDT_TOKEN_ADDRESS!) // ✅ Correct param
-    
+    params.set("network_id", searchParams.get("network_id") || "56"); // ✅ BNB default
+    params.set(
+      "token_address",
+      searchParams.get("token_address") ||
+        process.env.NEXT_PUBLIC_USDT_TOKEN_ADDRESS!,
+    ); // ✅ Correct param
+
     // Optional filters
-    const state = searchParams.get('state')
-    const keyword = searchParams.get('keyword')
-    const topics = searchParams.get('topics')
-    const sort = searchParams.get('sort')
-    const order = searchParams.get('order')
-    const page = searchParams.get('page')
-    const limit = searchParams.get('limit')
-    
-    if (state) params.set('state', state)
-    if (keyword) params.set('keyword', keyword)
-    if (topics) params.set('topics', topics)
-    if (sort) params.set('sort', sort)
-    if (order) params.set('order', order)
-    if (page) params.set('page', page)
-    if (limit) params.set('limit', limit)
+    const state = searchParams.get("state");
+    const keyword = searchParams.get("keyword");
+    const topics = searchParams.get("topics");
+    const sort = searchParams.get("sort");
+    const order = searchParams.get("order");
+    const page = searchParams.get("page");
+    const limit = searchParams.get("limit");
+
+    if (state) params.set("state", state);
+    if (keyword) params.set("keyword", keyword);
+    if (topics) params.set("topics", topics);
+    if (sort) params.set("sort", sort);
+    if (order) params.set("order", order);
+    if (page) params.set("page", page);
+    if (limit) params.set("limit", limit);
 
     const response = await fetch(`${MYRIAD_API_URL}/markets?${params}`, {
       headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': MYRIAD_API_KEY, // ✅ Required auth
+        "Content-Type": "application/json",
+        "x-api-key": MYRIAD_API_KEY, // ✅ Required auth
       },
       next: { revalidate: 30 },
-    })
+    });
 
     if (!response.ok) {
-      console.error('❌ Myriad V2 API error:', response.status, response.statusText)
+      console.error(
+        "❌ Myriad V2 API error:",
+        response.status,
+        response.statusText,
+      );
       return NextResponse.json(
         { error: `Myriad API error: ${response.statusText}` },
-        { status: response.status }
-      )
+        { status: response.status },
+      );
     }
 
-    const data = await response.json()
-    
+    const data = await response.json();
+
     return NextResponse.json(data, {
       headers: {
-        'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
+        "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60",
       },
-    })
+    });
   } catch (error) {
-    console.error('Error proxying markets request:', error)
+    console.error("Error proxying markets request:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch markets from Myriad V2' },
-      { status: 500 }
-    )
+      { error: "Failed to fetch markets from Myriad V2" },
+      { status: 500 },
+    );
   }
 }
 ```
 
-**Impact:** 🔴 **CRITICAL**  
-**Lines Changed:** 50 → 70 lines  
+**Impact:** 🔴 **CRITICAL**
+**Lines Changed:** 50 → 70 lines
 **Complexity:** Low
 
 ---
 
 #### 6. `types/market.ts` ⏳ **PENDING**
-**Current:** V1 types (strings for prices, string outcome IDs)  
+
+**Current:** V1 types (strings for prices, string outcome IDs)
 **Required:** V2 types (numbers for prices, numeric outcome IDs, new fields)
 
 **Current Code (70 lines):**
+
 ```typescript
 export interface Market {
-  id: number
-  slug: string
-  liquidity: number // Already numeric - good!
-  volume: number // Already numeric - good!
-  outcomes: Outcome[]
+  id: number;
+  slug: string;
+  liquidity: number; // Already numeric - good!
+  volume: number; // Already numeric - good!
+  outcomes: Outcome[];
   // ... rest
 }
 
 export interface Outcome {
-  id: number // Already numeric - good!
-  price: number // Already numeric - good!
-  shares: number // Already numeric - good!
-  price_charts?: PriceChart[] // Already has charts - good!
+  id: number; // Already numeric - good!
+  price: number; // Already numeric - good!
+  shares: number; // Already numeric - good!
+  price_charts?: PriceChart[]; // Already has charts - good!
   // ...
 }
 ```
@@ -643,29 +703,31 @@ export interface Outcome {
 **Analysis:** ✅ **ALREADY V2-COMPATIBLE!**
 
 **Required Changes:**
+
 ```typescript
 // Add new V2 fields only
 export interface Market {
   // ... existing fields
-  volume_24h: number // ✅ NEW in V2
-  liquidityPrice: number // ✅ NEW in V2
-  publishedAt: number // ✅ NEW (Unix timestamp)
+  volume_24h: number; // ✅ NEW in V2
+  liquidityPrice: number; // ✅ NEW in V2
+  publishedAt: number; // ✅ NEW (Unix timestamp)
   // Update outcomes structure if needed
 }
 
 export interface Outcome {
   // ... existing fields
-  price_charts?: { // ✅ NEW nested structure in V2
-    '24h': Array<{ timestamp: number; price: number }>
-    '7d': Array<{ timestamp: number; price: number }>
-    '30d': Array<{ timestamp: number; price: number }>
-    'all': Array<{ timestamp: number; price: number }>
-  }
+  price_charts?: {
+    // ✅ NEW nested structure in V2
+    "24h": Array<{ timestamp: number; price: number }>;
+    "7d": Array<{ timestamp: number; price: number }>;
+    "30d": Array<{ timestamp: number; price: number }>;
+    all: Array<{ timestamp: number; price: number }>;
+  };
 }
 ```
 
-**Impact:** 🟡 **MEDIUM**  
-**Lines Changed:** +10 new fields  
+**Impact:** 🟡 **MEDIUM**
+**Lines Changed:** +10 new fields
 **Complexity:** Low (additive changes only)
 
 ---
@@ -673,33 +735,38 @@ export interface Outcome {
 ### TIER 2: HIGH PRIORITY (Trading Functionality)
 
 #### 7. `components/market/TradingPanel.tsx` ⏳ **PENDING**
-**Current:** No referral code in buy transactions  
+
+**Current:** No referral code in buy transactions
 **Required:** Add `referralAddress: 'predik'` to all buy() calls
 
 **Current Code (Line ~160):**
+
 ```typescript
 const tx = await predictionMarket.buy({
   marketId: market.id,
   outcomeId: selectedOutcome,
   value: parseFloat(amount),
   minOutcomeSharesToBuy: 0,
-})
+});
 ```
 
 **New Code:**
+
 ```typescript
 const tx = await predictionMarket.buy({
   marketId: market.id,
   outcomeId: selectedOutcome,
   value: parseFloat(amount),
   minOutcomeSharesToBuy: 0,
-  referralAddress: process.env.NEXT_PUBLIC_POLKAMARKETS_REFERRAL_CODE || 'predik', // ✅ ADD THIS
-})
+  referralAddress:
+    process.env.NEXT_PUBLIC_POLKAMARKETS_REFERRAL_CODE || "predik", // ✅ ADD THIS
+});
 ```
 
-**Impact:** 🟡 **HIGH** (revenue-generating feature)  
-**Lines Changed:** 1 line per buy() call  
+**Impact:** 🟡 **HIGH** (revenue-generating feature)
+**Lines Changed:** 1 line per buy() call
 **Locations to Update:**
+
 - `components/market/TradingPanel.tsx` (desktop)
 - `components/market/MobileTradingModal.tsx` (mobile)
 
@@ -708,91 +775,96 @@ const tx = await predictionMarket.buy({
 ---
 
 #### 8. `components/market/MobileTradingModal.tsx` ⏳ **PENDING**
+
 **Same changes as TradingPanel.tsx**
 
-**Lines Changed:** 1 line  
+**Lines Changed:** 1 line
 **Impact:** 🟡 **HIGH**
 
 ---
 
 #### 9. `lib/polkamarkets/sdk.ts` ⏳ **PENDING**
-**Current:** Basic wrapper, no referral code helper  
+
+**Current:** Basic wrapper, no referral code helper
 **Required:** Add helper function for buy with referral
 
 **Current Code (25 lines):**
-```typescript
-import * as polkamarketsjs from 'polkamarkets-js'
 
-const PM_CONTRACT = process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS || ''
-const PM_QUERIER = process.env.NEXT_PUBLIC_PREDICTION_MARKET_QUERIER || ''
+```typescript
+import * as polkamarketsjs from "polkamarkets-js";
+
+const PM_CONTRACT = process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS || "";
+const PM_QUERIER = process.env.NEXT_PUBLIC_PREDICTION_MARKET_QUERIER || "";
 
 export function createPolkamarketsInstance(provider: any) {
-  return new polkamarketsjs.Application({ web3Provider: provider })
+  return new polkamarketsjs.Application({ web3Provider: provider });
 }
 
 export function getPredictionMarketContract(polkamarkets: any) {
   return polkamarkets.getPredictionMarketV3PlusContract({
     contractAddress: PM_CONTRACT,
     querierContractAddress: PM_QUERIER,
-  })
+  });
 }
 ```
 
 **New Code:**
-```typescript
-import * as polkamarketsjs from 'polkamarkets-js'
 
-const PM_CONTRACT = process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS || ''
-const PM_QUERIER = process.env.NEXT_PUBLIC_PREDICTION_MARKET_QUERIER || ''
-const REFERRAL_CODE = process.env.NEXT_PUBLIC_POLKAMARKETS_REFERRAL_CODE || 'predik' // ✅ ADD
+```typescript
+import * as polkamarketsjs from "polkamarkets-js";
+
+const PM_CONTRACT = process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS || "";
+const PM_QUERIER = process.env.NEXT_PUBLIC_PREDICTION_MARKET_QUERIER || "";
+const REFERRAL_CODE =
+  process.env.NEXT_PUBLIC_POLKAMARKETS_REFERRAL_CODE || "predik"; // ✅ ADD
 
 export function createPolkamarketsInstance(provider: any) {
-  return new polkamarketsjs.Application({ web3Provider: provider })
+  return new polkamarketsjs.Application({ web3Provider: provider });
 }
 
 export function getPredictionMarketContract(polkamarkets: any) {
   return polkamarkets.getPredictionMarketV3PlusContract({
     contractAddress: PM_CONTRACT,
     querierContractAddress: PM_QUERIER,
-  })
+  });
 }
 
 export function getERC20Contract(polkamarkets: any, tokenAddress: string) {
-  return polkamarkets.getERC20Contract({ contractAddress: tokenAddress })
+  return polkamarkets.getERC20Contract({ contractAddress: tokenAddress });
 }
 
 // ✅ NEW: Helper for buy with referral
 export async function buyWithReferral(
   predictionMarket: any,
   params: {
-    marketId: number
-    outcomeId: number
-    value: number
-    minOutcomeSharesToBuy?: number
-  }
+    marketId: number;
+    outcomeId: number;
+    value: number;
+    minOutcomeSharesToBuy?: number;
+  },
 ) {
   return predictionMarket.buy({
     ...params,
     referralAddress: REFERRAL_CODE,
-  })
+  });
 }
 
 // ✅ NEW: Helper constants
 export const CONTRACTS = {
   PREDICTION_MARKET: PM_CONTRACT,
   PREDICTION_MARKET_QUERIER: PM_QUERIER,
-  USDT: process.env.NEXT_PUBLIC_USDT_TOKEN_ADDRESS || '',
-}
+  USDT: process.env.NEXT_PUBLIC_USDT_TOKEN_ADDRESS || "",
+};
 
 export const CONFIG = {
   REFERRAL_CODE,
   CHAIN_ID: 56,
   NETWORK_ID: 56,
-}
+};
 ```
 
-**Impact:** 🟡 **MEDIUM**  
-**Lines Changed:** +30 lines  
+**Impact:** 🟡 **MEDIUM**
+**Lines Changed:** +30 lines
 **Complexity:** Low (additive, non-breaking)
 
 ---
@@ -800,104 +872,111 @@ export const CONFIG = {
 ### TIER 3: MEDIUM PRIORITY (Component Updates)
 
 #### 10. `components/wallet/ConnectButton.tsx` ⏳ **PENDING**
-**Current:** Uses Reown AppKit hooks  
+
+**Current:** Uses Reown AppKit hooks
 **Required:** Use Dynamic hooks
 
 **Current Code:**
+
 ```typescript
-import { useAccount, useConnect, useDisconnect } from 'wagmi'
+import { useAccount, useConnect, useDisconnect } from "wagmi";
 
 export function ConnectButton() {
-  const { address, isConnected } = useAccount()
-  const { connect } = useConnect()
-  const { disconnect } = useDisconnect()
-  
+  const { address, isConnected } = useAccount();
+  const { connect } = useConnect();
+  const { disconnect } = useDisconnect();
+
   // ... RainbowKit modal integration
 }
 ```
 
 **New Code:**
+
 ```typescript
-import { useDynamicContext } from '@dynamic-labs/sdk-react-core'
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 export function ConnectButton() {
-  const { 
-    user, 
-    setShowAuthFlow, 
-    handleLogOut,
-    primaryWallet,
-  } = useDynamicContext()
-  
-  const address = primaryWallet?.address
-  const isConnected = !!user
+  const { user, setShowAuthFlow, handleLogOut, primaryWallet } =
+    useDynamicContext();
+
+  const address = primaryWallet?.address;
+  const isConnected = !!user;
 
   if (isConnected) {
     return (
       <button onClick={handleLogOut}>
         Disconnect {address?.slice(0, 6)}...{address?.slice(-4)}
       </button>
-    )
+    );
   }
 
-  return (
-    <button onClick={() => setShowAuthFlow(true)}>
-      Connect Wallet
-    </button>
-  )
+  return <button onClick={() => setShowAuthFlow(true)}>Connect Wallet</button>;
 }
 ```
 
-**Impact:** 🟡 **MEDIUM**  
-**Lines Changed:** Complete rewrite (~40 lines)  
+**Impact:** 🟡 **MEDIUM**
+**Lines Changed:** Complete rewrite (~40 lines)
 **Complexity:** Medium
 
 ---
 
 #### 11. `components/layout/GlobalSearch.tsx` & `MobileSearch.tsx` ⏳ **PENDING**
-**Current:** Uses V1 API via `fetchMarkets()`  
+
+**Current:** Uses V1 API via `fetchMarkets()`
 **Required:** Update to use new V2 params
 
 **Current Code:**
+
 ```typescript
 const fetchMarkets = async () => {
-  const data = await fetch('/api/markets?state=open&token=USDT&network_id=11142220')
+  const data = await fetch(
+    "/api/markets?state=open&token=USDT&network_id=11142220",
+  );
   // ...
-}
+};
 ```
 
 **New Code:**
+
 ```typescript
 const fetchMarkets = async () => {
-  const data = await fetch(`/api/markets?state=open&token_address=${process.env.NEXT_PUBLIC_USDT_TOKEN_ADDRESS}&network_id=56`)
+  const data = await fetch(
+    `/api/markets?state=open&token_address=${process.env.NEXT_PUBLIC_USDT_TOKEN_ADDRESS}&network_id=56`,
+  );
   // OR use keyword search:
-  const data = await fetch(`/api/markets?keyword=${searchQuery}&network_id=56&token_address=${process.env.NEXT_PUBLIC_USDT_TOKEN_ADDRESS}`)
+  const data = await fetch(
+    `/api/markets?keyword=${searchQuery}&network_id=56&token_address=${process.env.NEXT_PUBLIC_USDT_TOKEN_ADDRESS}`,
+  );
   // ...
-}
+};
 ```
 
-**Impact:** 🟢 **LOW**  
-**Lines Changed:** 2 lines per file  
+**Impact:** 🟢 **LOW**
+**Lines Changed:** 2 lines per file
 **Complexity:** Very Low
 
 ---
 
 #### 12. `hooks/use-user-transactions.ts` ⏳ **PENDING**
-**Current:** Reads from Celo chain  
+
+**Current:** Reads from Celo chain
 **Required:** Read from BNB chain
 
 **Current Code:**
+
 ```typescript
-const PM_CONTRACT = (process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS || '') as Address
+const PM_CONTRACT = (process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS ||
+  "") as Address;
 
 const logs = await publicClient.getLogs({
   address: PM_CONTRACT,
   event: PREDICTION_MARKET_ABI[0],
   // ... reads from current chain (Celo)
-})
+});
 ```
 
-**Impact:** ✅ **AUTO-FIXED** (uses current chain from wagmi config)  
-**Lines Changed:** 0 (no changes needed if wagmi.ts is updated correctly)  
+**Impact:** ✅ **AUTO-FIXED** (uses current chain from wagmi config)
+**Lines Changed:** 0 (no changes needed if wagmi.ts is updated correctly)
 **Complexity:** None
 
 ---
@@ -905,7 +984,9 @@ const logs = await publicClient.getLogs({
 ### TIER 4: LOW PRIORITY (Nice to Have)
 
 #### 13. `package.json` ⏳ **PENDING**
+
 **Dependencies to Add:**
+
 ```json
 {
   "@dynamic-labs/sdk-react-core": "^3.0.0",
@@ -914,6 +995,7 @@ const logs = await publicClient.getLogs({
 ```
 
 **Dependencies to Remove:**
+
 ```json
 {
   "@reown/appkit": "^1.8.8",
@@ -922,6 +1004,7 @@ const logs = await publicClient.getLogs({
 ```
 
 **Keep (still needed):**
+
 ```json
 {
   "@rainbow-me/rainbowkit": "^2.2.8", // Remove if not using RainbowKitProvider
@@ -938,6 +1021,7 @@ const logs = await publicClient.getLogs({
 ### PHASE 0: PRE-MIGRATION (2-3 Days) ⏳ **IN PROGRESS**
 
 **Blockers to Resolve:**
+
 - [x] Update .env.local ✅ DONE
 - [ ] Get Polkamarkets BNB contract addresses ⏳ WAITING
 - [ ] Test Myriad V2 API with actual call ⏳ TODO
@@ -945,6 +1029,7 @@ const logs = await publicClient.getLogs({
 - [ ] Database backup ⏳ TODO
 
 **Deliverables:**
+
 - [x] Migration plan document ✅ THIS DOCUMENT
 - [ ] All contract addresses confirmed
 - [ ] V2 API response validated
@@ -957,6 +1042,7 @@ const logs = await publicClient.getLogs({
 **Goal:** Update core infrastructure without breaking existing functionality
 
 **Tasks:**
+
 1. ✅ Update `.env.local` (DONE)
 2. Install new dependencies:
    ```bash
@@ -968,6 +1054,7 @@ const logs = await publicClient.getLogs({
 6. Test wallet connection locally
 
 **Success Criteria:**
+
 - [ ] `npm run build` succeeds
 - [ ] Dynamic wallet modal opens
 - [ ] Can connect MetaMask to BNB mainnet
@@ -982,6 +1069,7 @@ const logs = await publicClient.getLogs({
 **Goal:** Migrate all API clients to Myriad V2
 
 **Tasks:**
+
 1. Update `lib/myriad/api.ts` (V2 client)
 2. Update `app/api/markets/route.ts` (V2 proxy with auth)
 3. Create new API routes:
@@ -992,6 +1080,7 @@ const logs = await publicClient.getLogs({
 5. Test API routes with Postman/curl
 
 **Success Criteria:**
+
 - [ ] GET `/api/markets?network_id=56` returns BNB markets
 - [ ] GET `/api/markets/[slug]` returns correct data
 - [ ] All new endpoints work
@@ -1006,6 +1095,7 @@ const logs = await publicClient.getLogs({
 **Goal:** Enable trading on BNB with referral code
 
 **Tasks:**
+
 1. Update `components/market/TradingPanel.tsx` (add referral)
 2. Update `components/market/MobileTradingModal.tsx` (add referral)
 3. Test approval flow with USDT BNB
@@ -1013,6 +1103,7 @@ const logs = await publicClient.getLogs({
 5. Verify referral code is included in transaction
 
 **Success Criteria:**
+
 - [ ] Can approve USDT on BNB
 - [ ] Can execute buy transaction
 - [ ] Transaction includes referral code "predik"
@@ -1028,6 +1119,7 @@ const logs = await publicClient.getLogs({
 **Goal:** Update all remaining components to use V2 data
 
 **Tasks:**
+
 1. Update `components/wallet/ConnectButton.tsx` (Dynamic hooks)
 2. Update `components/layout/GlobalSearch.tsx` (V2 search)
 3. Update `components/layout/MobileSearch.tsx` (V2 search)
@@ -1036,6 +1128,7 @@ const logs = await publicClient.getLogs({
 6. Test all user-facing features
 
 **Success Criteria:**
+
 - [ ] Wallet connection UX works smoothly
 - [ ] Search finds markets correctly
 - [ ] Portfolio displays correctly
@@ -1050,7 +1143,9 @@ const logs = await publicClient.getLogs({
 **Goal:** Comprehensive end-to-end testing
 
 **Test Scenarios:**
+
 1. **Wallet Connection:**
+
    - [ ] MetaMask connection
    - [ ] Binance Wallet connection
    - [ ] Trust Wallet connection
@@ -1058,6 +1153,7 @@ const logs = await publicClient.getLogs({
    - [ ] Disconnect/reconnect
 
 2. **Market Browsing:**
+
    - [ ] Home page loads markets
    - [ ] Filters work (state, category)
    - [ ] Search finds markets
@@ -1065,6 +1161,7 @@ const logs = await publicClient.getLogs({
    - [ ] Price charts display
 
 3. **Trading Flow:**
+
    - [ ] Connect wallet
    - [ ] Select market
    - [ ] Enter trade amount
@@ -1074,6 +1171,7 @@ const logs = await publicClient.getLogs({
    - [ ] Shares appear in wallet
 
 4. **Portfolio:**
+
    - [ ] View positions
    - [ ] See unrealized P&L
    - [ ] View transaction history
@@ -1086,6 +1184,7 @@ const logs = await publicClient.getLogs({
    - [ ] Mobile responsiveness
 
 **Success Criteria:**
+
 - [ ] All test scenarios pass
 - [ ] No critical bugs found
 - [ ] Performance meets targets
@@ -1098,6 +1197,7 @@ const logs = await publicClient.getLogs({
 ### PHASE 6: DEPLOYMENT (Day 6-7) ⏳ **WAITING FOR PHASE 5**
 
 **Pre-Deployment Checklist:**
+
 - [ ] All tests passing
 - [ ] Database backed up
 - [ ] Environment variables set in Vercel
@@ -1105,6 +1205,7 @@ const logs = await publicClient.getLogs({
 - [ ] Rollback plan ready
 
 **Deployment Steps:**
+
 1. Merge migration branch to `main`
 2. Deploy to Vercel production
 3. Verify deployment health
@@ -1113,12 +1214,14 @@ const logs = await publicClient.getLogs({
 6. Monitor analytics for issues
 
 **Post-Deployment Monitoring (48 hours):**
+
 - [ ] Check error rates
 - [ ] Monitor transaction success rate
 - [ ] Track user feedback
 - [ ] Verify referral code in on-chain transactions
 
 **Rollback Triggers:**
+
 - Transaction failure rate >10%
 - API error rate >5%
 - Critical bug affecting trading
@@ -1133,6 +1236,7 @@ const logs = await publicClient.getLogs({
 ### Task Checklist (Copy to Your Project Management Tool)
 
 #### INFRASTRUCTURE (9 tasks)
+
 - [ ] **ENV-001**: Update `.env.local` with BNB config ✅ DONE
 - [ ] **ENV-002**: Update `.env.example` template
 - [ ] **DEPS-001**: Install Dynamic SDK packages
@@ -1144,6 +1248,7 @@ const logs = await publicClient.getLogs({
 - [ ] **DB-001**: Backup production database
 
 #### API MIGRATION (8 tasks)
+
 - [ ] **API-001**: Update `lib/myriad/api.ts` for V2
 - [ ] **API-002**: Update `app/api/markets/route.ts` (add auth)
 - [ ] **API-003**: Update `app/api/markets/[slug]/route.ts`
@@ -1154,6 +1259,7 @@ const logs = await publicClient.getLogs({
 - [ ] **TEST-002**: Test all API routes with curl/Postman
 
 #### TRADING (5 tasks)
+
 - [ ] **TRADE-001**: Add referral to `TradingPanel.tsx`
 - [ ] **TRADE-002**: Add referral to `MobileTradingModal.tsx`
 - [ ] **TRADE-003**: Test USDT approval on BNB
@@ -1161,6 +1267,7 @@ const logs = await publicClient.getLogs({
 - [ ] **TRADE-005**: Verify referral code on-chain
 
 #### COMPONENTS (6 tasks)
+
 - [ ] **COMP-001**: Update `ConnectButton.tsx` (Dynamic hooks)
 - [ ] **COMP-002**: Update `GlobalSearch.tsx` (V2 params)
 - [ ] **COMP-003**: Update `MobileSearch.tsx` (V2 params)
@@ -1169,6 +1276,7 @@ const logs = await publicClient.getLogs({
 - [ ] **COMP-006**: Update `MarketsGrid.tsx` (V2 filters)
 
 #### TESTING (12 tasks)
+
 - [ ] **QA-001**: Wallet connection (MetaMask)
 - [ ] **QA-002**: Wallet connection (Binance Wallet)
 - [ ] **QA-003**: Wallet connection (Trust Wallet)
@@ -1183,6 +1291,7 @@ const logs = await publicClient.getLogs({
 - [ ] **QA-012**: Mobile responsiveness
 
 #### DEPLOYMENT (7 tasks)
+
 - [ ] **DEPLOY-001**: Set Vercel environment variables
 - [ ] **DEPLOY-002**: Preview deployment test
 - [ ] **DEPLOY-003**: Merge to main branch
@@ -1201,28 +1310,28 @@ const logs = await publicClient.getLogs({
 
 ```typescript
 // tests/lib/myriad/api.test.ts
-describe('Myriad V2 API Client', () => {
-  test('fetchMarkets includes auth header', async () => {
+describe("Myriad V2 API Client", () => {
+  test("fetchMarkets includes auth header", async () => {
     // Mock fetch
-    const mockFetch = jest.fn()
-    global.fetch = mockFetch
+    const mockFetch = jest.fn();
+    global.fetch = mockFetch;
 
-    await fetchMarkets({ network_id: 56 })
+    await fetchMarkets({ network_id: 56 });
 
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('network_id=56'),
+      expect.stringContaining("network_id=56"),
       expect.objectContaining({
         headers: expect.objectContaining({
-          'x-api-key': expect.any(String)
-        })
-      })
-    )
-  })
+          "x-api-key": expect.any(String),
+        }),
+      }),
+    );
+  });
 
-  test('fetchMarkets uses token_address param', async () => {
+  test("fetchMarkets uses token_address param", async () => {
     // ...
-  })
-})
+  });
+});
 ```
 
 ### Integration Tests (Manual)
@@ -1233,6 +1342,7 @@ describe('Myriad V2 API Client', () => {
 # Migration Smoke Test
 
 ## Prerequisites
+
 - [ ] Wallet with BNB for gas
 - [ ] Wallet with USDT on BNB
 - [ ] MetaMask installed
@@ -1241,6 +1351,7 @@ describe('Myriad V2 API Client', () => {
 ## Test Flow
 
 ### 1. Wallet Connection
+
 - [ ] Go to http://localhost:3000
 - [ ] Click "Connect Wallet"
 - [ ] Dynamic modal opens
@@ -1250,6 +1361,7 @@ describe('Myriad V2 API Client', () => {
 - [ ] Network shows "BNB Smart Chain"
 
 ### 2. Market Browsing
+
 - [ ] Home page shows markets
 - [ ] Markets have BNB USDT prices
 - [ ] Click on a market card
@@ -1258,6 +1370,7 @@ describe('Myriad V2 API Client', () => {
 - [ ] Outcomes show probabilities
 
 ### 3. Trading
+
 - [ ] Click "Buy Yes" or "Buy No"
 - [ ] Enter amount (e.g., 10 USDT)
 - [ ] See share estimate
@@ -1273,6 +1386,7 @@ describe('Myriad V2 API Client', () => {
 - [ ] Shares appear in portfolio
 
 ### 4. Portfolio
+
 - [ ] Click "Portfolio" in navigation
 - [ ] See your positions
 - [ ] See unrealized P&L
@@ -1280,12 +1394,14 @@ describe('Myriad V2 API Client', () => {
 - [ ] Redirects to market detail
 
 ### 5. Transaction History
+
 - [ ] Go to Profile page
 - [ ] See recent transactions
 - [ ] Transactions show BNB chain
 - [ ] Transaction links go to BSCScan
 
 ### 6. Disconnect
+
 - [ ] Click wallet address
 - [ ] Click "Disconnect"
 - [ ] Wallet disconnects
@@ -1307,6 +1423,7 @@ describe('Myriad V2 API Client', () => {
    - Dependency issues → Check package.json
 
 **Action:**
+
 ```bash
 # Fix issues locally
 npm run build # Verify builds
@@ -1322,12 +1439,14 @@ git push
 **If users report critical bugs (trading fails, wallet crashes):**
 
 1. **Immediate:** Revert to previous deployment in Vercel
+
    - Go to Vercel Dashboard → Deployments
    - Find last stable deployment
    - Click "⋯" → "Promote to Production"
    - Takes ~30 seconds
 
 2. **Communication:**
+
    - Post status update: "We've detected an issue and temporarily rolled back. Investigating."
    - Disable affected features if possible
 
@@ -1344,12 +1463,14 @@ git push
 **If trading transactions fail on BNB:**
 
 **Possible Causes:**
+
 - Wrong contract addresses
 - Contract not deployed on BNB
 - ABI mismatch
 - Gas estimation errors
 
 **Action:**
+
 1. Verify contract addresses on BSCScan
 2. Test contract calls with Ethers.js directly
 3. Contact Polkamarkets team for support
@@ -1362,10 +1483,12 @@ git push
 **If V2 API returns 500 errors consistently:**
 
 **Temporary Fix:**
+
 - Switch API URL back to V1 in Vercel env vars
 - Note: Will break V2-specific features (price charts, portfolio)
 
 **Long-term:**
+
 - Contact Myriad support
 - Implement API fallback logic
 - Cache responses more aggressively
@@ -1377,18 +1500,21 @@ git push
 **If migration fails completely:**
 
 1. **Revert code:**
+
    ```bash
    git revert <migration-commit-hash>
    git push
    ```
 
 2. **Revert env vars in Vercel:**
+
    - Change back to Celo chain ID
    - Change back to V1 API URL
    - Remove V2 API key
    - Remove Dynamic credentials
 
 3. **Verify:**
+
    - Test wallet connection (Celo)
    - Test market loading
    - Test trading
@@ -1403,11 +1529,13 @@ git push
 ### Critical Questions (Block Migration)
 
 1. **Polkamarkets Contracts (BLOCKER)**
+
    - **Q:** What are the BNB Mainnet contract addresses?
    - **Who to ask:** Polkamarkets team
    - **Deadline:** Before Phase 3 (Day 3)
 
 2. **Myriad V2 BNB Markets**
+
    - **Q:** Are there existing markets on BNB network_id=56?
    - **Test:** `curl -H "x-api-key: myr_sk_live_..." "https://api-v2.myriadprotocol.com/markets?network_id=56&token_address=0x39E66eE6b2ddaf4DEfDEd3038E0162180dbeF340"`
    - **If NO markets:** Can we create test markets? Or use staging?
@@ -1420,14 +1548,17 @@ git push
 ### Nice-to-Have Questions
 
 4. **RainbowKit Removal**
+
    - **Q:** Can we remove RainbowKit completely? Or keep as fallback?
    - **Decision:** Remove completely to reduce bundle size
 
 5. **Myriad V2 Rate Limits**
+
    - **Q:** What are the exact rate limits? 5 req/sec per IP or per API key?
    - **Why:** To implement proper rate limiting/caching strategy
 
 6. **Referral Revenue**
+
    - **Q:** What percentage of fees does "predik" referral code earn?
    - **Who to ask:** Polkamarkets team
    - **Why:** To track ROI and revenue projections
@@ -1443,23 +1574,23 @@ git push
 
 ### Technical Metrics
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| **API Response Time** | <500ms | Vercel Analytics |
-| **Page Load Time** | <2s | Lighthouse |
-| **Transaction Success Rate** | >95% | On-chain data |
-| **Wallet Connection Success** | >90% | Dynamic dashboard |
-| **Build Time** | <3 min | Vercel build logs |
-| **Bundle Size** | <500KB | `npm run build` |
+| Metric                        | Target | Measurement       |
+| ----------------------------- | ------ | ----------------- |
+| **API Response Time**         | <500ms | Vercel Analytics  |
+| **Page Load Time**            | <2s    | Lighthouse        |
+| **Transaction Success Rate**  | >95%   | On-chain data     |
+| **Wallet Connection Success** | >90%   | Dynamic dashboard |
+| **Build Time**                | <3 min | Vercel build logs |
+| **Bundle Size**               | <500KB | `npm run build`   |
 
 ### Business Metrics
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| **Daily Active Traders** | 10+ in first week | Analytics |
-| **Total Trading Volume** | $1,000+ in first week | On-chain |
-| **Referral Revenue** | >0 (proof of concept) | Polkamarkets |
-| **User Retention (D7)** | >40% | Analytics |
+| Metric                   | Target                | Measurement  |
+| ------------------------ | --------------------- | ------------ |
+| **Daily Active Traders** | 10+ in first week     | Analytics    |
+| **Total Trading Volume** | $1,000+ in first week | On-chain     |
+| **Referral Revenue**     | >0 (proof of concept) | Polkamarkets |
+| **User Retention (D7)**  | >40%                  | Analytics    |
 
 ---
 
@@ -1468,20 +1599,24 @@ git push
 ### Immediate Actions (Today)
 
 1. **Obtain Polkamarkets BNB Addresses**
+
    - Email Polkamarkets support
    - Ask in Telegram/Discord if available
    - Check Polkamarkets docs for BNB deployment
 
 2. **Test Myriad V2 API**
+
    ```bash
    curl -X GET "https://api-v2.myriadprotocol.com/markets?network_id=56&token_address=0x39E66eE6b2ddaf4DEfDEd3038E0162180dbeF340" \
      -H "x-api-key: myr_sk_live_cwkloxyzeq47cjlorm29irdvgzynlfyxqu3bfu8g60"
    ```
+
    - Verify response format
    - Check if markets exist
    - Validate field types
 
 3. **Backup Database**
+
    ```bash
    # In Neon dashboard or via CLI
    pg_dump $DATABASE_URL > predik_backup_$(date +%Y%m%d).sql
@@ -1558,6 +1693,6 @@ git push
 
 **END OF MIGRATION PLAN**
 
-*Document Version: 1.0*  
-*Last Updated: October 30, 2025*  
-*Author: AI Assistant + Predik Team*
+_Document Version: 1.0_
+_Last Updated: October 30, 2025_
+_Author: AI Assistant + Predik Team_

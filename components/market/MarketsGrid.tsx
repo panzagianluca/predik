@@ -1,111 +1,122 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { MarketCard } from '@/components/market/MarketCard'
-import { Market } from '@/types/market'
-import { TrendingUp, Clock, Calendar, X } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { TooltipProvider } from '@/components/animate-ui/primitives/animate/tooltip'
-import { motion, AnimatePresence } from 'framer-motion'
-import { haptics } from '@/lib/haptics'
+import { useState } from "react";
+import { MarketCard } from "@/components/market/MarketCard";
+import { Market } from "@/types/market";
+import { TrendingUp, Clock, Calendar, X } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { TooltipProvider } from "@/components/animate-ui/primitives/animate/tooltip";
+import { motion, AnimatePresence } from "framer-motion";
+import { haptics } from "@/lib/haptics";
 
-type TimeFilter = 'trending' | 'recent' | 'closing-soon' | 'closed'
-type CategoryFilter = 'all' | 'sports' | 'economy' | 'politics' | 'crypto' | 'culture'
+type TimeFilter = "trending" | "recent" | "closing-soon" | "closed";
+type CategoryFilter =
+  | "all"
+  | "sports"
+  | "economy"
+  | "politics"
+  | "crypto"
+  | "culture";
 
 interface MarketsGridProps {
-  markets: Market[]
+  markets: Market[];
 }
 
 export function MarketsGrid({ markets }: MarketsGridProps) {
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>('trending')
-  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all')
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("trending");
+  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
 
   // Filter markets based on selected filters
-  const filteredMarkets = markets.filter(market => {
+  const filteredMarkets = markets.filter((market) => {
     // Time filter logic
-    if (timeFilter === 'closed') {
+    if (timeFilter === "closed") {
       // Show only closed or resolved markets
-      if (market.state !== 'closed' && market.state !== 'resolved') return false
+      if (market.state !== "closed" && market.state !== "resolved")
+        return false;
     } else {
       // For all other filters, only show open markets
-      if (market.state !== 'open') return false
+      if (market.state !== "open") return false;
     }
-    
+
     // Category filter - V2 uses topics array only (no category field)
-    if (categoryFilter !== 'all') {
+    if (categoryFilter !== "all") {
       const categoryMap: Record<CategoryFilter, string[]> = {
         all: [],
-        sports: ['Deportes', 'Sports', 'Deporte'],
-        economy: ['Economía', 'Economy', 'Economia'],
-        politics: ['Política', 'Politics', 'Politica'],
-        crypto: ['Crypto', 'Cryptocurrency'],
-        culture: ['Cultura', 'Culture']
-      }
-      
-      const allowedCategories = categoryMap[categoryFilter]
-      
+        sports: ["Deportes", "Sports", "Deporte"],
+        economy: ["Economía", "Economy", "Economia"],
+        politics: ["Política", "Politics", "Politica"],
+        crypto: ["Crypto", "Cryptocurrency"],
+        culture: ["Cultura", "Culture"],
+      };
+
+      const allowedCategories = categoryMap[categoryFilter];
+
       // V2 only has topics array
-      const topicMatches = market.topics && market.topics.some(topic =>
-        allowedCategories.some(cat => topic.toLowerCase().includes(cat.toLowerCase()))
-      )
-      
-      if (!topicMatches) return false
+      const topicMatches =
+        market.topics &&
+        market.topics.some((topic) =>
+          allowedCategories.some((cat) =>
+            topic.toLowerCase().includes(cat.toLowerCase()),
+          ),
+        );
+
+      if (!topicMatches) return false;
     }
-    
-    return true
-  })
+
+    return true;
+  });
 
   // Sort markets based on time filter
   const sortedMarkets = [...filteredMarkets].sort((a, b) => {
-    if (timeFilter === 'trending') {
+    if (timeFilter === "trending") {
       // Trending: Most volume first
-      return (b.volume || 0) - (a.volume || 0)
+      return (b.volume || 0) - (a.volume || 0);
     }
-    if (timeFilter === 'recent') {
+    if (timeFilter === "recent") {
       // Recientes: Most recently created first (V2 uses publishedAt)
-      const aDate = a.publishedAt || a.createdAt || ''
-      const bDate = b.publishedAt || b.createdAt || ''
-      return new Date(bDate).getTime() - new Date(aDate).getTime()
+      const aDate = a.publishedAt || a.createdAt || "";
+      const bDate = b.publishedAt || b.createdAt || "";
+      return new Date(bDate).getTime() - new Date(aDate).getTime();
     }
-    if (timeFilter === 'closing-soon') {
+    if (timeFilter === "closing-soon") {
       // Cierra Pronto: Soonest to expire first (only open markets)
-      if (a.state !== 'open' || b.state !== 'open') return 0
-      const aExpires = a.expiresAt || a.expires_at || ''
-      const bExpires = b.expiresAt || b.expires_at || ''
-      if (!aExpires || !bExpires) return 0
-      return new Date(aExpires).getTime() - new Date(bExpires).getTime()
+      if (a.state !== "open" || b.state !== "open") return 0;
+      const aExpires = a.expiresAt || a.expires_at || "";
+      const bExpires = b.expiresAt || b.expires_at || "";
+      if (!aExpires || !bExpires) return 0;
+      return new Date(aExpires).getTime() - new Date(bExpires).getTime();
     }
-    if (timeFilter === 'closed') {
+    if (timeFilter === "closed") {
       // Cerrados: Most recently closed first
-      const aExpires = a.expiresAt || a.expires_at || ''
-      const bExpires = b.expiresAt || b.expires_at || ''
-      return new Date(bExpires).getTime() - new Date(aExpires).getTime()
+      const aExpires = a.expiresAt || a.expires_at || "";
+      const bExpires = b.expiresAt || b.expires_at || "";
+      return new Date(bExpires).getTime() - new Date(aExpires).getTime();
     }
-    return 0
-  })
+    return 0;
+  });
 
   const timeFilters: Array<{
-    id: TimeFilter
-    label: string
-    icon: React.ComponentType<{ className?: string }>
+    id: TimeFilter;
+    label: string;
+    icon: React.ComponentType<{ className?: string }>;
   }> = [
-    { id: 'trending', label: 'Trending', icon: TrendingUp },
-    { id: 'recent', label: 'Recientes', icon: Clock },
-    { id: 'closing-soon', label: 'Cierra Pronto', icon: Calendar },
-    { id: 'closed', label: 'Cerrados', icon: X },
-  ]
+    { id: "trending", label: "Trending", icon: TrendingUp },
+    { id: "recent", label: "Recientes", icon: Clock },
+    { id: "closing-soon", label: "Cierra Pronto", icon: Calendar },
+    { id: "closed", label: "Cerrados", icon: X },
+  ];
 
   const categoryFilters: Array<{
-    id: CategoryFilter
-    label: string
+    id: CategoryFilter;
+    label: string;
   }> = [
-    { id: 'all', label: 'Todos' },
-    { id: 'sports', label: 'Deportes' },
-    { id: 'economy', label: 'Economía' },
-    { id: 'politics', label: 'Política' },
-    { id: 'crypto', label: 'Crypto' },
-    { id: 'culture', label: 'Cultura' },
-  ]
+    { id: "all", label: "Todos" },
+    { id: "sports", label: "Deportes" },
+    { id: "economy", label: "Economía" },
+    { id: "politics", label: "Política" },
+    { id: "crypto", label: "Crypto" },
+    { id: "culture", label: "Cultura" },
+  ];
 
   return (
     <div className="space-y-4">
@@ -114,22 +125,25 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
         {/* Mobile: Two separate scrollable rows */}
         <div className="md:hidden space-y-3">
           {/* Time Filters Row - Mobile */}
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide px-1 py-1 -mx-1" style={{ WebkitOverflowScrolling: 'touch' }}>
+          <div
+            className="flex gap-2 overflow-x-auto scrollbar-hide px-1 py-1 -mx-1"
+            style={{ WebkitOverflowScrolling: "touch" }}
+          >
             {timeFilters.map((filter) => {
-              const Icon = filter.icon
-              const isActive = timeFilter === filter.id
+              const Icon = filter.icon;
+              const isActive = timeFilter === filter.id;
               return (
                 <motion.button
                   key={filter.id}
                   onClick={() => {
-                    haptics.selection()
-                    setTimeFilter(filter.id)
+                    haptics.selection();
+                    setTimeFilter(filter.id);
                   }}
                   className={cn(
-                    'flex items-center gap-2 px-4 h-[36px] rounded-md border-2 transition-all duration-200 text-[14px] relative overflow-hidden flex-shrink-0',
+                    "flex items-center gap-2 px-4 h-[36px] rounded-md border-2 transition-all duration-200 text-[14px] relative overflow-hidden flex-shrink-0",
                     isActive
-                      ? 'bg-electric-purple text-white border-electric-purple font-semibold'
-                      : 'bg-background border-border hover:border-electric-purple/50 text-foreground font-medium'
+                      ? "bg-electric-purple text-white border-electric-purple font-semibold"
+                      : "bg-background border-border hover:border-electric-purple/50 text-foreground font-medium",
                   )}
                   whileTap={{ scale: 0.95 }}
                   transition={{ duration: 0.2, ease: "easeOut" }}
@@ -144,26 +158,29 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
                   <Icon className="h-4 w-4 relative z-10" />
                   <span className="relative z-10">{filter.label}</span>
                 </motion.button>
-              )
+              );
             })}
           </div>
 
           {/* Category Filters Row - Mobile */}
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide px-1 py-1 -mx-1" style={{ WebkitOverflowScrolling: 'touch' }}>
+          <div
+            className="flex gap-2 overflow-x-auto scrollbar-hide px-1 py-1 -mx-1"
+            style={{ WebkitOverflowScrolling: "touch" }}
+          >
             {categoryFilters.map((filter) => {
-              const isActive = categoryFilter === filter.id
+              const isActive = categoryFilter === filter.id;
               return (
                 <motion.button
                   key={filter.id}
                   onClick={() => {
-                    haptics.selection()
-                    setCategoryFilter(filter.id)
+                    haptics.selection();
+                    setCategoryFilter(filter.id);
                   }}
                   className={cn(
-                    'px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] relative overflow-hidden flex-shrink-0',
+                    "px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] relative overflow-hidden flex-shrink-0",
                     isActive
-                      ? 'text-electric-purple bg-electric-purple/5'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                      ? "text-electric-purple bg-electric-purple/5"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted",
                   )}
                   whileTap={{ scale: 0.95 }}
                   transition={{ duration: 0.2, ease: "easeOut" }}
@@ -177,7 +194,7 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
                   )}
                   <span className="relative z-10">{filter.label}</span>
                 </motion.button>
-              )
+              );
             })}
           </div>
         </div>
@@ -187,20 +204,20 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
           <div className="flex flex-wrap items-center gap-2">
             {/* Time Filters - Desktop */}
             {timeFilters.map((filter) => {
-              const Icon = filter.icon
-              const isActive = timeFilter === filter.id
+              const Icon = filter.icon;
+              const isActive = timeFilter === filter.id;
               return (
                 <motion.button
                   key={filter.id}
                   onClick={() => {
-                    haptics.selection()
-                    setTimeFilter(filter.id)
+                    haptics.selection();
+                    setTimeFilter(filter.id);
                   }}
                   className={cn(
-                    'flex items-center gap-2 px-4 h-[36px] rounded-md border-2 transition-all duration-200 text-[14px] relative overflow-hidden',
+                    "flex items-center gap-2 px-4 h-[36px] rounded-md border-2 transition-all duration-200 text-[14px] relative overflow-hidden",
                     isActive
-                      ? 'bg-electric-purple text-white border-electric-purple font-semibold'
-                      : 'bg-background border-border hover:border-electric-purple/50 text-foreground font-medium'
+                      ? "bg-electric-purple text-white border-electric-purple font-semibold"
+                      : "bg-background border-border hover:border-electric-purple/50 text-foreground font-medium",
                   )}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -216,7 +233,7 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
                   <Icon className="h-4 w-4 relative z-10" />
                   <span className="relative z-10">{filter.label}</span>
                 </motion.button>
-              )
+              );
             })}
 
             {/* Divider */}
@@ -224,19 +241,19 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
 
             {/* Category Filters - Desktop */}
             {categoryFilters.map((filter) => {
-              const isActive = categoryFilter === filter.id
+              const isActive = categoryFilter === filter.id;
               return (
                 <motion.button
                   key={filter.id}
                   onClick={() => {
-                    haptics.selection()
-                    setCategoryFilter(filter.id)
+                    haptics.selection();
+                    setCategoryFilter(filter.id);
                   }}
                   className={cn(
-                    'px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] relative overflow-hidden',
+                    "px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] relative overflow-hidden",
                     isActive
-                      ? 'text-electric-purple bg-electric-purple/5'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                      ? "text-electric-purple bg-electric-purple/5"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted",
                   )}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -251,7 +268,7 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
                   )}
                   <span className="relative z-10">{filter.label}</span>
                 </motion.button>
-              )
+              );
             })}
           </div>
         </div>
@@ -274,10 +291,10 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
                     key={market.id}
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ 
-                      duration: 0.2, 
+                    transition={{
+                      duration: 0.2,
                       delay: index * 0.05,
-                      ease: "easeOut"
+                      ease: "easeOut",
                     }}
                   >
                     <MarketCard market={market} />
@@ -295,5 +312,5 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
         </motion.div>
       </AnimatePresence>
     </div>
-  )
+  );
 }

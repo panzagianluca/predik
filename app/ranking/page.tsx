@@ -1,99 +1,109 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { Tabs, TabsContent, TabsContents, TabsList, TabsTrigger } from '@/components/animate-ui/components/radix/tabs'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { RankingSkeleton } from '@/components/ui/skeletons/RankingSkeleton'
-import { Trophy, TrendingUp, Users } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { useState, useEffect } from "react";
+import {
+  Tabs,
+  TabsContent,
+  TabsContents,
+  TabsList,
+  TabsTrigger,
+} from "@/components/animate-ui/components/radix/tabs";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { RankingSkeleton } from "@/components/ui/skeletons/RankingSkeleton";
+import { Trophy, TrendingUp, Users } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface RankingUser {
-  address: string
-  value: string
-  rank: number
+  address: string;
+  value: string;
+  rank: number;
 }
 
 interface RankingData {
-  winners: RankingUser[]
-  holders: RankingUser[]
-  traders: RankingUser[]
+  winners: RankingUser[];
+  holders: RankingUser[];
+  traders: RankingUser[];
 }
 
 export default function RankingPage() {
-  const [timeframe, setTimeframe] = useState<'month' | 'all'>('month')
-  const [data, setData] = useState<RankingData | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [timeframe, setTimeframe] = useState<"month" | "all">("month");
+  const [data, setData] = useState<RankingData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchRankings = async () => {
-      setIsLoading(true)
-      setError(null)
+      setIsLoading(true);
+      setError(null);
       try {
         const [winnersRes, holdersRes, tradersRes] = await Promise.all([
           fetch(`/api/ranking/winners?timeframe=${timeframe}`),
           fetch(`/api/ranking/holders?timeframe=${timeframe}`),
-          fetch(`/api/ranking/traders?timeframe=${timeframe}`)
-        ])
+          fetch(`/api/ranking/traders?timeframe=${timeframe}`),
+        ]);
 
         if (!winnersRes.ok || !holdersRes.ok || !tradersRes.ok) {
-          throw new Error('Failed to fetch ranking data')
+          throw new Error("Failed to fetch ranking data");
         }
 
         const [winners, holders, traders] = await Promise.all([
           winnersRes.json(),
           holdersRes.json(),
-          tradersRes.json()
-        ])
+          tradersRes.json(),
+        ]);
 
-        setData({ winners, holders, traders })
+        setData({ winners, holders, traders });
       } catch (err) {
-        console.error('Error fetching rankings:', err)
-        setError(err instanceof Error ? err.message : 'Failed to load rankings')
+        console.error("Error fetching rankings:", err);
+        setError(
+          err instanceof Error ? err.message : "Failed to load rankings",
+        );
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchRankings()
-  }, [timeframe])
+    fetchRankings();
+  }, [timeframe]);
 
   const truncateAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`
-  }
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
 
   const getRankBadge = (rank: number) => {
-    if (rank === 1) return '🥇'
-    if (rank === 2) return '🥈'
-    if (rank === 3) return '🥉'
-    return `#${rank}`
-  }
+    if (rank === 1) return "🥇";
+    if (rank === 2) return "🥈";
+    if (rank === 3) return "🥉";
+    return `#${rank}`;
+  };
 
   const formatValue = (value: string, suffix: string) => {
-    const num = parseFloat(value)
-    if (isNaN(num)) return value + suffix
-    
-    // Format with commas for thousands
-    return num.toLocaleString('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }) + suffix
-  }
+    const num = parseFloat(value);
+    if (isNaN(num)) return value + suffix;
 
-  const RankingCard = ({ 
-    title, 
-    icon: Icon, 
-    users, 
-    valueLabel, 
-    valueSuffix = '',
-    emptyMessage 
-  }: { 
-    title: string
-    icon: any
-    users: RankingUser[]
-    valueLabel: string
-    valueSuffix?: string
-    emptyMessage: string
+    // Format with commas for thousands
+    return (
+      num.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }) + suffix
+    );
+  };
+
+  const RankingCard = ({
+    title,
+    icon: Icon,
+    users,
+    valueLabel,
+    valueSuffix = "",
+    emptyMessage,
+  }: {
+    title: string;
+    icon: any;
+    users: RankingUser[];
+    valueLabel: string;
+    valueSuffix?: string;
+    emptyMessage: string;
   }) => (
     <Card>
       <CardHeader className="pb-4">
@@ -110,21 +120,23 @@ export default function RankingPage() {
         ) : (
           <div className="space-y-2">
             {users.map((user) => (
-              <div 
+              <div
                 key={user.address}
                 className={cn(
                   "flex items-center justify-between p-3 rounded-lg transition-colors hover:bg-muted/50",
-                  user.rank <= 3 && "bg-muted/30"
+                  user.rank <= 3 && "bg-muted/30",
                 )}
               >
                 <div className="flex items-center gap-3">
-                  <span className={cn(
-                    "font-bold min-w-[3ch]",
-                    user.rank <= 3 ? "text-lg" : "text-sm",
-                    user.rank === 1 && "text-yellow-500",
-                    user.rank === 2 && "text-gray-400",
-                    user.rank === 3 && "text-amber-600"
-                  )}>
+                  <span
+                    className={cn(
+                      "font-bold min-w-[3ch]",
+                      user.rank <= 3 ? "text-lg" : "text-sm",
+                      user.rank === 1 && "text-yellow-500",
+                      user.rank === 2 && "text-gray-400",
+                      user.rank === 3 && "text-amber-600",
+                    )}
+                  >
                     {getRankBadge(user.rank)}
                   </span>
                   <a
@@ -148,7 +160,7 @@ export default function RankingPage() {
         )}
       </CardContent>
     </Card>
-  )
+  );
 
   return (
     <div className="min-h-screen pb-12">
@@ -159,7 +171,10 @@ export default function RankingPage() {
         </div>
 
         {/* Timeframe Tabs */}
-        <Tabs value={timeframe} onValueChange={(value) => setTimeframe(value as 'month' | 'all')}>
+        <Tabs
+          value={timeframe}
+          onValueChange={(value) => setTimeframe(value as "month" | "all")}
+        >
           <TabsList className="grid w-full max-w-md grid-cols-2 my-3 mb-8">
             <TabsTrigger value="month">Este Mes</TabsTrigger>
             <TabsTrigger value="all">Todos los Tiempos</TabsTrigger>
@@ -171,9 +186,11 @@ export default function RankingPage() {
                 <RankingSkeleton />
               ) : error || !data ? (
                 <div className="py-20 text-center">
-                  <p className="text-red-500 mb-4">{error || 'Failed to load rankings'}</p>
-                  <button 
-                    onClick={() => window.location.reload()} 
+                  <p className="text-red-500 mb-4">
+                    {error || "Failed to load rankings"}
+                  </p>
+                  <button
+                    onClick={() => window.location.reload()}
                     className="text-electric-purple hover:underline"
                   >
                     Intentar de nuevo
@@ -213,9 +230,11 @@ export default function RankingPage() {
                 <RankingSkeleton />
               ) : error || !data ? (
                 <div className="py-20 text-center">
-                  <p className="text-red-500 mb-4">{error || 'Failed to load rankings'}</p>
-                  <button 
-                    onClick={() => window.location.reload()} 
+                  <p className="text-red-500 mb-4">
+                    {error || "Failed to load rankings"}
+                  </p>
+                  <button
+                    onClick={() => window.location.reload()}
                     className="text-electric-purple hover:underline"
                   >
                     Intentar de nuevo
@@ -253,5 +272,5 @@ export default function RankingPage() {
         </Tabs>
       </div>
     </div>
-  )
+  );
 }

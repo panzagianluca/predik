@@ -1,6 +1,7 @@
 # Mobile Strategy for Predik
 
 ## 🎯 Core Principle: DESKTOP FIRST, MOBILE ADAPTIVE
+
 **CRITICAL: Desktop layout is PERFECT. All mobile work must be additive only.**
 
 ---
@@ -8,6 +9,7 @@
 ## 📱 Viewport Configuration
 
 ### Meta Tags (Configured in `app/layout.tsx`)
+
 ```typescript
 viewport: {
   width: "device-width",
@@ -18,6 +20,7 @@ viewport: {
 ```
 
 **Why these values:**
+
 - `width: device-width` - Proper mobile viewport
 - `initialScale: 1` - No zoom on load
 - `maximumScale: 5` - Allow users to zoom (accessibility)
@@ -28,6 +31,7 @@ viewport: {
 ## 📐 Breakpoints System
 
 ### Tailwind Breakpoints (Mobile-First)
+
 Configured in `tailwind.config.ts`:
 
 ```typescript
@@ -42,6 +46,7 @@ screens: {
 ```
 
 ### Usage Pattern
+
 ```tsx
 // Mobile-first approach: base styles apply to mobile, then override for larger screens
 <div className="w-full md:w-auto">        // Full width on mobile, auto on desktop
@@ -57,34 +62,43 @@ screens: {
 ### Added to `globals.css`:
 
 #### Touch Targets
+
 ```css
 .touch-target
 ```
+
 - Ensures minimum 44x44px tap targets (Apple HIG & Material Design standard)
 - Use on all interactive elements (buttons, links, etc.)
 
 #### Mobile Padding
+
 ```css
 .mobile-padding
 ```
+
 - Consistent mobile spacing (px-4 py-3)
 - Use for cards and containers on mobile
 
 #### Mobile Text
+
 ```css
 .mobile-text-base
 ```
+
 - Clamps text between 16px-18px (prevents mobile browser zoom on input focus)
 - Use for form inputs and body text
 
 #### Mobile Scrolling
+
 ```css
 .mobile-scroll
 ```
+
 - Smooth touch scrolling on iOS
 - Prevents overscroll bounce issues
 
 #### Visibility Helpers
+
 ```css
 .mobile-hidden  // Hide on mobile, show on desktop (md+)
 .mobile-only    // Show on mobile, hide on desktop
@@ -97,6 +111,7 @@ screens: {
 ## 🚀 Mobile Development Workflow
 
 ### 1. Before Touching Any Component:
+
 ```bash
 # Test desktop first - ensure it still works
 # Open http://localhost:3000 on desktop browser
@@ -104,6 +119,7 @@ screens: {
 ```
 
 ### 2. Add Mobile Styles:
+
 ```tsx
 // ❌ WRONG - Breaks desktop
 <div className="w-[320px]">
@@ -119,6 +135,7 @@ screens: {
 ```
 
 ### 3. Test Breakpoints:
+
 ```
 Chrome DevTools -> Toggle Device Toolbar (Cmd+Shift+M)
 Test at:
@@ -129,6 +146,7 @@ Test at:
 ```
 
 ### 4. Verify Desktop Unchanged:
+
 ```bash
 # After any mobile work, ALWAYS verify:
 # 1. Desktop layout unchanged
@@ -143,27 +161,32 @@ Test at:
 When making a component mobile-responsive:
 
 ### Layout
+
 - [ ] Component adapts to full width on mobile
 - [ ] Desktop width preserved (no changes to existing `w-[320px]` etc.)
 - [ ] Proper stacking on mobile (flex-col)
 - [ ] Desktop flex-row preserved
 
 ### Touch Targets
+
 - [ ] All buttons min 44x44px on mobile
 - [ ] Touch targets have adequate spacing (min 8px apart)
 - [ ] No tiny tap targets (<44px)
 
 ### Typography
+
 - [ ] Base font size ≥16px (prevents iOS zoom)
 - [ ] Readable text size on mobile
 - [ ] Desktop typography unchanged
 
 ### Spacing
+
 - [ ] Reduced padding on mobile (p-4 instead of p-6)
 - [ ] Adequate margin between sections
 - [ ] Desktop spacing preserved
 
 ### Performance
+
 - [ ] No layout shift on resize
 - [ ] Smooth transitions
 - [ ] No performance regression on desktop
@@ -173,18 +196,21 @@ When making a component mobile-responsive:
 ## 🎯 Priority Components for Mobile
 
 ### Phase 1: Critical Path (Now)
+
 1. **TradingPanel** - Core trading functionality
 2. **Navbar** - Navigation
 3. **MarketCard** - Market browsing
 4. **MarketsGrid** - Market list
 
 ### Phase 2: User Features
+
 5. **Profile** - User profile page
 6. **PositionsList** - User positions
 7. **Comments** - Market discussions
 8. **Notifications** - User notifications
 
 ### Phase 3: Polish
+
 9. **Footer** - Footer navigation
 10. **Modals** - All modal dialogs
 11. **Forms** - Form layouts
@@ -195,6 +221,7 @@ When making a component mobile-responsive:
 ## 🛠️ Testing Strategy
 
 ### Manual Testing
+
 ```
 1. Desktop Chrome (1920x1080) - Reference implementation
 2. Desktop Safari (1920x1080) - Desktop Mac compatibility
@@ -204,12 +231,14 @@ When making a component mobile-responsive:
 ```
 
 ### Automated Testing (Future)
+
 ```bash
 # Playwright visual regression tests at breakpoints
 npm run test:visual -- --grep "responsive"
 ```
 
 ### Performance Budget
+
 - First Contentful Paint: <1.5s (mobile)
 - Time to Interactive: <3.5s (mobile)
 - Layout Shift: <0.1 (both)
@@ -231,18 +260,21 @@ npm run test:visual -- --grep "responsive"
 ## ✅ Best Practices
 
 1. **Always use mobile-first approach:**
+
    ```tsx
    // Base = mobile, md: = desktop
    <div className="p-4 md:p-6">
    ```
 
 2. **Preserve desktop classes:**
+
    ```tsx
    // Keep desktop class, add mobile override
    <div className="w-full md:w-[320px]">
    ```
 
 3. **Test both breakpoints:**
+
    ```bash
    # After any change
    1. Test mobile (375px)
@@ -251,10 +283,11 @@ npm run test:visual -- --grep "responsive"
    ```
 
 4. **Use semantic breakpoints:**
+
    ```tsx
    // ✅ Clear intent
    <div className="mobile-stack">
-   
+
    // ❌ Unclear
    <div className="flex-col md:flex-row">
    ```

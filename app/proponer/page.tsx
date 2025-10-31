@@ -1,125 +1,137 @@
-'use client'
+"use client";
 
-import { useState, useEffect, useRef } from 'react'
-import { ProposalCard } from '@/components/proponer/ProposalCard'
-import { SubmitProposalModal } from '@/components/proponer/SubmitProposalModal'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { ProponerSkeleton, ProponerCardsSkeleton } from '@/components/ui/skeletons/ProponerSkeleton'
-import { Trophy } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useAccount } from 'wagmi'
+import { useState, useEffect, useRef } from "react";
+import { ProposalCard } from "@/components/proponer/ProposalCard";
+import { SubmitProposalModal } from "@/components/proponer/SubmitProposalModal";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  ProponerSkeleton,
+  ProponerCardsSkeleton,
+} from "@/components/ui/skeletons/ProponerSkeleton";
+import { Trophy } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
+import { useAccount } from "wagmi";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
-} from '@/components/animate-ui/components/radix/dialog'
+} from "@/components/animate-ui/components/radix/dialog";
 
-type SortFilter = 'most-voted' | 'recent'
+type SortFilter = "most-voted" | "recent";
 
 interface Proposal {
-  id: string
-  title: string
-  category: string
-  endDate: string
-  source: string | null
-  outcomes: string
-  createdBy: string
-  upvotes: number
-  createdAt: string
+  id: string;
+  title: string;
+  category: string;
+  endDate: string;
+  source: string | null;
+  outcomes: string;
+  createdBy: string;
+  upvotes: number;
+  createdAt: string;
 }
 
 export default function ProponerPage() {
-  const { address } = useAccount()
-  const [proposals, setProposals] = useState<Proposal[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [isListLoading, setIsListLoading] = useState(false)
-  const [sortFilter, setSortFilter] = useState<SortFilter>('most-voted')
-  const [userVotes, setUserVotes] = useState<Set<string>>(new Set())
-  const [topContributors, setTopContributors] = useState<Array<{ address: string; count: number }>>([])
-  const [showContributors, setShowContributors] = useState(false)
-  const hasLoadedRef = useRef(false)
+  const { address } = useAccount();
+  const [proposals, setProposals] = useState<Proposal[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isListLoading, setIsListLoading] = useState(false);
+  const [sortFilter, setSortFilter] = useState<SortFilter>("most-voted");
+  const [userVotes, setUserVotes] = useState<Set<string>>(new Set());
+  const [topContributors, setTopContributors] = useState<
+    Array<{ address: string; count: number }>
+  >([]);
+  const [showContributors, setShowContributors] = useState(false);
+  const hasLoadedRef = useRef(false);
 
   useEffect(() => {
-    const isInitialLoad = !hasLoadedRef.current
-    fetchProposals({ initial: isInitialLoad })
-    hasLoadedRef.current = true
+    const isInitialLoad = !hasLoadedRef.current;
+    fetchProposals({ initial: isInitialLoad });
+    hasLoadedRef.current = true;
     if (address) {
-      fetchUserVotes()
+      fetchUserVotes();
     }
-  }, [sortFilter, address])
+  }, [sortFilter, address]);
 
-  const fetchProposals = async ({ initial = false }: { initial?: boolean } = {}) => {
+  const fetchProposals = async ({
+    initial = false,
+  }: { initial?: boolean } = {}) => {
     if (initial) {
-      setIsLoading(true)
+      setIsLoading(true);
     } else {
-      setIsListLoading(true)
+      setIsListLoading(true);
     }
     try {
       const params = new URLSearchParams({
-        sort: sortFilter
-      })
-      
-      const response = await fetch(`/api/proposals?${params}`)
-      if (!response.ok) throw new Error('Failed to fetch proposals')
-      
-      const data = await response.json()
-      setProposals(data)
-      
+        sort: sortFilter,
+      });
+
+      const response = await fetch(`/api/proposals?${params}`);
+      if (!response.ok) throw new Error("Failed to fetch proposals");
+
+      const data = await response.json();
+      setProposals(data);
+
       // Calculate top contributors
-      const contributorMap = new Map<string, number>()
+      const contributorMap = new Map<string, number>();
       data.forEach((p: Proposal) => {
-        contributorMap.set(p.createdBy, (contributorMap.get(p.createdBy) || 0) + 1)
-      })
-      
+        contributorMap.set(
+          p.createdBy,
+          (contributorMap.get(p.createdBy) || 0) + 1,
+        );
+      });
+
       const sorted = Array.from(contributorMap.entries())
         .map(([address, count]) => ({ address, count }))
         .sort((a, b) => b.count - a.count)
-        .slice(0, 5)
-      
-      setTopContributors(sorted)
+        .slice(0, 5);
+
+      setTopContributors(sorted);
     } catch (error) {
-      console.error('Error fetching proposals:', error)
+      console.error("Error fetching proposals:", error);
     } finally {
       if (initial) {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-      setIsListLoading(false)
+      setIsListLoading(false);
     }
-  }
+  };
 
   const fetchUserVotes = async () => {
-    if (!address) return
-    
+    if (!address) return;
+
     try {
       // Fetch all proposal IDs that the user has voted on
-      const response = await fetch(`/api/proposals/user-votes?voterAddress=${address}`)
+      const response = await fetch(
+        `/api/proposals/user-votes?voterAddress=${address}`,
+      );
       if (response.ok) {
-        const votedProposalIds = await response.json()
-        setUserVotes(new Set(votedProposalIds))
+        const votedProposalIds = await response.json();
+        setUserVotes(new Set(votedProposalIds));
       }
     } catch (error) {
-      console.error('Error fetching user votes:', error)
+      console.error("Error fetching user votes:", error);
     }
-  }
+  };
 
   const handleVote = async (proposalId: string) => {
     // Just refresh proposals to keep counts in sync
     // The ProposalCard component handles the actual voting
-    await fetchProposals()
-  }
+    await fetchProposals();
+  };
 
   const truncateAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`
-  }
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
 
   const sortFilters: Array<{
-    id: SortFilter
-    label: string
+    id: SortFilter;
+    label: string;
   }> = [
-    { id: 'most-voted', label: 'Más Votados' },
-    { id: 'recent', label: 'Recientes' },
-  ]
+    { id: "most-voted", label: "Más Votados" },
+    { id: "recent", label: "Recientes" },
+  ];
 
   return (
     <div className="pb-12">
@@ -149,13 +161,18 @@ export default function ProponerPage() {
                     <CardHeader className="pb-4">
                       <div className="flex items-center gap-2">
                         <Trophy className="h-5 w-5 text-electric-purple" />
-                        <h3 className="text-[16px] font-medium">Mejores Contribuidores</h3>
+                        <h3 className="text-[16px] font-medium">
+                          Mejores Contribuidores
+                        </h3>
                       </div>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
                         {topContributors.map((contributor, index) => (
-                          <div key={contributor.address} className="flex items-center justify-between">
+                          <div
+                            key={contributor.address}
+                            className="flex items-center justify-between"
+                          >
                             <div className="flex items-center gap-2">
                               <span className="text-sm font-bold text-muted-foreground min-w-[1.5ch]">
                                 {index + 1}.
@@ -169,7 +186,9 @@ export default function ProponerPage() {
                                 {truncateAddress(contributor.address)}
                               </a>
                             </div>
-                            <span className="text-sm font-semibold">{contributor.count}</span>
+                            <span className="text-sm font-semibold">
+                              {contributor.count}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -184,16 +203,16 @@ export default function ProponerPage() {
                 <div className="flex flex-wrap items-center gap-2 rounded-lg py-3 mb-4">
                   {/* Sort Filters - Ghost buttons */}
                   {sortFilters.map((filter) => {
-                    const isActive = sortFilter === filter.id
+                    const isActive = sortFilter === filter.id;
                     return (
                       <motion.button
                         key={filter.id}
                         onClick={() => setSortFilter(filter.id)}
                         className={cn(
-                          'px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] relative overflow-hidden',
+                          "px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] relative overflow-hidden",
                           isActive
-                            ? 'text-electric-purple bg-electric-purple/5'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                            ? "text-electric-purple bg-electric-purple/5"
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted",
                         )}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
@@ -208,7 +227,7 @@ export default function ProponerPage() {
                         )}
                         <span className="relative z-10">{filter.label}</span>
                       </motion.button>
-                    )
+                    );
                   })}
 
                   {/* Contribuidores Button - Mobile Only */}
@@ -231,7 +250,8 @@ export default function ProponerPage() {
                 ) : proposals.length === 0 ? (
                   <div className="text-center py-20">
                     <p className="text-muted-foreground text-lg">
-                      No hay propuestas aún. ¡Sé el primero en proponer un mercado!
+                      No hay propuestas aún. ¡Sé el primero en proponer un
+                      mercado!
                     </p>
                   </div>
                 ) : (
@@ -252,7 +272,7 @@ export default function ProponerPage() {
                           transition={{
                             duration: 0.2,
                             delay: index * 0.05,
-                            ease: "easeOut"
+                            ease: "easeOut",
                           }}
                         >
                           <ProposalCard
@@ -274,23 +294,28 @@ export default function ProponerPage() {
 
       {/* Contributors Dialog - Mobile Only */}
       <Dialog open={showContributors} onOpenChange={setShowContributors}>
-        <DialogContent 
+        <DialogContent
           className="sm:max-w-md w-[calc(100%-2rem)] md:w-full p-0 gap-0 max-h-[90vh] overflow-hidden"
           from="top"
-          transition={{ type: 'spring', stiffness: 260, damping: 26 }}
+          transition={{ type: "spring", stiffness: 260, damping: 26 }}
         >
           <DialogTitle className="sr-only">Mejores Contribuidores</DialogTitle>
-          
+
           <div className="p-6">
             <div className="flex items-center gap-2 mb-4">
               <Trophy className="h-5 w-5 text-electric-purple" />
-              <h3 className="text-[18px] font-semibold">Mejores Contribuidores</h3>
+              <h3 className="text-[18px] font-semibold">
+                Mejores Contribuidores
+              </h3>
             </div>
 
             {topContributors.length > 0 ? (
               <div className="space-y-3">
                 {topContributors.map((contributor, index) => (
-                  <div key={contributor.address} className="flex items-center justify-between">
+                  <div
+                    key={contributor.address}
+                    className="flex items-center justify-between"
+                  >
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-bold text-muted-foreground min-w-[1.5ch]">
                         {index + 1}.
@@ -304,7 +329,9 @@ export default function ProponerPage() {
                         {truncateAddress(contributor.address)}
                       </a>
                     </div>
-                    <span className="text-sm font-semibold">{contributor.count}</span>
+                    <span className="text-sm font-semibold">
+                      {contributor.count}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -324,5 +351,5 @@ export default function ProponerPage() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

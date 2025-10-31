@@ -22,9 +22,9 @@ To obtain an API key, please reach out to the Myriad team.
 
 - 5 requests/second per IP and/or API key.
 - Headers included on responses:
-    - `X-RateLimit-Limit`
-    - `X-RateLimit-Remaining`
-    - `X-RateLimit-Reset`
+  - `X-RateLimit-Limit`
+  - `X-RateLimit-Remaining`
+  - `X-RateLimit-Reset`
 
 ## Pagination
 
@@ -52,7 +52,7 @@ Response pagination object:
 
 ## Questions
 
-A question is the canonical proposition (title + expiration), independent of where it’s traded. The same question can have multiple markets across different chains, each with its own liquidity, prices, and activity. 
+A question is the canonical proposition (title + expiration), independent of where it’s traded. The same question can have multiple markets across different chains, each with its own liquidity, prices, and activity.
 
 Questions endpoints return the question with all its markets and a marketCount, letting clients compare performance across chains and build cross‑chain summaries, while trading/price data remains per‑market.
 
@@ -79,9 +79,9 @@ Response data (per question):
 - `id`, `title`, `expiresAt`
 - `marketCount`: number of linked markets
 - `markets`: array of markets with:
-    - `id` (blockchain market id), `slug`, `title`, `description`, `state`, `networkId`
-    - `liquidity`, `volume`, `volume24h`, `imageUrl`, `expiresAt`, `topics`
-    - `outcomes`: array with summary per outcome: `id`, `title`, `price`, `shares`
+  - `id` (blockchain market id), `slug`, `title`, `description`, `state`, `networkId`
+  - `liquidity`, `volume`, `volume24h`, `imageUrl`, `expiresAt`, `topics`
+  - `outcomes`: array with summary per outcome: `id`, `title`, `price`, `shares`
 
 ---
 
@@ -100,9 +100,9 @@ Response (selected fields):
 
 - `id`, `title`, `expiresAt`
 - `markets`: array of markets with:
-    - `id` (blockchain market id), `slug`, `title`, `description`, `state`, `networkId`
-    - `liquidity`, `volume`, `volume24h`, `shares`, `imageUrl`, `expiresAt`, `topics`, `fees`
-    - `outcomes`: array with `id`, `title`, `price`, `shares`, `imageUrl`
+  - `id` (blockchain market id), `slug`, `title`, `description`, `state`, `networkId`
+  - `liquidity`, `volume`, `volume24h`, `shares`, `imageUrl`, `expiresAt`, `topics`, `fees`
+  - `outcomes`: array with `id`, `title`, `price`, `shares`, `imageUrl`
 
 ---
 
@@ -160,10 +160,10 @@ Price charts:
 
 - Field `outcomes[*].price_charts`.
 - Timeframes and buckets
-    - `24h`: 5-minute (max 288)
-    - `7d`: 30-minute (max 336)
-    - `30d`: 4-hour (max 180)
-    - `all`: 4-hour
+  - `24h`: 5-minute (max 288)
+  - `7d`: 30-minute (max 336)
+  - `30d`: 4-hour (max 180)
+  - `all`: 4-hour
 - Series end at `min(now, expiresAt)` with backfill from the last known price before the window start.
 
 Example:
@@ -231,8 +231,8 @@ Response data (per outcome):
 - `outcomeTitle`: string | null
 - `totalHolders`: total addresses with ≥ 1 share in this outcome
 - `holders`: array limited per outcome with:
-    - `user`: address
-    - `shares`: number
+  - `user`: address
+  - `shares`: number
 
 Pagination notes:
 
@@ -345,4 +345,3 @@ Common errors:
 - Markets endpoints with keyword search and charts
 - Market events and user events endpoints with timestamp filtering
 - Historical prices ingestion + charting
-

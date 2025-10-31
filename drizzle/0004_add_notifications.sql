@@ -3,22 +3,22 @@ CREATE TABLE IF NOT EXISTS notifications (
   id SERIAL PRIMARY KEY,
   user_address VARCHAR(42) NOT NULL,
   type VARCHAR(20) NOT NULL CHECK (type IN ('comment_reply', 'market_resolved')),
-  
+
   -- Display content
   title TEXT NOT NULL,
   message TEXT NOT NULL,
   link TEXT NOT NULL,
-  
+
   -- Reference data
   market_slug VARCHAR(255),
   comment_id INTEGER,
   from_user_address VARCHAR(42),
-  
+
   -- State
   is_read BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT NOW(),
   read_at TIMESTAMP,
-  
+
   -- Indexes for performance
   CONSTRAINT notifications_user_address_idx CHECK (user_address = LOWER(user_address)),
   CONSTRAINT notifications_from_user_address_idx CHECK (from_user_address IS NULL OR from_user_address = LOWER(from_user_address))

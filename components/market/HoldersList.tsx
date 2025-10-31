@@ -1,78 +1,78 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { LogoSpinner } from '@/components/ui/logo-spinner'
+import { useEffect, useState } from "react";
+import { LogoSpinner } from "@/components/ui/logo-spinner";
 
 interface Holder {
-  address: string
-  shares: string
-  usdValue: string
+  address: string;
+  shares: string;
+  usdValue: string;
 }
 
 interface Outcome {
-  id: number
-  title: string
-  price: number
-  holders: Holder[]
+  id: number;
+  title: string;
+  price: number;
+  holders: Holder[];
 }
 
 interface HoldersData {
-  marketId: number
-  outcomes: Outcome[]
-  cachedAt: string
+  marketId: number;
+  outcomes: Outcome[];
+  cachedAt: string;
 }
 
 interface HoldersListProps {
-  marketSlug: string
+  marketSlug: string;
 }
 
 export function HoldersList({ marketSlug }: HoldersListProps) {
-  const [data, setData] = useState<HoldersData | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [data, setData] = useState<HoldersData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchHolders = async () => {
       try {
-        setIsLoading(true)
-        const response = await fetch(`/api/markets/${marketSlug}/holders`)
-        
+        setIsLoading(true);
+        const response = await fetch(`/api/markets/${marketSlug}/holders`);
+
         if (!response.ok) {
-          throw new Error('Failed to fetch holders')
+          throw new Error("Failed to fetch holders");
         }
 
-        const holdersData = await response.json()
-        setData(holdersData)
+        const holdersData = await response.json();
+        setData(holdersData);
       } catch (err) {
-        console.error('Error fetching holders:', err)
-        setError(err instanceof Error ? err.message : 'Failed to load holders')
+        console.error("Error fetching holders:", err);
+        setError(err instanceof Error ? err.message : "Failed to load holders");
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchHolders()
-  }, [marketSlug])
+    fetchHolders();
+  }, [marketSlug]);
 
   const truncateAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`
-  }
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <LogoSpinner size={40} />
       </div>
-    )
+    );
   }
 
   if (error || !data) {
     return (
       <div className="py-12 text-center text-muted-foreground">
-        <p>{error || 'No se pudieron cargar los holders'}</p>
+        <p>{error || "No se pudieron cargar los holders"}</p>
         <p className="text-sm mt-2">Intenta recargar la página</p>
       </div>
-    )
+    );
   }
 
   // Ensure we have exactly 2 outcomes
@@ -81,10 +81,10 @@ export function HoldersList({ marketSlug }: HoldersListProps) {
       <div className="py-12 text-center text-muted-foreground">
         <p>Este mercado no tiene el formato esperado de outcomes</p>
       </div>
-    )
+    );
   }
 
-  const [outcome1, outcome2] = data.outcomes
+  const [outcome1, outcome2] = data.outcomes;
 
   return (
     <div className="py-6">
@@ -106,13 +106,19 @@ export function HoldersList({ marketSlug }: HoldersListProps) {
             <tbody>
               {outcome1.holders.length === 0 ? (
                 <tr>
-                  <td colSpan={2} className="py-8 text-center text-sm text-muted-foreground">
+                  <td
+                    colSpan={2}
+                    className="py-8 text-center text-sm text-muted-foreground"
+                  >
                     No hay holders aún
                   </td>
                 </tr>
               ) : (
                 outcome1.holders.map((holder, index) => (
-                  <tr key={holder.address} className="hover:bg-muted/50 transition-colors">
+                  <tr
+                    key={holder.address}
+                    className="hover:bg-muted/50 transition-colors"
+                  >
                     <td className="py-3 px-4">
                       <span className="text-sm">
                         {truncateAddress(holder.address)}
@@ -146,13 +152,19 @@ export function HoldersList({ marketSlug }: HoldersListProps) {
             <tbody>
               {outcome2.holders.length === 0 ? (
                 <tr>
-                  <td colSpan={2} className="py-8 text-center text-sm text-muted-foreground">
+                  <td
+                    colSpan={2}
+                    className="py-8 text-center text-sm text-muted-foreground"
+                  >
                     No hay holders aún
                   </td>
                 </tr>
               ) : (
                 outcome2.holders.map((holder, index) => (
-                  <tr key={holder.address} className="hover:bg-muted/50 transition-colors">
+                  <tr
+                    key={holder.address}
+                    className="hover:bg-muted/50 transition-colors"
+                  >
                     <td className="py-3 px-4">
                       <span className="text-sm">
                         {truncateAddress(holder.address)}
@@ -174,11 +186,11 @@ export function HoldersList({ marketSlug }: HoldersListProps) {
       {/* Cache info */}
       <div className="mt-6 pt-4 border-t border-border text-center">
         <p className="text-xs text-muted-foreground">
-          Datos actualizados: {new Date(data.cachedAt).toLocaleString('es-AR')}
+          Datos actualizados: {new Date(data.cachedAt).toLocaleString("es-AR")}
           <span className="mx-2">•</span>
           Actualización cada hora
         </p>
       </div>
     </div>
-  )
+  );
 }

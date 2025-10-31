@@ -7,13 +7,10 @@ export function MarketDetailSkeleton() {
   return (
     <div className="pb-12">
       <div className="max-w-7xl mx-auto">
-        
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_318px] gap-6 pt-6">
-          
           {/* LEFT COLUMN */}
           <div className="space-y-6">
-            
             {/* Title and Badges Section - SAME FOR MOBILE AND DESKTOP */}
             <div className="space-y-3">
               <div className="flex items-center md:items-start gap-3">
@@ -21,13 +18,13 @@ export function MarketDetailSkeleton() {
                 <div className="relative w-16 h-16 rounded-xl bg-muted flex-shrink-0 overflow-hidden">
                   <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                 </div>
-                
+
                 <div className="flex-1 min-w-0 space-y-2">
                   {/* Title Skeleton - 20px mobile, 24px desktop, LEFT aligned */}
                   <div className="h-[20px] md:h-[24px] bg-muted rounded w-3/4 relative overflow-hidden">
                     <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                   </div>
-                  
+
                   {/* Badges Skeleton - Desktop only (inline with title) */}
                   <div className="hidden md:flex items-center gap-2 flex-wrap">
                     <div className="h-7 w-20 bg-muted rounded-full relative overflow-hidden">
@@ -78,7 +75,7 @@ export function MarketDetailSkeleton() {
                 </div>
               </div>
             </div>
-            
+
             {/* Chart Skeleton */}
             <div className="space-y-4">
               <div className="h-[400px] bg-muted rounded-xl relative overflow-hidden">
@@ -125,7 +122,7 @@ export function MarketDetailSkeleton() {
                   </div>
                 ))}
               </div>
-              
+
               {/* Probabilities section */}
               <div className="border-t pt-4 space-y-2">
                 <div className="h-4 w-32 bg-muted rounded mb-2" />
@@ -167,13 +164,12 @@ export function MarketDetailSkeleton() {
 
           {/* RIGHT COLUMN - DESKTOP ONLY */}
           <div className="space-y-6 hidden lg:block">
-            
             {/* Trading Panel Skeleton */}
             <div className="bg-card border border-border rounded-xl p-4 space-y-4">
               <div className="h-6 w-32 bg-muted rounded relative overflow-hidden">
                 <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
               </div>
-              
+
               {/* Outcomes */}
               <div className="space-y-3">
                 <div className="h-16 bg-muted rounded relative overflow-hidden">
@@ -183,7 +179,7 @@ export function MarketDetailSkeleton() {
                   <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                 </div>
               </div>
-              
+
               {/* Amount input */}
               <div>
                 <div className="h-4 w-20 bg-muted rounded mb-2" />
@@ -191,7 +187,7 @@ export function MarketDetailSkeleton() {
                   <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                 </div>
               </div>
-              
+
               {/* Summary section */}
               <div className="border-t pt-4 space-y-2">
                 <div className="h-4 w-24 bg-muted rounded mb-2" />
@@ -204,7 +200,7 @@ export function MarketDetailSkeleton() {
                   <div className="h-4 w-20 bg-muted rounded" />
                 </div>
               </div>
-              
+
               {/* Button */}
               <div className="h-12 bg-muted rounded relative overflow-hidden">
                 <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
@@ -224,7 +220,7 @@ export function MarketDetailSkeleton() {
                   </div>
                 ))}
               </div>
-              
+
               {/* Probabilities section */}
               <div className="border-t pt-4 space-y-2">
                 <div className="h-4 w-32 bg-muted rounded mb-2" />
@@ -254,5 +250,5 @@ export function MarketDetailSkeleton() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,103 +1,117 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/animate-ui/components/radix/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Plus, X } from 'lucide-react'
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/animate-ui/components/radix/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Plus, X } from "lucide-react";
 
 interface SubmitProposalModalProps {
-  userAddress?: string
-  onProposalCreated?: () => void
+  userAddress?: string;
+  onProposalCreated?: () => void;
 }
 
-export function SubmitProposalModal({ userAddress, onProposalCreated }: SubmitProposalModalProps) {
-  const [open, setOpen] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+export function SubmitProposalModal({
+  userAddress,
+  onProposalCreated,
+}: SubmitProposalModalProps) {
+  const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    title: '',
-    category: '',
-    endDate: '',
-    source: '',
-    outcomes: ['Sí', 'No']
-  })
+    title: "",
+    category: "",
+    endDate: "",
+    source: "",
+    outcomes: ["Sí", "No"],
+  });
 
   const categories = [
-    { value: 'Deportes', label: 'Deportes' },
-    { value: 'Economía', label: 'Economía' },
-    { value: 'Política', label: 'Política' },
-    { value: 'Crypto', label: 'Crypto' },
-    { value: 'Cultura', label: 'Cultura' }
-  ]
+    { value: "Deportes", label: "Deportes" },
+    { value: "Economía", label: "Economía" },
+    { value: "Política", label: "Política" },
+    { value: "Crypto", label: "Crypto" },
+    { value: "Cultura", label: "Cultura" },
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     if (!userAddress) {
-      alert('Por favor conecta tu wallet para proponer un mercado')
-      return
+      alert("Por favor conecta tu wallet para proponer un mercado");
+      return;
     }
 
     if (!formData.title || !formData.category || !formData.endDate) {
-      alert('Por favor completa todos los campos requeridos')
-      return
+      alert("Por favor completa todos los campos requeridos");
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
-      const response = await fetch('/api/proposals', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/proposals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
-          createdBy: userAddress
-        })
-      })
+          createdBy: userAddress,
+        }),
+      });
 
       if (!response.ok) {
-        throw new Error('Failed to create proposal')
+        throw new Error("Failed to create proposal");
       }
 
       // Reset form and close modal
       setFormData({
-        title: '',
-        category: '',
-        endDate: '',
-        source: '',
-        outcomes: ['Sí', 'No']
-      })
-      setOpen(false)
-      
+        title: "",
+        category: "",
+        endDate: "",
+        source: "",
+        outcomes: ["Sí", "No"],
+      });
+      setOpen(false);
+
       // Notify parent to refresh proposals
-      onProposalCreated?.()
+      onProposalCreated?.();
     } catch (error) {
-      console.error('Error creating proposal:', error)
-      alert('Error al crear la propuesta. Por favor intenta de nuevo.')
+      console.error("Error creating proposal:", error);
+      alert("Error al crear la propuesta. Por favor intenta de nuevo.");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const handleOutcomeChange = (index: number, value: string) => {
-    const newOutcomes = [...formData.outcomes]
-    newOutcomes[index] = value
-    setFormData({ ...formData, outcomes: newOutcomes })
-  }
+    const newOutcomes = [...formData.outcomes];
+    newOutcomes[index] = value;
+    setFormData({ ...formData, outcomes: newOutcomes });
+  };
 
   const addOutcome = () => {
     if (formData.outcomes.length < 5) {
-      setFormData({ ...formData, outcomes: [...formData.outcomes, ''] })
+      setFormData({ ...formData, outcomes: [...formData.outcomes, ""] });
     }
-  }
+  };
 
   const removeOutcome = (index: number) => {
     if (formData.outcomes.length > 2) {
-      const newOutcomes = formData.outcomes.filter((_, i) => i !== index)
-      setFormData({ ...formData, outcomes: newOutcomes })
+      const newOutcomes = formData.outcomes.filter((_, i) => i !== index);
+      setFormData({ ...formData, outcomes: newOutcomes });
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -115,7 +129,7 @@ export function SubmitProposalModal({ userAddress, onProposalCreated }: SubmitPr
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px] w-full max-h-[90vh] overflow-y-auto">
         <DialogTitle>Nueva Propuesta de Mercado</DialogTitle>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           {/* Question/Title */}
           <div className="space-y-2">
@@ -126,16 +140,22 @@ export function SubmitProposalModal({ userAddress, onProposalCreated }: SubmitPr
               id="title"
               placeholder="¿Sucederá esto antes del 2026?"
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
               maxLength={200}
               required
             />
-            <p className="text-xs text-muted-foreground">{formData.title.length}/200</p>
+            <p className="text-xs text-muted-foreground">
+              {formData.title.length}/200
+            </p>
           </div>
 
           {/* Outcomes */}
           <div className="space-y-2">
-            <Label>Opciones del Mercado <span className="text-red-500">*</span></Label>
+            <Label>
+              Opciones del Mercado <span className="text-red-500">*</span>
+            </Label>
             <div className="space-y-2">
               {formData.outcomes.map((outcome, index) => (
                 <div key={index} className="flex gap-2">
@@ -183,7 +203,9 @@ export function SubmitProposalModal({ userAddress, onProposalCreated }: SubmitPr
             </Label>
             <Select
               value={formData.category}
-              onValueChange={(value) => setFormData({ ...formData, category: value })}
+              onValueChange={(value) =>
+                setFormData({ ...formData, category: value })
+              }
               required
             >
               <SelectTrigger>
@@ -208,8 +230,10 @@ export function SubmitProposalModal({ userAddress, onProposalCreated }: SubmitPr
               id="endDate"
               type="date"
               value={formData.endDate}
-              onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-              min={new Date().toISOString().split('T')[0]}
+              onChange={(e) =>
+                setFormData({ ...formData, endDate: e.target.value })
+              }
+              min={new Date().toISOString().split("T")[0]}
               required
             />
           </div>
@@ -222,7 +246,9 @@ export function SubmitProposalModal({ userAddress, onProposalCreated }: SubmitPr
               type="url"
               placeholder="https://ejemplo.com/fuente"
               value={formData.source}
-              onChange={(e) => setFormData({ ...formData, source: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, source: e.target.value })
+              }
             />
           </div>
 
@@ -232,7 +258,7 @@ export function SubmitProposalModal({ userAddress, onProposalCreated }: SubmitPr
             className="w-full"
             disabled={isSubmitting || !userAddress}
           >
-            {isSubmitting ? 'Enviando...' : 'Enviar Propuesta'}
+            {isSubmitting ? "Enviando..." : "Enviar Propuesta"}
           </Button>
 
           {!userAddress && (
@@ -243,5 +269,5 @@ export function SubmitProposalModal({ userAddress, onProposalCreated }: SubmitPr
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

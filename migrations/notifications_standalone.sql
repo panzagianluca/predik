@@ -15,10 +15,10 @@ CREATE TABLE IF NOT EXISTS "notifications" (
 );
 
 -- Add foreign key if notifications table was created
-DO $$ 
+DO $$
 BEGIN
     IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'notifications') THEN
-        ALTER TABLE "notifications" ADD CONSTRAINT "notifications_comment_id_comments_id_fk" 
+        ALTER TABLE "notifications" ADD CONSTRAINT "notifications_comment_id_comments_id_fk"
         FOREIGN KEY ("comment_id") REFERENCES "public"."comments"("id") ON DELETE cascade ON UPDATE no action;
     END IF;
 END $$;

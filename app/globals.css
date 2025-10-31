@@ -4,18 +4,20 @@
 
 /* Satoshi Variable Font */
 @font-face {
-  font-family: 'Satoshi';
-  src: url('/fonts/Satoshi-Variable.woff2') format('woff2'),
-       url('/fonts/Satoshi-Variable.woff') format('woff');
+  font-family: "Satoshi";
+  src:
+    url("/fonts/Satoshi-Variable.woff2") format("woff2"),
+    url("/fonts/Satoshi-Variable.woff") format("woff");
   font-weight: 300 900;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Satoshi';
-  src: url('/fonts/Satoshi-VariableItalic.woff2') format('woff2'),
-       url('/fonts/Satoshi-VariableItalic.woff') format('woff');
+  font-family: "Satoshi";
+  src:
+    url("/fonts/Satoshi-VariableItalic.woff2") format("woff2"),
+    url("/fonts/Satoshi-VariableItalic.woff") format("woff");
   font-weight: 300 900;
   font-style: italic;
   font-display: swap;
@@ -107,38 +109,38 @@
   .touch-target {
     @apply min-h-[44px] min-w-[44px];
   }
-  
+
   /* Mobile-optimized spacing */
   .mobile-padding {
     @apply px-4 py-3;
   }
-  
+
   /* Prevent text from being too small on mobile */
   .mobile-text-base {
     font-size: clamp(16px, 4vw, 18px);
   }
-  
+
   /* Mobile-safe scrolling */
   .mobile-scroll {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
   }
-  
+
   /* Hide on mobile only */
   .mobile-hidden {
     @apply xs:hidden sm:hidden md:block;
   }
-  
+
   /* Show on mobile only */
   .mobile-only {
     @apply xs:block sm:block md:hidden;
   }
-  
+
   /* Mobile full width, desktop auto */
   .mobile-full {
     @apply w-full md:w-auto;
   }
-  
+
   /* Mobile stacked, desktop flex */
   .mobile-stack {
     @apply flex-col md:flex-row;
@@ -146,11 +148,11 @@
 
   /* Hide scrollbars while keeping scroll functionality */
   .scrollbar-hide {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
   .scrollbar-hide::-webkit-scrollbar {
-    display: none;  /* Chrome, Safari and Opera */
+    display: none; /* Chrome, Safari and Opera */
   }
 }
 
@@ -164,7 +166,8 @@
 }
 
 @keyframes pulse-scale {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {
@@ -201,11 +204,11 @@ nav button,
 
 @theme inline {
   @keyframes rainbow {
-  0% {
-    background-position: 0%;
+    0% {
+      background-position: 0%;
     }
-  100% {
-    background-position: 200%;
+    100% {
+      background-position: 200%;
     }
   }
 }

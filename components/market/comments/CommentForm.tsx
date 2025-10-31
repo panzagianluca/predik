@@ -1,17 +1,23 @@
-'use client'
+"use client";
 
-import { useState, useRef } from 'react'
-import { Bold, Italic, Underline, Image as ImageIcon, Send } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { useState, useRef } from "react";
+import {
+  Bold,
+  Italic,
+  Underline,
+  Image as ImageIcon,
+  Send,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface CommentFormProps {
-  marketId: string
-  userAddress?: string
-  avatarUrl?: string
-  parentId?: string
-  onSubmit?: (content: string, gifUrl?: string) => Promise<void>
-  onCancel?: () => void
-  placeholder?: string
+  marketId: string;
+  userAddress?: string;
+  avatarUrl?: string;
+  parentId?: string;
+  onSubmit?: (content: string, gifUrl?: string) => Promise<void>;
+  onCancel?: () => void;
+  placeholder?: string;
 }
 
 export function CommentForm({
@@ -21,80 +27,86 @@ export function CommentForm({
   parentId,
   onSubmit,
   onCancel,
-  placeholder = "Escribe un comentario..."
+  placeholder = "Escribe un comentario...",
 }: CommentFormProps) {
-  const [content, setContent] = useState('')
-  const [gifUrl, setGifUrl] = useState<string>('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const [content, setContent] = useState("");
+  const [gifUrl, setGifUrl] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const maxChars = 300
-  const remaining = maxChars - content.length
+  const maxChars = 300;
+  const remaining = maxChars - content.length;
 
   // Use custom avatar if provided, otherwise generate from address
-  const displayAvatar = avatarUrl || (userAddress ? `https://api.dicebear.com/7.x/identicon/svg?seed=${userAddress}` : null)
+  const displayAvatar =
+    avatarUrl ||
+    (userAddress
+      ? `https://api.dicebear.com/7.x/identicon/svg?seed=${userAddress}`
+      : null);
 
   const insertMarkdown = (before: string, after: string = before) => {
-    const textarea = textareaRef.current
-    if (!textarea) return
+    const textarea = textareaRef.current;
+    if (!textarea) return;
 
-    const start = textarea.selectionStart
-    const end = textarea.selectionEnd
-    const selectedText = content.substring(start, end)
-    const newText = 
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = content.substring(start, end);
+    const newText =
       content.substring(0, start) +
-      before + selectedText + after +
-      content.substring(end)
+      before +
+      selectedText +
+      after +
+      content.substring(end);
 
-    setContent(newText)
-    
+    setContent(newText);
+
     // Restore focus and selection
     setTimeout(() => {
-      textarea.focus()
+      textarea.focus();
       textarea.setSelectionRange(
         start + before.length,
-        start + before.length + selectedText.length
-      )
-    }, 0)
-  }
+        start + before.length + selectedText.length,
+      );
+    }, 0);
+  };
 
   const handleSubmit = async () => {
-    if (!content.trim() || !userAddress) return
-    if (content.length > maxChars) return
+    if (!content.trim() || !userAddress) return;
+    if (content.length > maxChars) return;
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     try {
       if (onSubmit) {
-        await onSubmit(content, gifUrl || undefined)
+        await onSubmit(content, gifUrl || undefined);
       } else {
         // Default API call
-        const response = await fetch('/api/comments', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const response = await fetch("/api/comments", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             marketId,
             userAddress,
             content,
             gifUrl: gifUrl || undefined,
-            parentId
-          })
-        })
+            parentId,
+          }),
+        });
 
-        if (!response.ok) throw new Error('Failed to post comment')
+        if (!response.ok) throw new Error("Failed to post comment");
       }
 
       // Reset form
-      setContent('')
-      setGifUrl('')
-      if (onCancel) onCancel()
+      setContent("");
+      setGifUrl("");
+      if (onCancel) onCancel();
     } catch (error) {
-      console.error('Error posting comment:', error)
-      alert('Error al publicar comentario')
+      console.error("Error posting comment:", error);
+      alert("Error al publicar comentario");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="py-4">
@@ -122,7 +134,7 @@ export function CommentForm({
               "bg-muted/50 border border-border",
               "focus:outline-none focus:ring-2 focus:ring-electric-purple/50",
               "resize-none text-sm",
-              "disabled:opacity-50 disabled:cursor-not-allowed"
+              "disabled:opacity-50 disabled:cursor-not-allowed",
             )}
             disabled={!userAddress || isSubmitting}
             maxLength={maxChars}
@@ -131,9 +143,13 @@ export function CommentForm({
           {/* GIF Preview */}
           {gifUrl && (
             <div className="mt-2 relative max-w-xs">
-              <img src={gifUrl} alt="Selected GIF" className="rounded-lg w-full" />
+              <img
+                src={gifUrl}
+                alt="Selected GIF"
+                className="rounded-lg w-full"
+              />
               <button
-                onClick={() => setGifUrl('')}
+                onClick={() => setGifUrl("")}
                 className="absolute top-2 right-2 bg-black/50 text-white rounded-full p-1 hover:bg-black/70"
               >
                 ✕
@@ -146,7 +162,7 @@ export function CommentForm({
             <div className="flex items-center gap-1">
               {/* Bold */}
               <button
-                onClick={() => insertMarkdown('**')}
+                onClick={() => insertMarkdown("**")}
                 className="p-1.5 rounded hover:bg-muted transition-colors"
                 title="Bold"
                 disabled={!userAddress}
@@ -156,7 +172,7 @@ export function CommentForm({
 
               {/* Italic */}
               <button
-                onClick={() => insertMarkdown('*')}
+                onClick={() => insertMarkdown("*")}
                 className="p-1.5 rounded hover:bg-muted transition-colors"
                 title="Italic"
                 disabled={!userAddress}
@@ -166,7 +182,7 @@ export function CommentForm({
 
               {/* Underline */}
               <button
-                onClick={() => insertMarkdown('__')}
+                onClick={() => insertMarkdown("__")}
                 className="p-1.5 rounded hover:bg-muted transition-colors"
                 title="Underline"
                 disabled={!userAddress}
@@ -178,7 +194,7 @@ export function CommentForm({
 
               {/* GIF Picker - Placeholder for now */}
               <button
-                onClick={() => alert('GIF picker coming soon!')}
+                onClick={() => alert("GIF picker coming soon!")}
                 className="p-1.5 rounded hover:bg-muted transition-colors"
                 title="GIF"
                 disabled={!userAddress}
@@ -189,11 +205,13 @@ export function CommentForm({
 
             {/* Character Count & Post Button */}
             <div className="flex items-center gap-3">
-              <span className={cn(
-                "text-xs",
-                remaining < 50 ? "text-orange-500" : "text-muted-foreground",
-                remaining < 0 && "text-red-500"
-              )}>
+              <span
+                className={cn(
+                  "text-xs",
+                  remaining < 50 ? "text-orange-500" : "text-muted-foreground",
+                  remaining < 0 && "text-red-500",
+                )}
+              >
                 {remaining}/{maxChars}
               </span>
 
@@ -209,15 +227,22 @@ export function CommentForm({
 
               <button
                 onClick={handleSubmit}
-                disabled={!content.trim() || !userAddress || isSubmitting || remaining < 0}
+                disabled={
+                  !content.trim() ||
+                  !userAddress ||
+                  isSubmitting ||
+                  remaining < 0
+                }
                 className={cn(
                   "flex items-center gap-1.5 px-4 py-1.5 rounded-lg",
                   "bg-electric-purple text-white text-sm font-medium",
                   "hover:bg-electric-purple/90 transition-colors",
-                  "disabled:opacity-50 disabled:cursor-not-allowed"
+                  "disabled:opacity-50 disabled:cursor-not-allowed",
                 )}
               >
-                {isSubmitting ? 'Publicando...' : (
+                {isSubmitting ? (
+                  "Publicando..."
+                ) : (
                   <>
                     <Send className="h-3.5 w-3.5" />
                     Publicar
@@ -229,5 +254,5 @@ export function CommentForm({
         </div>
       </div>
     </div>
-  )
+  );
 }

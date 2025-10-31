@@ -9,6 +9,7 @@
 ## 🎯 Core Concept
 
 Predik is a full-stack TypeScript prediction market platform where users can:
+
 - Browse and discover prediction markets
 - Place predictions using on-chain transactions
 - Track portfolio performance
@@ -21,12 +22,14 @@ All prediction markets are deployed on-chain via the Polkamarkets protocol, whil
 ## 🏗️ Technical Stack
 
 ### Frontend Framework
+
 - **Next.js 15** (App Router with React Server Components)
 - **React 19** (latest stable)
 - **TypeScript** (strict mode)
 - **npm** (package manager)
 
 ### Blockchain & Web3
+
 - **Blockchain**: Celo (testnet initially, mainnet for production)
 - **Web3 Library**: Wagmi + Viem
 - **Wallet Connection**: Reown AppKit (formerly Web3Modal) / WalletConnect
@@ -36,16 +39,19 @@ All prediction markets are deployed on-chain via the Polkamarkets protocol, whil
   - Myriad API - Market data, analytics, pricing
 
 ### Database & ORM
+
 - **Database**: PostgreSQL (hosted on Railway)
 - **ORM**: Drizzle ORM
   - Fast, type-safe, minimal overhead
   - Better performance than Prisma for this use case
 
 ### Backend Architecture
+
 - **API Layer**: Next.js Route Handlers (`app/api/**/route.ts`)
 - **No Server Actions** (for now) - using traditional API routes for better separation of concerns
 
 ### UI & Styling
+
 - **Component Library**: Shadcn UI (base components)
 - **Animations**: Animate UI Primitives
   - Installation: `npx shadcn@latest add @animate-ui/primitives-texts-sliding-number`
@@ -53,9 +59,11 @@ All prediction markets are deployed on-chain via the Polkamarkets protocol, whil
 - **Styling**: TailwindCSS
 
 ### State Management
+
 - **Zustand** - Lightweight global state (wallet state, user preferences, UI state)
 
 ### Deployment
+
 - **Hosting**: Vercel
 - **Database**: Railway (PostgreSQL)
 - **Environment**: Edge-compatible where possible
@@ -81,10 +89,12 @@ Text: Contrast-adjusted based on background
 ```
 
 ### Typography
+
 - System font stack (TailwindCSS defaults)
 - Responsive scaling with Tailwind's typography utilities
 
 ### Component Philosophy
+
 - Shadcn base components for consistency
 - Animate UI for micro-interactions (numbers, state changes, transitions)
 - Custom components built on top of Shadcn primitives
@@ -94,44 +104,51 @@ Text: Contrast-adjusted based on background
 ## 📡 Integration Architecture
 
 ### Myriad API Integration
+
 **Base URLs**:
+
 - Staging: `https://api-v1.staging.myriadprotocol.com/`
 - Production: `https://api-v1.myriadprotocol.com/`
 
 **Key Endpoints**:
+
 - `GET /markets` - Fetch all markets (with filters: state, token, network_id)
 - `GET /markets/:slug` - Fetch single market with full details
 
 **Network ID** (Celo):
+
 - Testnet: `11142220` (Celo Sepolia)
 - Mainnet: TBD (Coming soon per API docs)
 
 ### Polkamarkets SDK Integration
 
 **Contract Addresses** (Celo Testnet):
+
 - PredictionMarket: `0x289E3908ECDc3c8CcceC5b6801E758549846Ab19`
 - PredictionMarketQuerier: `0x49c86faa48facCBaC75920Bb0d5Dd955F8678e15`
 
 **Token** (Celo Testnet):
+
 - USDT: `0xf74B14ecbAdC9fBb283Fb3c8ae11E186856eae6f`
 
 **Key SDK Functions**:
+
 ```typescript
 // Initialize
 const polkamarkets = new polkamarketsjs.Application({
   web3Provider,
   web3EventsProvider,
-  web3PrivateKey // optional for wallet bypass
+  web3PrivateKey, // optional for wallet bypass
 });
 
 // Contract instances
 const pm = polkamarkets.getPredictionMarketV3PlusContract({
-  contractAddress: '0x289E...',
-  querierContractAddress: '0x49c8...'
+  contractAddress: "0x289E...",
+  querierContractAddress: "0x49c8...",
 });
 
 const erc20 = polkamarkets.getERC20Contract({
-  contractAddress: '0xf74B...' // USDT
+  contractAddress: "0xf74B...", // USDT
 });
 
 // Core Operations
@@ -224,6 +241,7 @@ NODE_ENV=development
 ## 🚀 Development Workflow
 
 ### Initial Setup
+
 ```bash
 # Install dependencies
 npm install
@@ -246,6 +264,7 @@ npm run dev
 ```
 
 ### Key Scripts
+
 ```json
 {
   "scripts": {
@@ -271,26 +290,26 @@ npm run dev
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "typescript": "^5.x",
-    
+
     "wagmi": "^2.x",
     "viem": "^2.x",
     "@reown/appkit": "^1.x",
     "@reown/appkit-adapter-wagmi": "^1.x",
-    
+
     "polkamarkets-js": "latest",
-    
+
     "drizzle-orm": "^0.33.0",
     "drizzle-kit": "^0.24.0",
     "postgres": "^3.4.0",
-    
+
     "zustand": "^4.x",
-    
+
     "@radix-ui/react-*": "latest",
     "tailwindcss": "^3.4.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "tailwind-merge": "^2.2.0",
-    
+
     "lucide-react": "latest",
     "date-fns": "^3.x"
   },
@@ -308,6 +327,7 @@ npm run dev
 ## 🎯 Core Features (Planned)
 
 ### Phase 1: MVP
+
 - [ ] Market Discovery (browse, filter by state/topic)
 - [ ] Market Details (outcomes, prices, volume, liquidity)
 - [ ] Wallet Connection (Reown AppKit w/ Celo support)
@@ -316,12 +336,14 @@ npm run dev
 - [ ] Claim Winnings (resolved markets)
 
 ### Phase 2: Enhanced UX
+
 - [ ] Real-time price updates
 - [ ] Market search & filtering
 - [ ] Transaction history
 - [ ] Notifications (position updates, market resolutions)
 
 ### Phase 3: Advanced Features
+
 - [ ] Propose custom markets; page where users can submit a market and then other users can vote them
 - [ ] Social features (comments, likes - if implementing backend for this)
 
@@ -330,12 +352,14 @@ npm run dev
 ## 🔄 Data Flow
 
 ### Market Browsing
+
 1. **Client** requests markets from Next.js API route
 2. **API Route** fetches from Myriad API (with caching)
 3. **Client** renders market cards with Shadcn components
 4. **Client** displays real-time prices via Polkamarkets SDK
 
 ### Placing a Prediction
+
 1. **User** connects wallet via Reown AppKit
 2. **Client** checks ERC20 allowance (`erc20.isApproved()`)
 3. **Client** requests approval if needed (`erc20.approve()`)
@@ -344,6 +368,7 @@ npm run dev
 6. **Client** updates UI optimistically, confirms on-chain
 
 ### Portfolio & Claims
+
 1. **Client** fetches user positions (`pm.getPortfolio()`)
 2. **Client** displays claimable markets
 3. **User** claims winnings (`pm.claimWinnings()`)
@@ -417,7 +442,8 @@ npm run dev
 
 ---
 
-**Next Steps**: 
+**Next Steps**:
+
 1. Initialize Next.js 15 project
 2. Setup Drizzle with Railway PostgreSQL
 3. Configure Wagmi + Reown AppKit for Celo
@@ -430,6 +456,7 @@ npm run dev
 ## 🎨 UI Component & Animation Standards
 
 ### Mandatory Component Usage
+
 **ALL UI components MUST use Shadcn UI and Animate UI libraries unless explicitly stated otherwise.**
 
 - **Base Components**: Always use Shadcn UI components as the foundation
@@ -439,14 +466,16 @@ npm run dev
 ### Animation & Transition Requirements
 
 **Default Transition Configuration**:
+
 ```typescript
 transition={{ duration: 0.5, ease: "easeInOut" }}
 ```
 
 **Implementation Rules**:
+
 1. **ALWAYS apply transitions** to interactive components (tabs, modals, drawers, accordions, etc.)
 2. **ALWAYS use available effects** from Animate UI (highlight, auto-height, sliding numbers, etc.)
-3. **If a component lacks animation support**: 
+3. **If a component lacks animation support**:
    - Stop implementation
    - Ask user which Animate UI primitive to install
    - Install the appropriate component before proceeding
@@ -455,6 +484,7 @@ transition={{ duration: 0.5, ease: "easeInOut" }}
 ### Design System Consistency
 
 **Component Reusability Standards**:
+
 - **Reuse existing components** wherever possible
 - **Create variants** instead of new components
 - **Maintain consistent styling** across all UI elements
@@ -462,6 +492,7 @@ transition={{ duration: 0.5, ease: "easeInOut" }}
 - **Follow established patterns** for similar interactions
 
 **Style Consistency Checklist**:
+
 - ✅ Same spacing scale (Tailwind defaults)
 - ✅ Same color palette (Electric Purple primary)
 - ✅ Same border radius values
@@ -472,12 +503,14 @@ transition={{ duration: 0.5, ease: "easeInOut" }}
 - ✅ Same error/success feedback patterns
 
 **Design Goals**:
+
 - **Cohesive**: All components feel part of the same system
 - **Predictable**: Similar actions have similar visual feedback
 - **Polished**: Smooth transitions create premium feel
 - **Performant**: Animations enhance UX without sacrificing speed
 
 **Component Development Workflow**:
+
 1. Check if similar component exists → Reuse/extend it
 2. Choose appropriate Shadcn + Animate UI combination
 3. Apply default transition settings
@@ -486,6 +519,7 @@ transition={{ duration: 0.5, ease: "easeInOut" }}
 6. Ensure consistency with other components
 
 **Prohibited Actions**:
+
 - ❌ Using plain HTML elements when Shadcn components exist
 - ❌ Skipping animations on interactive components
 - ❌ Creating custom components without checking existing ones
@@ -495,5 +529,5 @@ transition={{ duration: 0.5, ease: "easeInOut" }}
 
 ---
 
-**Version**: 1.1  
+**Version**: 1.1
 **Last Updated**: October 4, 2025
