@@ -381,15 +381,14 @@ export function MobileTradingModal({
           slippage: "2%",
         });
 
-        // Execute buy (same as desktop)
-        console.log("🔄 Executing buy transaction...");
-        const buyTx = await predictionMarket.buy({
+        // Execute buy with referral code (same as desktop)
+        console.log("🔄 Executing buy transaction with referral code...");
+        const buyTx = await predictionMarket.referralBuy({
           marketId: market.id,
           outcomeId: selectedOutcome.id,
           value: tradeAmount,
           minOutcomeSharesToBuy: minSharesWithSlippage,
-          referralAddress:
-            process.env.NEXT_PUBLIC_POLKAMARKETS_REFERRAL_CODE || "predik",
+          code: "predik", // Referral code for revenue share
         });
 
         console.log("✅ Buy successful:", buyTx);
@@ -406,12 +405,13 @@ export function MobileTradingModal({
           maxShares: Number(maxShares),
         });
 
-        console.log("🔄 Executing sell transaction...");
-        const sellTx = await predictionMarket.sell({
+        console.log("🔄 Executing sell transaction with referral code...");
+        const sellTx = await predictionMarket.referralSell({
           marketId: market.id,
           outcomeId: selectedOutcome.id,
           value: tradeAmount,
           maxOutcomeSharesToSell: Number(maxShares),
+          code: "predik", // Referral code for revenue share
         });
 
         console.log("✅ Sell successful:", sellTx);

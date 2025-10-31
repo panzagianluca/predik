@@ -498,15 +498,14 @@ export function TradingPanel({
           slippage: "2%",
         });
 
-        // Execute buy
-        console.log("🔄 Executing buy transaction...");
-        const buyTx = await pm.buy({
+        // Execute buy with referral code
+        console.log("🔄 Executing buy transaction with referral code...");
+        const buyTx = await pm.referralBuy({
           marketId: market.id,
           outcomeId: selectedOutcome.id,
           value: tradeAmount,
           minOutcomeSharesToBuy: minSharesWithSlippage,
-          referralAddress:
-            process.env.NEXT_PUBLIC_POLKAMARKETS_REFERRAL_CODE || "predik", // Referral code for revenue share
+          code: "predik", // Referral code for revenue share
         });
 
         console.log("✅ Buy successful:", buyTx);
@@ -522,12 +521,13 @@ export function TradingPanel({
           maxShares: Number(maxShares),
         });
 
-        console.log("🔄 Executing sell transaction...");
-        const sellTx = await pm.sell({
+        console.log("🔄 Executing sell transaction with referral code...");
+        const sellTx = await pm.referralSell({
           marketId: market.id,
           outcomeId: selectedOutcome.id,
           value: tradeAmount,
           maxOutcomeSharesToSell: Number(maxShares),
+          code: "predik", // Referral code for revenue share
         });
 
         console.log("✅ Sell successful:", sellTx);

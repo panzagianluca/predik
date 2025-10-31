@@ -322,19 +322,20 @@ export default function UITestPage() {
         return;
       }
 
-      console.log("🚀 Executing buy...", {
+      console.log("🚀 Executing buy with referral code...", {
         marketId: market.id,
         outcomeId,
         value: buyAmount,
         minShares: minSharesWithSlippage,
       });
 
-      // Execute buy
-      const buyTx = await pm.buy({
+      // Execute buy with referral code
+      const buyTx = await pm.referralBuy({
         marketId: market.id,
         outcomeId,
         value: buyAmount,
         minOutcomeSharesToBuy: minSharesWithSlippage,
+        code: "predik",
       });
 
       console.log("✅ Buy transaction successful:", buyTx);
@@ -411,19 +412,20 @@ export default function UITestPage() {
         value: sellAmount,
       });
 
-      console.log("Selling shares...", {
+      console.log("Selling shares with referral code...", {
         marketId: market.id,
         outcomeId,
         value: sellAmount,
         maxShares,
       });
 
-      // Execute sell
-      await pm.sell({
+      // Execute sell with referral code
+      await pm.referralSell({
         marketId: market.id,
         outcomeId,
         value: sellAmount,
         maxOutcomeSharesToSell: maxShares,
+        code: "predik",
       });
 
       alert(
