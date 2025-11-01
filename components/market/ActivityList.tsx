@@ -124,14 +124,9 @@ export function ActivityList({ marketSlug }: ActivityListProps) {
                 className="hover:bg-muted/50 transition-colors"
               >
                 <td className="py-3 px-4">
-                  <a
-                    href={`https://celo-sepolia.blockscout.com/address/${activity.user}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm hover:text-electric-purple transition-colors"
-                  >
+                  <span className="text-sm text-muted-foreground">
                     {truncateAddress(activity.user)}
-                  </a>
+                  </span>
                 </td>
                 <td className="py-3 px-4">
                   <span
@@ -172,7 +167,7 @@ export function ActivityList({ marketSlug }: ActivityListProps) {
           Última actualización:{" "}
           {new Date(data.cachedAt).toLocaleString("es-AR")}
           <span className="mx-2">•</span>
-          Mostrando actividad de las últimas 12 horas
+          Mostrando actividad de las últimas 24 horas
         </p>
       </div>
     </div>
