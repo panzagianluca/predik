@@ -32,12 +32,13 @@ export function BottomNav() {
       icon: Home,
       isActive: pathname === "/",
     },
-    {
-      label: "Ranking",
-      href: "/ranking",
-      icon: Trophy,
-      isActive: pathname === "/ranking",
-    },
+    // Ranking hidden - requires heavy computation with V2 API
+    // {
+    //   label: "Ranking",
+    //   href: "/ranking",
+    //   icon: Trophy,
+    //   isActive: pathname === "/ranking",
+    // },
     {
       label: "Buscar",
       href: "#",

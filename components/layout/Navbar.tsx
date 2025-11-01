@@ -605,12 +605,13 @@ export function Navbar() {
                               className="w-auto min-w-[160px]"
                               transition={{ duration: 0.2, ease: "easeInOut" }}
                             >
-                              <Link href="/ranking">
+                              {/* Ranking hidden - requires heavy computation with V2 API */}
+                              {/* <Link href="/ranking">
                                 <DropdownMenuItem className="justify-start">
                                   <Trophy className="mr-2 h-4 w-4" />
                                   <span>Ranking</span>
                                 </DropdownMenuItem>
-                              </Link>
+                              </Link> */}
                               <Link href="/proponer">
                                 <DropdownMenuItem className="justify-start">
                                   <Lightbulb className="mr-2 h-4 w-4" />
@@ -795,13 +796,13 @@ export function Navbar() {
 
                                 <DropdownMenuSeparator />
 
-                                {/* Ranking */}
-                                <Link href="/ranking" prefetch={true}>
+                                {/* Ranking hidden - requires heavy computation with V2 API */}
+                                {/* <Link href="/ranking" prefetch={true}>
                                   <DropdownMenuItem className="justify-start">
                                     <Trophy className="mr-2 h-4 w-4" />
                                     <span>Ranking</span>
                                   </DropdownMenuItem>
-                                </Link>
+                                </Link> */}
 
                                 {/* Proponer */}
                                 <Link href="/proponer">
