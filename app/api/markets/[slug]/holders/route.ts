@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getCachedHolders, setCachedHolders } from "@/lib/holdersCache";
 
 const MYRIAD_API_URL =
   process.env.NEXT_PUBLIC_MYRIAD_API_URL || "https://api-v2.myriadprotocol.com";
 const MYRIAD_API_KEY = process.env.MYRIAD_API_KEY!; // SERVER-SIDE ONLY
 const NETWORK_ID = process.env.NEXT_PUBLIC_NETWORK_ID || "56"; // BSC mainnet
-
-// In-memory cache for 5 minutes
-const cache = new Map<string, { data: any; timestamp: number }>();
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 export async function GET(
   request: NextRequest,
@@ -18,11 +15,11 @@ export async function GET(
 
     console.log(`🔍 Fetching holders for market: ${slug}`);
 
-    // Check cache
-    const cached = cache.get(slug);
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    // Check cache (shared)
+    const shared = getCachedHolders(slug);
+    if (shared) {
       console.log(`✅ Cache HIT for ${slug}`);
-      return NextResponse.json(cached.data, {
+      return NextResponse.json(shared, {
         headers: {
           "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
           "X-Cache": "HIT",
@@ -98,8 +95,8 @@ export async function GET(
         .join(", "),
     );
 
-    // Cache for 5 minutes
-    cache.set(slug, { data: holdersData, timestamp: Date.now() });
+    // Cache for 5 minutes (shared)
+    setCachedHolders(slug, holdersData);
 
     return NextResponse.json(holdersData, {
       headers: {
