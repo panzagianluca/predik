@@ -158,7 +158,7 @@ export default function UITestPage() {
             const outcome = market.outcomes[i];
             const sharesRaw = outcomeShares[i];
 
-            const decimals = market.token.decimals || 18;
+            const decimals = market.token?.decimals || 18;
             const sharesFormatted = Number(sharesRaw) / Math.pow(10, decimals);
 
             sharesData[market.id][outcome.id] = sharesFormatted;
@@ -245,6 +245,12 @@ export default function UITestPage() {
         querierContractAddress:
           process.env.NEXT_PUBLIC_PREDICTION_MARKET_QUERIER || "",
       });
+
+      // Guard: Check if market has token info
+      if (!market.token) {
+        alert("❌ Market token information is missing");
+        return;
+      }
 
       // Get ERC20 token contract
       const erc20 = polkamarkets.getERC20Contract({
@@ -606,10 +612,10 @@ export default function UITestPage() {
                             className="hover:border-electric-purple transition-colors overflow-hidden"
                           >
                             {/* Market Banner Image */}
-                            {market.banner_url && (
+                            {market.bannerUrl && (
                               <div className="w-full h-32 overflow-hidden bg-gradient-to-br from-electric-purple/20 to-blue-500/20">
                                 <img
-                                  src={market.banner_url}
+                                  src={market.bannerUrl}
                                   alt={market.title}
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
@@ -622,14 +628,6 @@ export default function UITestPage() {
                             <CardHeader className="pb-3">
                               <CardTitle className="text-lg line-clamp-2 flex items-start gap-2">
                                 <span className="flex-1">{market.title}</span>
-                                {market.verified && (
-                                  <span
-                                    className="text-green-500 text-sm shrink-0"
-                                    title="Verified Market"
-                                  >
-                                    ✓
-                                  </span>
-                                )}
                               </CardTitle>
                               <CardDescription className="space-y-2">
                                 <div className="flex items-center gap-2 flex-wrap">
@@ -637,27 +635,29 @@ export default function UITestPage() {
                                     {market.state.toUpperCase()}
                                   </span>
                                   <span className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded">
-                                    {market.token.symbol}
+                                    {market.token?.symbol || "USDT"}
                                   </span>
-                                  {market.category && (
-                                    <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded">
-                                      {market.category}
-                                    </span>
-                                  )}
-                                  {market.users > 0 && (
-                                    <span className="text-xs text-muted-foreground">
-                                      👥 {market.users} trader
-                                      {market.users !== 1 ? "s" : ""}
-                                    </span>
-                                  )}
+                                  {market.topics &&
+                                    market.topics.length > 0 && (
+                                      <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded">
+                                        {market.topics[0]}
+                                      </span>
+                                    )}
+                                  {market.users !== undefined &&
+                                    market.users > 0 && (
+                                      <span className="text-xs text-muted-foreground">
+                                        👥 {market.users} trader
+                                        {market.users !== 1 ? "s" : ""}
+                                      </span>
+                                    )}
                                 </div>
 
-                                {market.expires_at &&
+                                {market.expiresAt &&
                                   market.state === "open" && (
                                     <div className="text-xs text-muted-foreground">
                                       ⏰ Closes:{" "}
                                       {new Date(
-                                        market.expires_at,
+                                        market.expiresAt,
                                       ).toLocaleDateString("en-US", {
                                         month: "short",
                                         day: "numeric",
@@ -699,16 +699,17 @@ export default function UITestPage() {
                                     💸 Fee:
                                   </span>
                                   <span className="font-semibold">
-                                    {(market.fee * 100).toFixed(1)}%
+                                    {(
+                                      (market.fees?.buy?.fee || 0) * 100
+                                    ).toFixed(1)}
+                                    %
                                   </span>
                                 </div>
                                 <div className="flex justify-between p-2 bg-muted/50 rounded">
                                   <span className="text-muted-foreground">
                                     💬 Comments:
                                   </span>
-                                  <span className="font-semibold">
-                                    {market.comments}
-                                  </span>
+                                  <span className="font-semibold">N/A</span>
                                 </div>
                               </div>
 
@@ -832,22 +833,6 @@ export default function UITestPage() {
                                   })}
                                 </div>
                               </div>
-
-                              {(market.likes > 0 ||
-                                market.votes.up > 0 ||
-                                market.votes.down > 0) && (
-                                <div className="flex items-center gap-3 pt-2 border-t text-xs text-muted-foreground">
-                                  {market.likes > 0 && (
-                                    <span>❤️ {market.likes}</span>
-                                  )}
-                                  {market.votes.up > 0 && (
-                                    <span>👍 {market.votes.up}</span>
-                                  )}
-                                  {market.votes.down > 0 && (
-                                    <span>👎 {market.votes.down}</span>
-                                  )}
-                                </div>
-                              )}
 
                               <div className="pt-2 border-t">
                                 <span className="text-xs text-muted-foreground font-mono">
@@ -1032,7 +1017,7 @@ export default function UITestPage() {
                                 <span>{market.title}</span>
                                 <span className="text-xs text-muted-foreground">
                                   {market.outcomes.length} outcomes •{" "}
-                                  {market.token.symbol}
+                                  {market.token?.symbol || "USDT"}
                                 </span>
                               </div>
                             </DropdownMenuItem>
