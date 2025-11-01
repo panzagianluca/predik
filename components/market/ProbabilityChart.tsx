@@ -309,9 +309,10 @@ export function ProbabilityChart({
 
       outcomes.forEach((outcome, index) => {
         const series = seriesRefs.current.get(outcome.id);
-        const priceChart = outcome.priceCharts?.find(
-          (pc) => pc.timeframe === timeframe,
-        );
+        // Support both priceCharts (camelCase) and price_charts (snake_case)
+        const priceChart = (
+          outcome.priceCharts || (outcome as any).price_charts
+        )?.find((pc: any) => pc.timeframe === timeframe);
 
         if (series && priceChart && priceChart.prices.length > 0) {
           const lastPrice = priceChart.prices[priceChart.prices.length - 1];
@@ -375,9 +376,11 @@ export function ProbabilityChart({
         const series = seriesRefs.current.get(outcome.id);
         if (!series) return;
 
-        const priceChart = outcome.priceCharts?.find(
-          (pc) => pc.timeframe === timeframe,
-        );
+        // Support both priceCharts (camelCase) and price_charts (snake_case)
+        const priceChart = (
+          outcome.priceCharts || (outcome as any).price_charts
+        )?.find((pc: any) => pc.timeframe === timeframe);
+
         if (!priceChart || priceChart.prices.length === 0) return;
 
         const latestPoint = priceChart.prices[priceChart.prices.length - 1];
