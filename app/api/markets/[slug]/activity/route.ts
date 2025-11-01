@@ -58,27 +58,58 @@ export async function GET(
       PM_CONTRACT,
     );
 
-    // Get recent blocks (last ~24 hours on Celo Sepolia = ~17280 blocks at 5s per block)
+    // Get recent blocks (last ~12 hours on Celo Sepolia = ~8640 blocks at 5s per block)
+    // Reduced from 24h to avoid RPC limits
     const latestBlock = Number(await web3.eth.getBlockNumber());
-    const fromBlock = latestBlock - 17280; // Last 24 hours
-
-    console.log(`📊 Querying blocks ${fromBlock} to ${latestBlock}`);
-
-    // Get MarketActionTx events for this market
-    const events = await contract.getPastEvents("MarketActionTx", {
-      fromBlock: fromBlock.toString(),
-      toBlock: "latest",
-      filter: {
-        marketId: [marketId], // Filter by this specific market
-      },
-    });
+    const blocksToQuery = 8640; // Last 12 hours
+    const fromBlock = latestBlock - blocksToQuery;
+    const CHUNK_SIZE = 2000; // Query in chunks of 2000 blocks to avoid RPC limits
 
     console.log(
-      `📝 Found ${events.length} MarketActionTx events for market ${marketId}`,
+      `📊 Querying blocks ${fromBlock} to ${latestBlock} in chunks of ${CHUNK_SIZE}`,
     );
 
+    // Query events in chunks to avoid RPC limits
+    const allEvents: any[] = [];
+    let currentFromBlock = fromBlock;
+
+    while (currentFromBlock <= latestBlock) {
+      const currentToBlock = Math.min(
+        currentFromBlock + CHUNK_SIZE - 1,
+        latestBlock,
+      );
+
+      try {
+        console.log(
+          `📦 Fetching chunk: blocks ${currentFromBlock} to ${currentToBlock}`,
+        );
+
+        const chunkEvents = await contract.getPastEvents("MarketActionTx", {
+          fromBlock: currentFromBlock.toString(),
+          toBlock: currentToBlock.toString(),
+          filter: {
+            marketId: [marketId],
+          },
+        });
+
+        allEvents.push(...chunkEvents);
+        console.log(
+          `✓ Found ${chunkEvents.length} events in this chunk (total: ${allEvents.length})`,
+        );
+      } catch (chunkError) {
+        console.error(
+          `⚠️ Error fetching chunk ${currentFromBlock}-${currentToBlock}:`,
+          chunkError,
+        );
+        // Continue with next chunk even if one fails
+      }
+
+      currentFromBlock = currentToBlock + 1;
+    }
+
+    const events = allEvents;
     console.log(
-      `📝 Found ${events.length} MarketActionTx events for market ${marketId}`,
+      `📝 Found ${events.length} total MarketActionTx events for market ${marketId}`,
     );
 
     // Process events into activities

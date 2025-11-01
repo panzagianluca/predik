@@ -1,18 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import Web3 from "web3";
-import {
-  PREDICTION_MARKET_ABI,
-  MarketAction,
-} from "@/lib/abis/PredictionMarketV3_4";
 
 const MYRIAD_API_URL =
   process.env.NEXT_PUBLIC_MYRIAD_API_URL || "https://api-v2.myriadprotocol.com";
 const MYRIAD_API_KEY = process.env.MYRIAD_API_KEY!; // SERVER-SIDE ONLY
-const PM_CONTRACT = process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS as string;
-const RPC_URL =
-  process.env.NEXT_PUBLIC_RPC_URL || "https://bsc-dataseed.binance.org/";
+const NETWORK_ID = process.env.NEXT_PUBLIC_NETWORK_ID || "56"; // BSC mainnet
 
-// In-memory cache for 5 minutes (real-time updates)
+// In-memory cache for 5 minutes
 const cache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
@@ -23,9 +16,12 @@ export async function GET(
   try {
     const { slug } = await params;
 
+    console.log(`🔍 Fetching holders for market: ${slug}`);
+
     // Check cache
     const cached = cache.get(slug);
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      console.log(`✅ Cache HIT for ${slug}`);
       return NextResponse.json(cached.data, {
         headers: {
           "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
@@ -34,105 +30,71 @@ export async function GET(
       });
     }
 
-    // Fetch market data
+    // Fetch market data first to get marketId
     const marketResponse = await fetch(`${MYRIAD_API_URL}/markets/${slug}`, {
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": MYRIAD_API_KEY, // V2 authentication
+        "x-api-key": MYRIAD_API_KEY,
       },
     });
+
     if (!marketResponse.ok) {
+      console.error(`❌ Market not found: ${slug}`);
       return NextResponse.json({ error: "Market not found" }, { status: 404 });
     }
 
     const market = await marketResponse.json();
     const marketId = market.id;
-    const outcomes = market.outcomes;
 
-    console.log(
-      `🔍 Calculating holders for market ${marketId} from blockchain events...`,
-    );
+    console.log(`� Market ID: ${marketId}, fetching holders from V2 API...`);
 
-    // Initialize Web3
-    const web3 = new Web3(RPC_URL);
-    const contract = new web3.eth.Contract(
-      PREDICTION_MARKET_ABI as any,
-      PM_CONTRACT,
-    );
-
-    // Get ALL MarketActionTx events for this market (from block 0)
-    const events = await contract.getPastEvents("MarketActionTx", {
-      fromBlock: "0",
-      toBlock: "latest",
-      filter: {
-        marketId: [marketId],
+    // Fetch holders from Myriad V2 API
+    const holdersResponse = await fetch(
+      `${MYRIAD_API_URL}/markets/${marketId}/holders?network_id=${NETWORK_ID}&limit=20`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": MYRIAD_API_KEY,
+        },
       },
-    });
-
-    console.log(
-      `📊 Found ${events.length} total transactions for market ${marketId}`,
     );
 
-    // Calculate balances per user per outcome
-    const balances: Record<number, Record<string, bigint>> = {};
-
-    // Initialize outcome balances
-    outcomes.forEach((outcome: any, index: number) => {
-      balances[index] = {};
-    });
-
-    // Process events chronologically
-    for (const event of events) {
-      const { user, action, outcomeId, shares } = event.returnValues as any;
-      const outcomeIndex = Number(outcomeId);
-      const userAddress = (user as string).toLowerCase();
-      const shareAmount = BigInt(shares);
-
-      // Initialize user balance if not exists
-      if (!balances[outcomeIndex][userAddress]) {
-        balances[outcomeIndex][userAddress] = BigInt(0);
-      }
-
-      // Update balance based on action
-      if (Number(action) === MarketAction.BUY) {
-        balances[outcomeIndex][userAddress] += shareAmount;
-      } else if (Number(action) === MarketAction.SELL) {
-        balances[outcomeIndex][userAddress] -= shareAmount;
-      }
-      // Ignore other actions (ADD_LIQUIDITY, REMOVE_LIQUIDITY, etc.)
+    if (!holdersResponse.ok) {
+      console.error(
+        `❌ Failed to fetch holders: ${holdersResponse.status} ${holdersResponse.statusText}`,
+      );
+      throw new Error(`Failed to fetch holders: ${holdersResponse.statusText}`);
     }
 
-    // Convert to holder lists per outcome
+    const holdersApiResponse = await holdersResponse.json();
+
+    console.log(
+      `✅ V2 API returned holders data:`,
+      JSON.stringify(holdersApiResponse, null, 2),
+    );
+
+    // Extract data array from the response - API returns { data: [...], pagination: {...} }
+    const holdersApiData = holdersApiResponse.data || holdersApiResponse;
+
+    // Transform V2 API response to match HoldersList component expectations
+    // V2 returns: { outcomeId, outcomeTitle, totalHolders, holders: [{ user, shares }] }[]
     const holdersData = {
       marketId,
-      outcomes: outcomes.map((outcome: any, index: number) => {
-        // Get all holders with non-zero balance for this outcome
-        const holders = Object.entries(balances[index])
-          .filter(([_, balance]) => balance > BigInt(0))
-          .map(([address, balance]) => ({
-            address,
-            shares: (Number(balance) / 1e6).toFixed(2), // Try 6 decimals like USDT
-          }))
-          .sort((a, b) => parseFloat(b.shares) - parseFloat(a.shares)) // Sort by balance descending
-          .slice(0, 20); // Top 20 holders
-
-        return {
-          id: outcome.id,
-          title: outcome.title,
-          holders,
-        };
-      }),
-      note: "Real-time blockchain data - cached for 5 minutes",
+      outcomes: holdersApiData.map((outcomeData: any) => ({
+        id: outcomeData.outcomeId || outcomeData.outcome_id,
+        title: outcomeData.outcomeTitle || outcomeData.outcome_title,
+        holders: (outcomeData.holders || []).map((holder: any) => ({
+          address: holder.user,
+          shares: holder.shares.toFixed(2), // Format shares to 2 decimal places
+        })),
+      })),
       cachedAt: new Date().toISOString(),
     };
 
     console.log(
-      `✅ Calculated holders:`,
-      outcomes
-        .map(
-          (o: any, i: number) =>
-            `${o.title}: ${holdersData.outcomes[i].holders.length} holders`,
-        )
+      `✅ Transformed holders:`,
+      holdersData.outcomes
+        .map((o: any) => `${o.title}: ${o.holders.length} holders`)
         .join(", "),
     );
 
@@ -146,10 +108,10 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error("❌ Error calculating holders:", error);
+    console.error("❌ Error fetching holders:", error);
     return NextResponse.json(
       {
-        error: "Failed to calculate holders",
+        error: "Failed to fetch holders",
         details: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 },

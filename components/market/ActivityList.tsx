@@ -88,7 +88,7 @@ export function ActivityList({ marketSlug }: ActivityListProps) {
       <div className="py-12 text-center text-muted-foreground">
         <p>No hay actividad reciente en este mercado</p>
         <p className="text-sm mt-2">
-          Las transacciones de las últimas 24h aparecerán acá
+          Las transacciones de las últimas 12h aparecerán acá
         </p>
       </div>
     );
@@ -172,7 +172,7 @@ export function ActivityList({ marketSlug }: ActivityListProps) {
           Última actualización:{" "}
           {new Date(data.cachedAt).toLocaleString("es-AR")}
           <span className="mx-2">•</span>
-          Mostrando actividad de las últimas 24 horas
+          Mostrando actividad de las últimas 12 horas
         </p>
       </div>
     </div>

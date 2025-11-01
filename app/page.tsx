@@ -70,7 +70,7 @@ async function getMarkets() {
       resolvedRes.ok ? resolvedRes.json() : { data: [] },
     ]);
 
-    // Combine all markets and filter out test markets
+    // Combine all markets and filter out test markets and BNB Candles
     const allMarkets = [
       ...(openData.data || []),
       ...(closedData.data || []),
@@ -79,7 +79,10 @@ async function getMarkets() {
       (market) =>
         // Exclude test markets
         !market.title.toLowerCase().includes("test usd") &&
-        !market.slug.includes("test-usd"),
+        !market.slug.includes("test-usd") &&
+        // Exclude BNB Candles markets
+        !market.title.toLowerCase().includes("bnb candles") &&
+        !market.slug.includes("bnb-candles"),
     );
 
     console.log(
