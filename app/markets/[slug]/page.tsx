@@ -29,7 +29,6 @@ import { useAccount } from "wagmi";
 import Image from "next/image";
 import {
   Calendar,
-  Users,
   TrendingUp,
   ExternalLink,
   CheckCircle2,
@@ -288,13 +287,15 @@ export default function MarketDetailPage() {
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Users className="h-4 w-4" />
-                    <span>{market.users} operadores</span>
+                    <TrendingUp className="h-4 w-4" />
+                    <span>
+                      ${(market.volume || 0).toLocaleString()} volumen
+                    </span>
                   </div>
                   <div className="flex items-center gap-1">
                     <TrendingUp className="h-4 w-4" />
                     <span>
-                      ${(market.volume || 0).toLocaleString()} volumen
+                      ${(market.liquidity || 0).toLocaleString()} liquidez
                     </span>
                   </div>
                 </div>

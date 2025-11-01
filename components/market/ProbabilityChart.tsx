@@ -137,24 +137,28 @@ export function ProbabilityChart({
       });
 
       // Find the price chart for the selected timeframe
-      const priceChart = outcome.priceCharts?.find(
-        (pc) => pc.timeframe === timeframe,
-      );
+      // V2 API returns price_charts (snake_case), but we also check priceCharts (camelCase) for compatibility
+      const priceChart = (
+        outcome.priceCharts || (outcome as any).price_charts
+      )?.find((pc: any) => pc.timeframe === timeframe);
 
       console.log(`📊 Chart data for ${outcome.title}:`, {
         currentPrice: outcome.price,
         timeframe,
+        hasPriceCharts: !!outcome.priceCharts,
+        hasPrice_charts: !!(outcome as any).price_charts,
         priceChartFound: !!priceChart,
-        priceCount: priceChart?.prices.length || 0,
-        samplePrices: priceChart?.prices.slice(0, 3),
+        priceCount: priceChart?.prices?.length || 0,
+        samplePrices: priceChart?.prices?.slice(0, 3),
+        allCharts: outcome.priceCharts || (outcome as any).price_charts,
       });
 
-      if (priceChart && priceChart.prices.length > 0) {
+      if (priceChart && priceChart.prices?.length > 0) {
         // Convert to lightweight-charts format and remove duplicates
         const dataMap = new Map<number, number>();
 
         // Use Map to automatically handle duplicates (later values overwrite earlier ones)
-        priceChart.prices.forEach((point) => {
+        priceChart.prices.forEach((point: any) => {
           // Multiply by 100 to convert decimal probability (0.1) to percentage (10)
           dataMap.set(point.timestamp, point.value * 100);
         });
