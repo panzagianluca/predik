@@ -11,6 +11,7 @@ import {
 } from "lightweight-charts";
 import { useTheme } from "next-themes";
 import { LogoSpinner } from "@/components/ui/logo-spinner";
+import { logger } from "@/lib/logger";
 import { Outcome } from "@/types/market";
 
 interface ProbabilityChartProps {
@@ -142,7 +143,7 @@ export function ProbabilityChart({
         outcome.priceCharts || (outcome as any).price_charts
       )?.find((pc: any) => pc.timeframe === timeframe);
 
-      console.log(`📊 Chart data for ${outcome.title}:`, {
+      logger.log(`📊 Chart data for ${outcome.title}:`, {
         currentPrice: outcome.price,
         timeframe,
         hasPriceCharts: !!outcome.priceCharts,
@@ -171,7 +172,7 @@ export function ProbabilityChart({
             value: value,
           }));
 
-        console.log(
+        logger.log(
           `📈 Processed ${data.length} data points for ${outcome.title}:`,
           data.slice(0, 3),
           "...",
@@ -324,7 +325,7 @@ export function ProbabilityChart({
               .timeScale()
               .timeToCoordinate(lastPoint.time as any);
 
-            console.log(`🎯 Marker for ${outcome.title}:`, {
+            logger.log(`🎯 Marker for ${outcome.title}:`, {
               value: lastPoint.value,
               timestamp: lastPoint.time,
               x: xCoordinate,
@@ -342,7 +343,7 @@ export function ProbabilityChart({
         }
       });
 
-      console.log(`📍 Total markers:`, markers);
+      logger.log(`📍 Total markers:`, markers);
       setPulseMarkers(markers);
     };
 

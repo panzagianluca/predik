@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { setCachedHolders, getCachedHolders } from "@/lib/holdersCache";
+import { logger } from "@/lib/logger";
 
 const MYRIAD_API_URL =
   process.env.NEXT_PUBLIC_MYRIAD_API_URL || "https://api-v2.myriadprotocol.com";
@@ -30,7 +31,7 @@ export async function GET(
     const data = await response.json();
 
     // Log to verify price charts are included
-    console.log("📊 Market data for", slug, ":", {
+    logger.log("📊 Market data for", slug, ":", {
       title: data.title,
       outcomesCount: data.outcomes?.length,
       firstOutcomeFields: data.outcomes?.[0]
@@ -78,12 +79,12 @@ export async function GET(
             .filter((m: any) => m.slug !== slug && m.slug !== data.slug)
             .slice(0, 4);
 
-          console.log(
+          logger.log(
             `🔗 Found ${relatedMarkets.length} related markets for ${slug} (topic: ${primaryTopic})`,
           );
         }
       } catch (error) {
-        console.error("Error fetching related markets:", error);
+        logger.error("Error fetching related markets:", error);
         // Don't fail the main request if related markets fail
       }
     }
@@ -132,15 +133,15 @@ export async function GET(
               cachedAt: new Date().toISOString(),
             };
             setCachedHolders(slug, holdersData);
-            console.log(`⚡ Pre-warmed holders cache for ${slug}`);
+            logger.log(`⚡ Pre-warmed holders cache for ${slug}`);
           } catch (err) {
             // ignore
-            console.debug("Pre-warm holders failed:", err);
+            logger.debug("Pre-warm holders failed:", err);
           }
         })();
       }
     } catch (err) {
-      console.debug("holders pre-warm error", err);
+      logger.debug("holders pre-warm error", err);
     }
 
     return NextResponse.json(responseData, {
@@ -149,7 +150,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error("Error fetching market:", error);
+    logger.error("Error fetching market:", error);
     return NextResponse.json(
       { error: "Failed to fetch market" },
       { status: 500 },

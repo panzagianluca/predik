@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCachedHolders, setCachedHolders } from "@/lib/holdersCache";
+import { logger } from "@/lib/logger";
 
 const MYRIAD_API_URL =
   process.env.NEXT_PUBLIC_MYRIAD_API_URL || "https://api-v2.myriadprotocol.com";
@@ -13,12 +14,12 @@ export async function GET(
   try {
     const { slug } = await params;
 
-    console.log(`🔍 Fetching holders for market: ${slug}`);
+    logger.log(`🔍 Fetching holders for market: ${slug}`);
 
     // Check cache (shared)
     const shared = getCachedHolders(slug);
     if (shared) {
-      console.log(`✅ Cache HIT for ${slug}`);
+      logger.log(`✅ Cache HIT for ${slug}`);
       return NextResponse.json(shared, {
         headers: {
           "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
@@ -36,14 +37,14 @@ export async function GET(
     });
 
     if (!marketResponse.ok) {
-      console.error(`❌ Market not found: ${slug}`);
+      logger.error(`❌ Market not found: ${slug}`);
       return NextResponse.json({ error: "Market not found" }, { status: 404 });
     }
 
     const market = await marketResponse.json();
     const marketId = market.id;
 
-    console.log(`� Market ID: ${marketId}, fetching holders from V2 API...`);
+    logger.log(`📊 Market ID: ${marketId}, fetching holders from V2 API...`);
 
     // Fetch holders from Myriad V2 API
     const holdersResponse = await fetch(
@@ -57,7 +58,7 @@ export async function GET(
     );
 
     if (!holdersResponse.ok) {
-      console.error(
+      logger.error(
         `❌ Failed to fetch holders: ${holdersResponse.status} ${holdersResponse.statusText}`,
       );
       throw new Error(`Failed to fetch holders: ${holdersResponse.statusText}`);
@@ -65,7 +66,7 @@ export async function GET(
 
     const holdersApiResponse = await holdersResponse.json();
 
-    console.log(
+    logger.log(
       `✅ V2 API returned holders data:`,
       JSON.stringify(holdersApiResponse, null, 2),
     );
@@ -88,7 +89,7 @@ export async function GET(
       cachedAt: new Date().toISOString(),
     };
 
-    console.log(
+    logger.log(
       `✅ Transformed holders:`,
       holdersData.outcomes
         .map((o: any) => `${o.title}: ${o.holders.length} holders`)
@@ -105,7 +106,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error("❌ Error fetching holders:", error);
+    logger.error("❌ Error fetching holders:", error);
     return NextResponse.json(
       {
         error: "Failed to fetch holders",

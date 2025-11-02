@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { LogoSpinner } from "@/components/ui/logo-spinner";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
+import { logger } from "@/lib/logger";
 
 interface Activity {
   user: string;
@@ -30,27 +31,27 @@ export function ActivityList({ marketSlug }: ActivityListProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log("🎬 ActivityList mounted, fetching activity for:", marketSlug);
+    logger.log("🎬 ActivityList mounted, fetching activity for:", marketSlug);
     const fetchActivity = async () => {
       try {
         setIsLoading(true);
-        console.log("🔄 Fetching activity from API...");
+        logger.log("🔄 Fetching activity from API...");
         const response = await fetch(`/api/markets/${marketSlug}/activity`);
-        console.log("📡 Activity API response:", response.status, response.ok);
+        logger.log("📡 Activity API response:", response.status, response.ok);
 
         if (!response.ok) {
           throw new Error("Failed to fetch activity");
         }
 
         const activityData = await response.json();
-        console.log("📊 Activity data received:", activityData);
-        console.log(
+        logger.log("📊 Activity data received:", activityData);
+        logger.log(
           "📋 Number of activities:",
           activityData.activities?.length || 0,
         );
         setData(activityData);
       } catch (err) {
-        console.error("Error fetching activity:", err);
+        logger.error("Error fetching activity:", err);
         setError(
           err instanceof Error ? err.message : "Failed to load activity",
         );

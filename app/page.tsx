@@ -1,6 +1,7 @@
 import { MarketsGrid } from "@/components/market/MarketsGrid";
 import { LogoSpinner } from "@/components/ui/logo-spinner";
 import { Suspense } from "react";
+import { logger } from "@/lib/logger";
 
 const MYRIAD_API_URL =
   process.env.NEXT_PUBLIC_MYRIAD_API_URL || "https://api-v2.myriadprotocol.com";
@@ -85,7 +86,7 @@ async function getMarkets() {
         !market.slug.includes("bnb-candles"),
     );
 
-    console.log(
+    logger.log(
       "✅ Home page loaded",
       allMarkets.length,
       "markets (open:",
@@ -98,7 +99,7 @@ async function getMarkets() {
     );
     return allMarkets;
   } catch (err) {
-    console.error("Error loading markets:", err);
+    logger.error("Error loading markets:", err);
     return [];
   }
 }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { logger } from "@/lib/logger";
 import { fetchMarket } from "@/lib/myriad/api";
 import { Market } from "@/types/market";
 import { ProbabilityChart } from "@/components/market/ProbabilityChart";
@@ -83,9 +84,9 @@ export default function MarketDetailPage() {
       try {
         const data = await fetchMarket(slug);
         setMarket(data);
-        console.log("📊 Loaded market:", data);
+        logger.log("📊 Loaded market:", data);
       } catch (err) {
-        console.error("Failed to load market:", err);
+        logger.error("Failed to load market:", err);
         setError(err instanceof Error ? err.message : "Failed to load market");
       } finally {
         setIsLoading(false);
@@ -103,7 +104,7 @@ export default function MarketDetailPage() {
       const data = await fetchMarket(slug);
       setMarket(data);
     } catch (err) {
-      console.error("Failed to reload market:", err);
+      logger.error("Failed to reload market:", err);
     }
   };
 

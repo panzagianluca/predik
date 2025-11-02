@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 
 const MYRIAD_API_URL =
   process.env.NEXT_PUBLIC_MYRIAD_API_URL || "https://api-v2.myriadprotocol.com";
@@ -26,7 +27,7 @@ export async function GET(
       });
     }
 
-    console.log(`🔍 Fetching activity for market ${slug} from Myriad API...`);
+    logger.log(`🔍 Fetching activity for market ${slug} from Myriad API...`);
 
     // Calculate 24 hours ago
     const since = Math.floor(Date.now() / 1000) - 24 * 60 * 60;
@@ -42,12 +43,12 @@ export async function GET(
     );
 
     if (!eventsRes.ok) {
-      console.error(`Failed to fetch events: ${eventsRes.status}`);
+      logger.error(`Failed to fetch events: ${eventsRes.status}`);
       throw new Error("Failed to fetch market events");
     }
 
     const eventsData = await eventsRes.json();
-    console.log(`📝 Found ${eventsData.data?.length || 0} events in last 24h`);
+    logger.log(`📝 Found ${eventsData.data?.length || 0} events in last 24h`);
 
     // Transform to our format - only include buy/sell actions
     const activities = (eventsData.data || [])
@@ -70,7 +71,7 @@ export async function GET(
     // Cache the result
     cache.set(slug, { data: result, timestamp: Date.now() });
 
-    console.log(`✅ Found ${activities.length} activities for market ${slug}`);
+    logger.log(`✅ Found ${activities.length} activities for market ${slug}`);
 
     return NextResponse.json(result, {
       headers: {
@@ -79,7 +80,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error("❌ Error fetching activity:", error);
+    logger.error("❌ Error fetching activity:", error);
     return NextResponse.json(
       {
         error: "Failed to fetch market activity",

@@ -19,6 +19,7 @@ import {
   TabsTrigger,
 } from "@/components/animate-ui/components/radix/tabs";
 import { formatUnits } from "viem";
+import { logger } from "@/lib/logger";
 
 // Lazy load heavy components - only load when needed
 const EditProfileModal = dynamic(
@@ -135,7 +136,7 @@ export default function ProfilePage() {
         setUsername(userData.username || "");
       }
     } catch (error) {
-      console.error("Failed to load user profile:", error);
+      logger.error("Failed to load user profile:", error);
     } finally {
       setIsLoadingProfile(false);
     }
@@ -181,7 +182,7 @@ export default function ProfilePage() {
       window.location.reload();
       window.location.reload();
     } catch (error) {
-      console.error("Error updating profile:", error);
+      logger.error("Error updating profile:", error);
       throw error;
     }
   };
