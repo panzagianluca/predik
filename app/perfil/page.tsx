@@ -9,8 +9,13 @@ import { getProfilePicture } from "@/lib/profileUtils";
 import { useUSDTBalance } from "@/hooks/use-usdt-balance";
 import { useUserTransactions } from "@/hooks/use-user-transactions";
 import { Card } from "@/components/ui/card";
-import { Copy, Check, SquarePen } from "lucide-react";
+import { Copy, Check, SquarePen, Link2, Twitter } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  useDynamicContext,
+  useUserWallets,
+} from "@dynamic-labs/sdk-react-core";
+import { Button } from "@/components/ui/button";
 import {
   Tabs,
   TabsContent,
@@ -96,6 +101,10 @@ export default function ProfilePage() {
   const [username, setUsername] = useState<string>("");
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
+  // Dynamic multi-wallet support
+  const { setShowAuthFlow } = useDynamicContext();
+  const userWallets = useUserWallets();
+
   useEffect(() => {
     if (!isConnected) {
       router.push("/");
@@ -148,6 +157,12 @@ export default function ProfilePage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
+  };
+
+  const handleLinkAccount = () => {
+    // Open Dynamic auth flow to link another wallet/account
+    // This allows users to link Google, Twitter, or another wallet
+    setShowAuthFlow(true);
   };
 
   const handleSaveProfile = async (data: {
@@ -269,6 +284,24 @@ export default function ProfilePage() {
                     )}
                   </div>
                 </div>
+              </div>
+
+              {/* Link Account Button */}
+              <div className="mb-4">
+                <Button
+                  onClick={handleLinkAccount}
+                  variant="outline"
+                  size="sm"
+                  className="w-full gap-2"
+                >
+                  <Link2 className="h-4 w-4" />
+                  Vincular Google o Twitter
+                </Button>
+                {userWallets.length > 1 && (
+                  <p className="text-xs text-muted-foreground mt-2 text-center">
+                    {userWallets.length} cuentas vinculadas
+                  </p>
+                )}
               </div>
 
               <div className="border-t border-border my-4" />
