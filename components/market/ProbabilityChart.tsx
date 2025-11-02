@@ -309,35 +309,35 @@ export function ProbabilityChart({
 
       outcomes.forEach((outcome, index) => {
         const series = seriesRefs.current.get(outcome.id);
-        // Support both priceCharts (camelCase) and price_charts (snake_case)
-        const priceChart = (
-          outcome.priceCharts || (outcome as any).price_charts
-        )?.find((pc: any) => pc.timeframe === timeframe);
 
-        if (series && priceChart && priceChart.prices.length > 0) {
-          const lastPrice = priceChart.prices[priceChart.prices.length - 1];
+        if (series) {
+          // Get the actual data displayed on the chart
+          const seriesData = (series as any).data();
 
-          // Convert price and time to chart coordinates
-          const valueInPercentage = lastPrice.value * 100; // Convert to percentage display
-          const yCoordinate = series.priceToCoordinate(valueInPercentage);
-          const xCoordinate = chart
-            .timeScale()
-            .timeToCoordinate(lastPrice.timestamp as any);
+          if (seriesData && seriesData.length > 0) {
+            // Use the last point from the displayed series data
+            const lastPoint = seriesData[seriesData.length - 1];
 
-          console.log(`🎯 Marker for ${outcome.title}:`, {
-            value: lastPrice.value,
-            valueInPercentage,
-            timestamp: lastPrice.timestamp,
-            x: xCoordinate,
-            y: yCoordinate,
-          });
+            // Convert price and time to chart coordinates
+            const yCoordinate = series.priceToCoordinate(lastPoint.value);
+            const xCoordinate = chart
+              .timeScale()
+              .timeToCoordinate(lastPoint.time as any);
 
-          if (yCoordinate !== null && xCoordinate !== null) {
-            markers.push({
+            console.log(`🎯 Marker for ${outcome.title}:`, {
+              value: lastPoint.value,
+              timestamp: lastPoint.time,
               x: xCoordinate,
               y: yCoordinate,
-              color: index === 0 ? "#22c55e" : "#ef4444", // Green for Yes, Red for No
             });
+
+            if (yCoordinate !== null && xCoordinate !== null) {
+              markers.push({
+                x: xCoordinate,
+                y: yCoordinate,
+                color: index === 0 ? "#22c55e" : "#ef4444", // Green for Yes, Red for No
+              });
+            }
           }
         }
       });
@@ -346,8 +346,8 @@ export function ProbabilityChart({
       setPulseMarkers(markers);
     };
 
-    // Initial marker update
-    updatePulseMarkers();
+    // Initial marker update with delay to ensure chart has fully rendered
+    setTimeout(() => updatePulseMarkers(), 100);
 
     // Update markers when chart is resized or panned
     const handleChartUpdate = () => {

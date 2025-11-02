@@ -18,13 +18,11 @@ export function Web3Provider({ children }: { children: ReactNode }) {
         walletConnectors: [EthereumWalletConnectors],
       }}
     >
-      <DynamicWagmiConnector>
-        <WagmiProvider config={config}>
-          <QueryClientProvider client={queryClient}>
-            {children}
-          </QueryClientProvider>
-        </WagmiProvider>
-      </DynamicWagmiConnector>
+      <WagmiProvider config={config}>
+        <QueryClientProvider client={queryClient}>
+          <DynamicWagmiConnector>{children}</DynamicWagmiConnector>
+        </QueryClientProvider>
+      </WagmiProvider>
     </DynamicContextProvider>
   );
 }

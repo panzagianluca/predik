@@ -1,15 +1,18 @@
-import { http, createConfig } from 'wagmi'
-import { bsc } from 'wagmi/chains'
+import { http, createConfig } from "wagmi";
+import { bsc } from "wagmi/chains";
 
 export const config = createConfig({
   chains: [bsc],
+  multiInjectedProviderDiscovery: false,
   transports: {
-    [bsc.id]: http(process.env.NEXT_PUBLIC_RPC_URL || 'https://bsc-dataseed.binance.org/'),
+    [bsc.id]: http(
+      process.env.NEXT_PUBLIC_RPC_URL || "https://bsc-dataseed.binance.org/",
+    ),
   },
-})
+});
 
-declare module 'wagmi' {
+declare module "wagmi" {
   interface Register {
-    config: typeof config
+    config: typeof config;
   }
 }
