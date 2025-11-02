@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { useAccount, useDisconnect } from "wagmi";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -24,6 +25,7 @@ import { getProfilePicture } from "@/lib/profileUtils";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { TutorialDialog } from "./TutorialDialog";
+import { logger } from "@/lib/logger";
 
 interface Notification {
   id: string;
@@ -58,6 +60,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
   const { theme, resolvedTheme, setTheme } = useTheme();
   const { address } = useAccount();
   const { disconnect } = useDisconnect();
+  const { handleLogOut } = useDynamicContext();
   const [mounted, setMounted] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
@@ -213,8 +216,19 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
     onClose();
   };
 
-  const handleLogout = () => {
-    disconnect();
+  const handleLogout = async () => {
+    try {
+      // Use Dynamic's logout if available, otherwise use wagmi disconnect
+      if (handleLogOut) {
+        await handleLogOut();
+      } else {
+        disconnect();
+      }
+    } catch (error) {
+      logger.error("Error during logout:", error);
+      // Fallback to disconnect if Dynamic logout fails
+      disconnect();
+    }
     onClose();
   };
 

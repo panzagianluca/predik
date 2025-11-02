@@ -43,6 +43,7 @@ import { Confetti } from "@/components/ui/confetti";
 import { useUSDTBalance } from "@/hooks/use-usdt-balance";
 import { getProfilePicture } from "@/lib/profileUtils";
 import { useDisconnect, useAccount } from "wagmi";
+import { logger } from "@/lib/logger";
 
 // Lazy load DepositModal - only loads when needed
 const DepositModal = dynamic(
@@ -70,7 +71,7 @@ export function Navbar() {
   const { formatted: usdtBalance, isLoading: isLoadingBalance } =
     useUSDTBalance();
   const { address } = useAccount();
-  const { setShowAuthFlow } = useDynamicContext();
+  const { setShowAuthFlow, handleLogOut } = useDynamicContext();
 
   // Avoid hydration mismatch
   useEffect(() => {
@@ -111,6 +112,22 @@ export function Navbar() {
 
     loadUserAvatar();
   }, [address]);
+
+  // Handle logout - uses Dynamic's handleLogOut for proper cleanup
+  const handleLogout = async () => {
+    try {
+      // Use Dynamic's logout if available, otherwise use wagmi disconnect
+      if (handleLogOut) {
+        await handleLogOut();
+      } else {
+        disconnect();
+      }
+    } catch (error) {
+      logger.error("Error during logout:", error);
+      // Fallback to disconnect if Dynamic logout fails
+      disconnect();
+    }
+  };
 
   // Determine which logo to show
   const logoSrc =
@@ -827,7 +844,7 @@ export function Navbar() {
                           {/* Cerrar Sesión (Disconnect) */}
                           <DropdownMenuItem
                             className="justify-start text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
-                            onClick={() => disconnect()}
+                            onClick={handleLogout}
                           >
                             <LogOut className="mr-2 h-4 w-4" />
                             <span>Cerrar Sesión</span>
