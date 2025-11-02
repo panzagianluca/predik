@@ -28,6 +28,7 @@ import {
   TooltipTrigger,
 } from "@/components/animate-ui/components/animate/tooltip";
 import { LogoSpinner } from "@/components/ui/logo-spinner";
+import { logger } from "@/lib/logger";
 
 interface TradingPanelProps {
   market: Market;
@@ -140,7 +141,7 @@ export function TradingPanel({
         contractAddress: market.token.address,
       });
 
-      console.log("🔍 Loading balance for:", {
+      logger.log("🔍 Loading balance for:", {
         userAddress,
         tokenAddress: market.token.address,
         tokenSymbol: market.token.symbol,
@@ -155,18 +156,18 @@ export function TradingPanel({
           .call();
         const decimals = market.token.decimals || 18;
         const balanceFormatted = Number(balanceWei) / Math.pow(10, decimals);
-        console.log(
+        logger.log(
           "💰 Balance from direct contract call:",
           balanceFormatted,
           market.token.symbol,
         );
         setBalance(balanceFormatted);
       } catch (directErr) {
-        console.error("❌ Direct contract call failed:", directErr);
+        logger.error("❌ Direct contract call failed:", directErr);
         // Fallback to SDK method
         try {
           const tokenBalance = await erc20.getTokenAmount(userAddress!);
-          console.log("💰 Fallback to SDK method:", tokenBalance);
+          logger.log("💰 Fallback to SDK method:", tokenBalance);
           if (
             tokenBalance !== null &&
             tokenBalance !== undefined &&
@@ -174,16 +175,16 @@ export function TradingPanel({
           ) {
             setBalance(tokenBalance);
           } else {
-            console.error("❌ SDK method also returned invalid balance");
+            logger.error("❌ SDK method also returned invalid balance");
             setBalance(0);
           }
         } catch (sdkErr) {
-          console.error("❌ SDK method also failed:", sdkErr);
+          logger.error("❌ SDK method also failed:", sdkErr);
           setBalance(0);
         }
       }
     } catch (err) {
-      console.error("❌ Error loading balance:", err);
+      logger.error("❌ Error loading balance:", err);
       setBalance(0);
     }
   };
@@ -249,7 +250,7 @@ export function TradingPanel({
         setUserPosition(null);
       }
     } catch (err) {
-      console.error("Error loading user position:", err);
+      logger.error("Error loading user position:", err);
       setUserPosition(null);
     }
   };
@@ -288,7 +289,7 @@ export function TradingPanel({
       const tradeAmount = parseFloat(amount);
       const priceFrom = selectedOutcome.price;
 
-      console.log("📊 Calculating trade:", {
+      logger.log("📊 Calculating trade:", {
         type: tradeType,
         marketId: market.id,
         outcomeId: selectedOutcome.id,
@@ -343,7 +344,7 @@ export function TradingPanel({
       // Price impact: difference between current market price and your average fill price
       const priceImpact = ((avgPrice - priceFrom) / priceFrom) * 100;
 
-      console.log("✅ Calculation result:", {
+      logger.log("✅ Calculation result:", {
         shares: shares.toFixed(2),
         avgPrice: (avgPrice * 100).toFixed(2) + "%",
         fee: fee.toFixed(2),
@@ -362,7 +363,7 @@ export function TradingPanel({
         priceImpact,
       });
     } catch (err) {
-      console.error("Calculation error:", err);
+      logger.error("Calculation error:", err);
       setError(
         "No se puede calcular la operación. El mercado puede estar cerrado o tener liquidez insuficiente.",
       );
@@ -396,7 +397,7 @@ export function TradingPanel({
       return;
     }
 
-    console.log("💰 Balance check before trade:", {
+    logger.log("💰 Balance check before trade:", {
       balance,
       balanceType: typeof balance,
       tradeAmount,
@@ -405,7 +406,7 @@ export function TradingPanel({
     });
 
     if (tradeType === "buy" && tradeAmount > balance) {
-      console.log("❌ Insufficient balance check:", {
+      logger.log("❌ Insufficient balance check:", {
         tradeAmount,
         balance,
         comparison: `${tradeAmount} > ${balance}`,
@@ -423,7 +424,7 @@ export function TradingPanel({
     setError(null);
 
     try {
-      console.log("🚀 Starting trade execution:", {
+      logger.log("🚀 Starting trade execution:", {
         type: tradeType,
         marketId: market.id,
         outcomeId: selectedOutcome.id,
@@ -469,19 +470,19 @@ export function TradingPanel({
           spenderAddress,
         });
 
-        console.log("💰 Token approval status:", {
+        logger.log("💰 Token approval status:", {
           isApproved,
           spenderAddress,
           amount: tradeAmount,
         });
 
         if (!isApproved) {
-          console.log("⏳ Approving token spend...");
+          logger.log("⏳ Approving token spend...");
           await erc20.approve({
             address: spenderAddress,
             amount: tradeAmount * 10,
           });
-          console.log("✅ Approval complete");
+          logger.log("✅ Approval complete");
         }
 
         // Calculate shares with slippage
@@ -492,14 +493,14 @@ export function TradingPanel({
         });
         const minSharesWithSlippage = Number(minShares) * 0.98;
 
-        console.log("📊 Buy calculation:", {
+        logger.log("📊 Buy calculation:", {
           minShares: Number(minShares),
           minSharesWithSlippage,
           slippage: "2%",
         });
 
         // Execute buy with referral code
-        console.log("🔄 Executing buy transaction with referral code...");
+        logger.log("🔄 Executing buy transaction with referral code...");
         const buyTx = await pm.referralBuy({
           marketId: market.id,
           outcomeId: selectedOutcome.id,
@@ -508,7 +509,7 @@ export function TradingPanel({
           code: "predik", // Referral code for revenue share
         });
 
-        console.log("✅ Buy successful:", buyTx);
+        logger.log("✅ Buy successful:", buyTx);
       } else {
         // Execute sell
         const maxShares = await pm.calcSellAmount({
@@ -517,11 +518,11 @@ export function TradingPanel({
           value: tradeAmount,
         });
 
-        console.log("📊 Sell calculation:", {
+        logger.log("📊 Sell calculation:", {
           maxShares: Number(maxShares),
         });
 
-        console.log("🔄 Executing sell transaction with referral code...");
+        logger.log("🔄 Executing sell transaction with referral code...");
         const sellTx = await pm.referralSell({
           marketId: market.id,
           outcomeId: selectedOutcome.id,
@@ -530,7 +531,7 @@ export function TradingPanel({
           code: "predik", // Referral code for revenue share
         });
 
-        console.log("✅ Sell successful:", sellTx);
+        logger.log("✅ Sell successful:", sellTx);
       }
 
       // Reset form
@@ -538,7 +539,7 @@ export function TradingPanel({
       setCalculation(null);
 
       // Reload data
-      console.log("🔄 Reloading balance and position...");
+      logger.log("🔄 Reloading balance and position...");
       await loadBalance();
       await loadUserPosition();
 
@@ -546,7 +547,7 @@ export function TradingPanel({
         onTradeComplete();
       }
     } catch (err) {
-      console.error("❌ Trade execution error:", err);
+      logger.error("❌ Trade execution error:", err);
       const message = err instanceof Error ? err.message : "Error desconocido";
       setError(`Operación fallida: ${message}`);
     } finally {

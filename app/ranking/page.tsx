@@ -54,7 +54,7 @@ export default function RankingPage() {
 
         setData({ winners, holders, traders });
       } catch (err) {
-        console.error("Error fetching rankings:", err);
+        logger.error("Error fetching rankings:", err);
         setError(
           err instanceof Error ? err.message : "Failed to load rankings",
         );

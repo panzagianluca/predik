@@ -125,7 +125,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
         setUnreadCount(data.unread_count || 0);
       }
     } catch (error) {
-      console.error("Error fetching unread count:", error);
+      logger.error("Error fetching unread count:", error);
     }
   };
 
@@ -141,7 +141,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
         setUnreadCount(data.unread_count || 0);
       }
     } catch (error) {
-      console.error("Error fetching notifications:", error);
+      logger.error("Error fetching notifications:", error);
     } finally {
       setIsLoadingNotifications(false);
     }
@@ -165,7 +165,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
         setUnreadCount((prev) => Math.max(0, prev - 1));
       }
     } catch (error) {
-      console.error("Error marking notification as read:", error);
+      logger.error("Error marking notification as read:", error);
     }
   };
 
@@ -185,7 +185,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
         setUnreadCount(0);
       }
     } catch (error) {
-      console.error("Error marking all notifications as read:", error);
+      logger.error("Error marking all notifications as read:", error);
     }
   };
 

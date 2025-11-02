@@ -83,21 +83,21 @@ export function CookieConsentBanner() {
 
     // Initialize analytics if accepted
     if (behavioral || analytics) {
-      console.log("✅ Analytics cookies ENABLED - consent saved:", consent);
+      logger.log("✅ Analytics cookies ENABLED - consent saved:", consent);
       await initAnalyticsIfConsented();
     } else {
-      console.log("⚠️ Analytics cookies DISABLED - consent saved:", consent);
+      logger.log("⚠️ Analytics cookies DISABLED - consent saved:", consent);
     }
   };
 
   const acceptAll = () => {
-    console.log("🟢 ACEPTAR TODO clicked - enabling ALL cookies");
+    logger.log("🟢 ACEPTAR TODO clicked - enabling ALL cookies");
     haptics.success();
     saveConsent(true, true, true);
   };
 
   const acceptNecessary = () => {
-    console.log("🟡 SOLO NECESARIAS clicked - disabling analytics");
+    logger.log("🟡 SOLO NECESARIAS clicked - disabling analytics");
     haptics.medium();
     saveConsent(true, false, false);
   };
@@ -281,7 +281,7 @@ export function CookieConsentBanner() {
             <div className="sticky bottom-0 bg-card border-t border-border p-4 flex gap-2">
               <button
                 onClick={() => {
-                  console.log(
+                  logger.log(
                     "💾 GUARDAR clicked - saving current toggle state:",
                     {
                       behavioral: behavioralEnabled,
@@ -296,7 +296,7 @@ export function CookieConsentBanner() {
               </button>
               <button
                 onClick={() => {
-                  console.log(
+                  logger.log(
                     "🟢 ACEPTAR TODO clicked from modal - enabling all toggles and saving",
                   );
                   setBehavioralEnabled(true);
@@ -309,7 +309,7 @@ export function CookieConsentBanner() {
               </button>
               <button
                 onClick={() => {
-                  console.log(
+                  logger.log(
                     "🟡 SOLO NECESARIAS clicked from modal - disabling all analytics",
                   );
                   setBehavioralEnabled(false);

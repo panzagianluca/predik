@@ -4,6 +4,7 @@ import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { logger } from "@/lib/logger";
 import {
   Dialog,
   DialogContent,
@@ -79,7 +80,7 @@ export const MobileSearch = forwardRef<MobileSearchRef>((props, ref) => {
       const data = await response.json();
       setMarkets(data);
     } catch (error) {
-      console.error("Error fetching markets:", error);
+      logger.error("Error fetching markets:", error);
       setMarkets([]);
     } finally {
       setIsLoading(false);

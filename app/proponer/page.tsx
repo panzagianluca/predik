@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { ProposalCard } from "@/components/proponer/ProposalCard";
 import { SubmitProposalModal } from "@/components/proponer/SubmitProposalModal";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { logger } from "@/lib/logger";
 import {
   ProponerSkeleton,
   ProponerCardsSkeleton,
@@ -89,7 +90,7 @@ export default function ProponerPage() {
 
       setTopContributors(sorted);
     } catch (error) {
-      console.error("Error fetching proposals:", error);
+      logger.error("Error fetching proposals:", error);
     } finally {
       if (initial) {
         setIsLoading(false);
@@ -111,7 +112,7 @@ export default function ProponerPage() {
         setUserVotes(new Set(votedProposalIds));
       }
     } catch (error) {
-      console.error("Error fetching user votes:", error);
+      logger.error("Error fetching user votes:", error);
     }
   };
 

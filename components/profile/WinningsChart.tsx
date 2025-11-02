@@ -154,7 +154,7 @@ export function WinningsChart({
       };
     });
 
-    console.log(
+    logger.log(
       "📊 Winnings chart data:",
       dataPoints.slice(0, 5),
       "...",

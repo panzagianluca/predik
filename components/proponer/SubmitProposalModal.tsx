@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, X } from "lucide-react";
+import { logger } from "@/lib/logger";
 
 interface SubmitProposalModalProps {
   userAddress?: string;
@@ -87,7 +88,7 @@ export function SubmitProposalModal({
       // Notify parent to refresh proposals
       onProposalCreated?.();
     } catch (error) {
-      console.error("Error creating proposal:", error);
+      logger.error("Error creating proposal:", error);
       alert("Error al crear la propuesta. Por favor intenta de nuevo.");
     } finally {
       setIsSubmitting(false);

@@ -12,7 +12,7 @@ export async function fetchUserProfile(walletAddress: string) {
       customAvatar: data.customAvatar,
     };
   } catch (error) {
-    console.error("Error fetching user profile:", error);
+    logger.error("Error fetching user profile:", error);
     return null;
   }
 }

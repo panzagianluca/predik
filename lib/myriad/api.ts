@@ -1,4 +1,5 @@
 // Myriad V2 API client (proxied through Next.js API routes to avoid CORS)
+import { logger } from "../logger";
 
 export interface FetchMarketsParams {
   state?: "open" | "closed" | "resolved";
@@ -28,7 +29,7 @@ export async function fetchMarkets(params: FetchMarketsParams = {}) {
   if (params.limit) searchParams.set("limit", String(params.limit));
 
   const url = `/api/markets?${searchParams}`;
-  console.log("🔍 Fetching markets (V2):", url, "params:", params);
+  logger.log("🔍 Fetching markets (V2):", url, "params:", params);
 
   const response = await fetch(url, {
     next: { revalidate: 30 }, // Cache for 30 seconds
@@ -42,7 +43,7 @@ export async function fetchMarkets(params: FetchMarketsParams = {}) {
   }
 
   const data = await response.json();
-  console.log("✅ Received markets:", data.length || 0, "markets");
+  logger.log("✅ Received markets:", data.length || 0, "markets");
   return data;
 }
 

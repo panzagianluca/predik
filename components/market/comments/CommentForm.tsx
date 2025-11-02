@@ -9,6 +9,7 @@ import {
   Send,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 
 interface CommentFormProps {
   marketId: string;
@@ -101,7 +102,7 @@ export function CommentForm({
       setGifUrl("");
       if (onCancel) onCancel();
     } catch (error) {
-      console.error("Error posting comment:", error);
+      logger.error("Error posting comment:", error);
       alert("Error al publicar comentario");
     } finally {
       setIsSubmitting(false);

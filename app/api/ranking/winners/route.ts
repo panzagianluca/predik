@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 
 // Cache for 1 hour
 const cache = new Map<string, { data: any; timestamp: number }>();
@@ -21,7 +22,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    console.log(`🏆 Winners ranking not fully implemented for Myriad V2`);
+    logger.log(`🏆 Winners ranking not fully implemented for Myriad V2`);
 
     // Myriad V2 doesn't have a direct "winners" endpoint
     // Would need to aggregate user portfolios and calculate P&L
@@ -45,7 +46,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("❌ Error fetching winners ranking:", error);
+    logger.error("❌ Error fetching winners ranking:", error);
     return NextResponse.json(
       {
         error: "Failed to fetch winners ranking",

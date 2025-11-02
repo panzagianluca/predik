@@ -1,18 +1,21 @@
-import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { notifications } from '@/lib/db/schema'
-import { eq } from 'drizzle-orm'
+import { NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { notifications } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 export async function POST(request: Request) {
   try {
-    const { searchParams } = new URL(request.url)
-    const userAddress = searchParams.get('userAddress')
+    const { searchParams } = new URL(request.url);
+    const userAddress = searchParams.get("userAddress");
 
     if (!userAddress) {
-      return NextResponse.json({ error: 'User address is required' }, { status: 400 })
+      return NextResponse.json(
+        { error: "User address is required" },
+        { status: 400 },
+      );
     }
 
-    const normalizedAddress = userAddress.toLowerCase()
+    const normalizedAddress = userAddress.toLowerCase();
 
     // Mark all user's notifications as read
     await db
@@ -21,11 +24,14 @@ export async function POST(request: Request) {
         isRead: true,
         readAt: new Date(),
       })
-      .where(eq(notifications.userAddress, normalizedAddress))
+      .where(eq(notifications.userAddress, normalizedAddress));
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error marking all notifications as read:', error)
-    return NextResponse.json({ error: 'Failed to mark all notifications as read' }, { status: 500 })
+    logger.error("Error marking all notifications as read:", error);
+    return NextResponse.json(
+      { error: "Failed to mark all notifications as read" },
+      { status: 500 },
+    );
   }
 }

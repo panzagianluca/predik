@@ -86,7 +86,7 @@ export async function PATCH(
       hasVoted,
     });
   } catch (error) {
-    console.error("Error voting on proposal:", error);
+    logger.error("Error voting on proposal:", error);
     return NextResponse.json(
       { error: "Failed to vote on proposal" },
       { status: 500 },

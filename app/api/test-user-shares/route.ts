@@ -15,7 +15,7 @@ export async function GET() {
 
     for (const address of testAddresses) {
       try {
-        console.log(`\n🔍 Testing ${address}...`);
+        logger.log(`\n🔍 Testing ${address}...`);
         const { liquidityShares, outcomeShares } = await getHolderShares(
           marketId,
           address,
@@ -31,8 +31,8 @@ export async function GET() {
           ),
         });
 
-        console.log(`  ✅ Success! Liquidity:`, liquidityShares.toString());
-        console.log(
+        logger.log(`  ✅ Success! Liquidity:`, liquidityShares.toString());
+        logger.log(
           `  ✅ Outcome Shares:`,
           outcomeShares.map((s) => s.toString()),
         );
@@ -42,7 +42,7 @@ export async function GET() {
           success: false,
           error: err instanceof Error ? err.message : "Unknown error",
         });
-        console.error(`  ❌ Error:`, err);
+        logger.error(`  ❌ Error:`, err);
       }
     }
 

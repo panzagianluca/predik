@@ -167,7 +167,7 @@ export default function EditProfileModal({
       await onSave(data);
       onClose();
     } catch (error) {
-      console.error("Error saving profile:", error);
+      logger.error("Error saving profile:", error);
       setErrors({ ...errors, general: "Error al guardar. Intentá de nuevo." });
     } finally {
       setSaving(false);

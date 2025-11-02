@@ -8,6 +8,7 @@ import {
   MARKET_ACTION_LABELS,
 } from "@/lib/abis/PredictionMarketV3_4";
 import { MarketAction } from "@/lib/abis/PredictionMarketV3_4";
+import { logger } from "@/lib/logger";
 
 // Re-export for convenience
 export { MarketAction } from "@/lib/abis/PredictionMarketV3_4";
@@ -100,7 +101,7 @@ export function useUserTransactions(
             ? currentBlock - blocksToQuery
             : BigInt(0);
 
-        console.log("🔍 Fetching user transactions...", {
+        logger.log("🔍 Fetching user transactions...", {
           userAddress,
           pmContract: PM_CONTRACT,
           fromBlock: fromBlock.toString(),
@@ -118,7 +119,7 @@ export function useUserTransactions(
           toBlock: currentBlock,
         });
 
-        console.log(`📊 Found ${logs.length} transactions for user`);
+        logger.log(`📊 Found ${logs.length} transactions for user`);
 
         // Parse logs into transactions
         const parsedTransactions: UserTransaction[] = logs.map((log) => {
@@ -232,7 +233,7 @@ export function useUserTransactions(
           (pos) => pos.shares > BigInt(0),
         );
 
-        console.log(`📈 Found ${openPositions.length} open positions`);
+        logger.log(`📈 Found ${openPositions.length} open positions`);
 
         setTransactions(parsedTransactions);
         setPositions(openPositions);
@@ -244,7 +245,7 @@ export function useUserTransactions(
           marketsTraded,
         });
       } catch (err) {
-        console.error("❌ Error fetching transactions:", err);
+        logger.error("❌ Error fetching transactions:", err);
         setError(
           err instanceof Error
             ? err

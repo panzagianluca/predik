@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { formatUnits } from "viem";
+import { logger } from "@/lib/logger";
 import {
   TrendingUp,
   TrendingDown,
@@ -184,22 +185,22 @@ export function PositionsList({
 
         const allMarkets: MarketInfo[] = marketsArrays.flat();
 
-        console.log(`Fetched ${allMarkets.length} markets for positions`);
+        logger.log(`Fetched ${allMarkets.length} markets for positions`);
 
         const dataMap = new Map<string, MarketInfo>();
         uniqueMarketIds.forEach((marketId) => {
           const market = allMarkets.find((m) => m.id.toString() === marketId);
           if (market) {
-            console.log(`Found market ${marketId}: ${market.title}`);
+            logger.log(`Found market ${marketId}: ${market.title}`);
             dataMap.set(marketId, market);
           } else {
-            console.log(`Market ${marketId} not found in API`);
+            logger.log(`Market ${marketId} not found in API`);
           }
         });
 
         setMarketData(dataMap);
       } catch (err) {
-        console.error("Error fetching market data:", err);
+        logger.error("Error fetching market data:", err);
       } finally {
         setIsLoadingMarkets(false);
       }

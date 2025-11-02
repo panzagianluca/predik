@@ -21,6 +21,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/animate-ui/components/radix/dropdown-menu";
+import { logger } from "@/lib/logger";
 import {
   ToggleGroup,
   ToggleGroupItem,
@@ -85,7 +86,7 @@ export default function UITestPage() {
         network_id: 56, // BNB Smart Chain Mainnet
       });
       setMarkets(data);
-      console.log("📊 Markets refreshed:", data.length, "markets loaded");
+      logger.log("📊 Markets refreshed:", data.length, "markets loaded");
 
       // Load user shares if connected
       if (isConnected && address) {
@@ -100,12 +101,12 @@ export default function UITestPage() {
 
   const loadUserShares = async (marketsData: Market[]) => {
     if (!address || typeof window === "undefined" || !window.ethereum) {
-      console.log("⚠️ Cannot load shares: no address or ethereum provider");
+      logger.log("⚠️ Cannot load shares: no address or ethereum provider");
       return;
     }
 
     setLoadingShares(true);
-    console.log("🔍 Loading shares for address:", address);
+    logger.log("🔍 Loading shares for address:", address);
 
     try {
       const polkamarketsjs = await import("polkamarkets-js");
@@ -128,7 +129,7 @@ export default function UITestPage() {
           process.env.NEXT_PUBLIC_PREDICTION_MARKET_QUERIER || "",
       });
 
-      console.log(
+      logger.log(
         "📝 PM Contract:",
         process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS,
       );
@@ -137,7 +138,7 @@ export default function UITestPage() {
 
       // Fetch shares for each market using getUserMarketShares
       for (const market of marketsData) {
-        console.log(`\n🔍 Checking market ${market.id}: "${market.title}"`);
+        logger.log(`\n🔍 Checking market ${market.id}: "${market.title}"`);
         sharesData[market.id] = {};
 
         try {
@@ -146,12 +147,12 @@ export default function UITestPage() {
             .getContract()
             .methods.getUserMarketShares(market.id, address)
             .call();
-          console.log(`  Raw user market shares:`, userMarketShares);
+          logger.log(`  Raw user market shares:`, userMarketShares);
 
           const liquidityShares = userMarketShares[0];
           const outcomeShares = userMarketShares[1];
 
-          console.log(`  Liquidity shares: ${liquidityShares}`);
+          logger.log(`  Liquidity shares: ${liquidityShares}`);
 
           // Parse outcome shares array
           for (let i = 0; i < market.outcomes.length; i++) {
@@ -164,19 +165,19 @@ export default function UITestPage() {
             sharesData[market.id][outcome.id] = sharesFormatted;
 
             if (sharesFormatted > 0) {
-              console.log(
+              logger.log(
                 `  ✅ Outcome ${outcome.id} (${
                   outcome.title
                 }): ${sharesFormatted.toFixed(6)} shares`,
               );
             } else {
-              console.log(
+              logger.log(
                 `  ⚪ Outcome ${outcome.id} (${outcome.title}): No shares`,
               );
             }
           }
         } catch (err) {
-          console.error(
+          logger.error(
             `  ❌ Error fetching shares for market ${market.id}:`,
             err,
           );
@@ -188,7 +189,7 @@ export default function UITestPage() {
       }
 
       setUserShares(sharesData);
-      console.log("\n💼 Final user shares data:", sharesData);
+      logger.log("\n💼 Final user shares data:", sharesData);
 
       // Summary
       const totalPositions = Object.values(sharesData).reduce(
@@ -196,9 +197,9 @@ export default function UITestPage() {
           acc + Object.values(marketShares).filter((s) => s > 0).length,
         0,
       );
-      console.log(`📊 Summary: ${totalPositions} active position(s)`);
+      logger.log(`📊 Summary: ${totalPositions} active position(s)`);
     } catch (err) {
-      console.error("❌ Error loading user shares:", err);
+      logger.error("❌ Error loading user shares:", err);
     } finally {
       setLoadingShares(false);
     }
@@ -260,7 +261,7 @@ export default function UITestPage() {
       const buyAmount = 1; // Buy 1 token worth
       const balance = await erc20.getTokenAmount(address);
 
-      console.log("🔍 Pre-buy diagnostics:", {
+      logger.log("🔍 Pre-buy diagnostics:", {
         userAddress: address,
         tokenAddress: market.token.address,
         tokenSymbol: market.token.symbol,
@@ -291,16 +292,16 @@ export default function UITestPage() {
         spenderAddress,
       });
 
-      console.log("💰 Token approval status:", { isApproved, spenderAddress });
+      logger.log("💰 Token approval status:", { isApproved, spenderAddress });
 
       if (!isApproved) {
-        console.log("⏳ Approving token spend...");
+        logger.log("⏳ Approving token spend...");
         const approveTx = await erc20.approve({
           address: spenderAddress,
           amount: buyAmount * 10, // Approve 10x for multiple trades
-          callback: () => console.log("✅ Approval confirmed"),
+          callback: () => logger.log("✅ Approval confirmed"),
         });
-        console.log("✅ Approval transaction:", approveTx);
+        logger.log("✅ Approval transaction:", approveTx);
       }
 
       // Calculate minimum shares to buy
@@ -313,7 +314,7 @@ export default function UITestPage() {
       // Apply 2% slippage tolerance (reduce minShares by 2%)
       const minSharesWithSlippage = Number(minShares) * 0.98;
 
-      console.log("📊 Calculated shares:", {
+      logger.log("📊 Calculated shares:", {
         minShares,
         minSharesNumber: Number(minShares),
         minSharesWithSlippage,
@@ -328,7 +329,7 @@ export default function UITestPage() {
         return;
       }
 
-      console.log("🚀 Executing buy with referral code...", {
+      logger.log("🚀 Executing buy with referral code...", {
         marketId: market.id,
         outcomeId,
         value: buyAmount,
@@ -344,7 +345,7 @@ export default function UITestPage() {
         code: "predik",
       });
 
-      console.log("✅ Buy transaction successful:", buyTx);
+      logger.log("✅ Buy transaction successful:", buyTx);
       alert(
         `✅ Successfully bought shares for outcome ${outcomeId}!\n\nTx: ${
           buyTx?.transactionHash || "pending"
@@ -354,7 +355,7 @@ export default function UITestPage() {
       // Refresh markets to show updated probabilities
       await loadMarkets();
     } catch (err) {
-      console.error("❌ Buy error:", err);
+      logger.error("❌ Buy error:", err);
       const message = err instanceof Error ? err.message : "Unknown error";
       const revertReason =
         typeof err === "object" &&
@@ -364,7 +365,7 @@ export default function UITestPage() {
       const errorDetails =
         typeof err === "object" && err ? JSON.stringify(err, null, 2) : message;
 
-      console.error("Full error details:", errorDetails);
+      logger.error("Full error details:", errorDetails);
 
       alert(
         `❌ Buy transaction failed!\n\n${
@@ -418,7 +419,7 @@ export default function UITestPage() {
         value: sellAmount,
       });
 
-      console.log("Selling shares with referral code...", {
+      logger.log("Selling shares with referral code...", {
         marketId: market.id,
         outcomeId,
         value: sellAmount,
@@ -441,7 +442,7 @@ export default function UITestPage() {
       // Refresh markets to show updated probabilities
       await loadMarkets();
     } catch (err) {
-      console.error("Sell error:", err);
+      logger.error("Sell error:", err);
       alert(
         `Sell failed: ${err instanceof Error ? err.message : "Unknown error"}`,
       );
@@ -890,12 +891,12 @@ export default function UITestPage() {
                                   market.slug,
                                 );
                                 setSelectedMarketDetails(marketDetails);
-                                console.log(
+                                logger.log(
                                   "📊 Loaded market details:",
                                   marketDetails,
                                 );
                               } catch (err) {
-                                console.error(
+                                logger.error(
                                   "Failed to load market details:",
                                   err,
                                 );

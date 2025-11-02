@@ -44,7 +44,7 @@ export function HoldersList({ marketSlug }: HoldersListProps) {
         const holdersData = await response.json();
         setData(holdersData);
       } catch (err) {
-        console.error("Error fetching holders:", err);
+        logger.error("Error fetching holders:", err);
         setError(err instanceof Error ? err.message : "Failed to load holders");
       } finally {
         setIsLoading(false);

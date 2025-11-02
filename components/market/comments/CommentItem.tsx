@@ -52,7 +52,7 @@ export function CommentItem({
     comment.avatarUrl ||
     `https://api.dicebear.com/7.x/identicon/svg?seed=${comment.userAddress}`;
 
-  console.log("CommentItem rendering:", {
+  logger.log("CommentItem rendering:", {
     username: comment.username,
     avatarUrl: comment.avatarUrl,
     generatedAvatarUrl: avatarUrl,

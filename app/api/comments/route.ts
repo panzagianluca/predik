@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { comments, users, commentVotes, notifications } from "@/lib/db/schema";
 import { eq, and, isNull, desc, inArray } from "drizzle-orm";
 import { Comment } from "@/types/comment";
+import { logger } from "@/lib/logger";
 
 // GET /api/comments?market_id=slug&limit=20&offset=0&user_address=0x...
 export async function GET(request: NextRequest) {
@@ -97,7 +98,7 @@ export async function GET(request: NextRequest) {
         : undefined;
       const hasVoted = userVotesSet.has(comment.id);
 
-      console.log("Formatting comment:", {
+      logger.log("Formatting comment:", {
         userAddress: comment.userAddress,
         hasProfile: !!profile,
         profileData: profile,
@@ -133,7 +134,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(formattedComments);
   } catch (error) {
-    console.error("Error fetching comments:", error);
+    logger.error("Error fetching comments:", error);
     return NextResponse.json(
       { error: "Failed to fetch comments" },
       { status: 500 },
@@ -204,7 +205,7 @@ export async function POST(request: NextRequest) {
       .where(eq(users.walletAddress, userAddress.toLowerCase()))
       .limit(1);
 
-    console.log("Creating comment - user profile:", userProfile);
+    logger.log("Creating comment - user profile:", userProfile);
 
     // If this is a reply, create a notification for the parent comment author
     if (parentId) {
@@ -236,7 +237,7 @@ export async function POST(request: NextRequest) {
           fromUserAddress: userAddress.toLowerCase(),
         });
 
-        console.log("✅ Created notification for comment reply");
+        logger.log("✅ Created notification for comment reply");
       }
     }
 
@@ -260,7 +261,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(formattedComment, { status: 201 });
   } catch (error) {
-    console.error("Error creating comment:", error);
+    logger.error("Error creating comment:", error);
     return NextResponse.json(
       { error: "Failed to create comment" },
       { status: 500 },

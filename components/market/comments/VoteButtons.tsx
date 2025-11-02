@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 
 interface VoteButtonsProps {
   commentId: string;
@@ -51,7 +52,7 @@ export function VoteButtons({
         onVoteChange(data.votes, data.hasVoted);
       }
     } catch (error) {
-      console.error("Error voting:", error);
+      logger.error("Error voting:", error);
       // Revert optimistic update
       setHasVoted(hasVoted);
       setVotes(votes);

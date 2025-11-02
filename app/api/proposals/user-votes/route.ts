@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error fetching user votes:", error);
+    logger.error("Error fetching user votes:", error);
     return NextResponse.json(
       { error: "Failed to fetch user votes" },
       { status: 500 },

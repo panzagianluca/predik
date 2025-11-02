@@ -8,30 +8,30 @@ const isDevelopment = process.env.NODE_ENV === "development";
 export const logger = {
   log: (...args: any[]) => {
     if (isDevelopment) {
-      console.log(...args);
+      logger.log(...args);
     }
   },
 
   warn: (...args: any[]) => {
     if (isDevelopment) {
-      console.warn(...args);
+      logger.warn(...args);
     }
   },
 
   error: (...args: any[]) => {
     // Always log errors, even in production (for error tracking services)
-    console.error(...args);
+    logger.error(...args);
   },
 
   info: (...args: any[]) => {
     if (isDevelopment) {
-      console.info(...args);
+      logger.info(...args);
     }
   },
 
   debug: (...args: any[]) => {
     if (isDevelopment) {
-      console.debug(...args);
+      logger.debug(...args);
     }
   },
 };

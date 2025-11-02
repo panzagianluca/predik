@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { sql } from "drizzle-orm";
+import { logger } from "@/lib/logger";
 
 export async function GET() {
   try {
@@ -30,7 +31,7 @@ export async function GET() {
         FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE cascade
       `);
     } catch (e) {
-      console.log("Foreign key constraint already exists or failed:", e);
+      logger.log("Foreign key constraint already exists or failed:", e);
     }
 
     // Create indexes
@@ -52,7 +53,7 @@ export async function GET() {
       message: "Notifications table and indexes created successfully",
     });
   } catch (error) {
-    console.error("Migration error:", error);
+    logger.error("Migration error:", error);
     return NextResponse.json(
       {
         success: false,

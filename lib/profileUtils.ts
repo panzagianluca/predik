@@ -30,7 +30,7 @@ function getStoredProfiles(): Record<string, string> {
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored ? JSON.parse(stored) : {};
   } catch (err) {
-    console.error("Error reading profile assignments:", err);
+    logger.error("Error reading profile assignments:", err);
     return {};
   }
 }
@@ -44,7 +44,7 @@ function saveProfiles(profiles: Record<string, string>): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(profiles));
   } catch (err) {
-    console.error("Error saving profile assignments:", err);
+    logger.error("Error saving profile assignments:", err);
   }
 }
 

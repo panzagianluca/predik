@@ -14,6 +14,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/animate-ui/components/radix/tabs";
+import { logger } from "@/lib/logger";
 import {
   Tooltip,
   TooltipContent,
@@ -155,7 +156,7 @@ export function MobileTradingModal({
         }
       }
     } catch (err) {
-      console.error("❌ Error loading balance:", err);
+      logger.error("❌ Error loading balance:", err);
       setBalance(0);
     }
   };
@@ -191,7 +192,7 @@ export function MobileTradingModal({
 
       const tradeAmount = parseFloat(amount);
 
-      console.log("🔢 Trade calculation:", {
+      logger.log("🔢 Trade calculation:", {
         tradeType,
         marketId: market.id,
         outcomeId: selectedOutcome.id,
@@ -224,7 +225,7 @@ export function MobileTradingModal({
         const priceImpact =
           ((priceTo - selectedOutcome.price) / selectedOutcome.price) * 100;
 
-        console.log("📊 Buy calculation result:", {
+        logger.log("📊 Buy calculation result:", {
           shares,
           priceTo,
           avgPrice,
@@ -260,7 +261,7 @@ export function MobileTradingModal({
         const priceImpact =
           ((priceTo - selectedOutcome.price) / selectedOutcome.price) * 100;
 
-        console.log("📊 Sell calculation result:", {
+        logger.log("📊 Sell calculation result:", {
           shares: tradeAmount,
           returnAmount,
           priceTo,
@@ -283,7 +284,7 @@ export function MobileTradingModal({
         setCalculation(calc);
       }
     } catch (err) {
-      console.error("Error calculating trade:", err);
+      logger.error("Error calculating trade:", err);
       setError("Error al calcular la operación");
       setCalculation(null);
     } finally {
@@ -335,7 +336,7 @@ export function MobileTradingModal({
 
       const tradeAmount = parseFloat(amount);
 
-      console.log("💰 Executing trade:", {
+      logger.log("💰 Executing trade:", {
         tradeType,
         marketId: market.id,
         outcomeId: selectedOutcome.id,
@@ -352,19 +353,19 @@ export function MobileTradingModal({
           spenderAddress,
         });
 
-        console.log("💰 Token approval status:", {
+        logger.log("💰 Token approval status:", {
           isApproved,
           spenderAddress,
           amount: tradeAmount,
         });
 
         if (!isApproved) {
-          console.log("⏳ Approving token spend...");
+          logger.log("⏳ Approving token spend...");
           await erc20.approve({
             address: spenderAddress,
             amount: tradeAmount * 10,
           });
-          console.log("✅ Approval complete");
+          logger.log("✅ Approval complete");
         }
 
         // Calculate shares with slippage (same as desktop)
@@ -375,14 +376,14 @@ export function MobileTradingModal({
         });
         const minSharesWithSlippage = Number(minShares) * 0.98;
 
-        console.log("📊 Buy calculation:", {
+        logger.log("📊 Buy calculation:", {
           minShares: Number(minShares),
           minSharesWithSlippage,
           slippage: "2%",
         });
 
         // Execute buy with referral code (same as desktop)
-        console.log("🔄 Executing buy transaction with referral code...");
+        logger.log("🔄 Executing buy transaction with referral code...");
         const buyTx = await predictionMarket.referralBuy({
           marketId: market.id,
           outcomeId: selectedOutcome.id,
@@ -391,7 +392,7 @@ export function MobileTradingModal({
           code: "predik", // Referral code for revenue share
         });
 
-        console.log("✅ Buy successful:", buyTx);
+        logger.log("✅ Buy successful:", buyTx);
         haptics.success();
       } else {
         // Execute sell (same as desktop)
@@ -401,11 +402,11 @@ export function MobileTradingModal({
           value: tradeAmount,
         });
 
-        console.log("📊 Sell calculation:", {
+        logger.log("📊 Sell calculation:", {
           maxShares: Number(maxShares),
         });
 
-        console.log("🔄 Executing sell transaction with referral code...");
+        logger.log("🔄 Executing sell transaction with referral code...");
         const sellTx = await predictionMarket.referralSell({
           marketId: market.id,
           outcomeId: selectedOutcome.id,
@@ -414,7 +415,7 @@ export function MobileTradingModal({
           code: "predik", // Referral code for revenue share
         });
 
-        console.log("✅ Sell successful:", sellTx);
+        logger.log("✅ Sell successful:", sellTx);
         haptics.success();
       }
 
@@ -423,7 +424,7 @@ export function MobileTradingModal({
       onTradeComplete?.();
       onClose();
     } catch (err: any) {
-      console.error("Trade execution error:", err);
+      logger.error("Trade execution error:", err);
       haptics.error();
       setError(err.message || "Error al ejecutar la operación");
     } finally {

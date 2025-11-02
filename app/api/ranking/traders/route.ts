@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 
 const MYRIAD_API_URL =
   process.env.NEXT_PUBLIC_MYRIAD_API_URL || "https://api-v2.myriadprotocol.com";
@@ -27,7 +28,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    console.log(`📈 Fetching traders ranking from Myriad V2 API`);
+    logger.log(`📈 Fetching traders ranking from Myriad V2 API`);
 
     // Step 1: Get all markets to fetch events from
     const marketsResponse = await fetch(
@@ -47,7 +48,7 @@ export async function GET(request: NextRequest) {
     const marketsData = await marketsResponse.json();
     const markets = marketsData.data || [];
 
-    console.log(`📊 Aggregating trading volume from ${markets.length} markets`);
+    logger.log(`📊 Aggregating trading volume from ${markets.length} markets`);
 
     // Step 2: Aggregate trading volume per user
     const userVolumes: Record<string, number> = {};
@@ -67,7 +68,7 @@ export async function GET(request: NextRequest) {
       },
     ];
 
-    console.log(
+    logger.log(
       `📈 Traders ranking not fully implemented for V2 - requires event aggregation`,
     );
 
@@ -81,7 +82,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("❌ Error fetching traders ranking:", error);
+    logger.error("❌ Error fetching traders ranking:", error);
     return NextResponse.json(
       {
         error: "Failed to fetch traders ranking",

@@ -1,4 +1,5 @@
 import Web3 from "web3";
+import { logger } from "./logger";
 
 const PM_ABI = [
   {
@@ -38,7 +39,7 @@ export async function getHolderShares(
       outcomeShares: (result.outcomes as string[]).map((s) => BigInt(s)),
     };
   } catch (err) {
-    console.error(`Error fetching shares for ${holderAddress}:`, err);
+    logger.error(`Error fetching shares for ${holderAddress}:`, err);
     throw err;
   }
 }

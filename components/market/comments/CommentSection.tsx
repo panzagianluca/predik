@@ -53,7 +53,7 @@ export function CommentSection({ marketId, userAddress }: CommentSectionProps) {
 
       const data: Comment[] = await response.json();
 
-      console.log("Fetched comments:", data);
+      logger.log("Fetched comments:", data);
 
       if (offset === 0) {
         setComments(data);
@@ -63,7 +63,7 @@ export function CommentSection({ marketId, userAddress }: CommentSectionProps) {
 
       setHasMore(data.length === limit);
     } catch (error) {
-      console.error("Error fetching comments:", error);
+      logger.error("Error fetching comments:", error);
     } finally {
       setIsLoading(false);
     }
@@ -112,7 +112,7 @@ export function CommentSection({ marketId, userAddress }: CommentSectionProps) {
         setComments((prev) => [newComment, ...prev]);
       }
     } catch (error) {
-      console.error("Error posting comment:", error);
+      logger.error("Error posting comment:", error);
       throw error;
     }
   };
@@ -141,7 +141,7 @@ export function CommentSection({ marketId, userAddress }: CommentSectionProps) {
         }));
       });
     } catch (error) {
-      console.error("Error deleting comment:", error);
+      logger.error("Error deleting comment:", error);
       alert("Error al eliminar comentario");
     }
   };

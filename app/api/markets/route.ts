@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 
 const MYRIAD_API_URL =
   process.env.NEXT_PUBLIC_MYRIAD_API_URL || "https://api-v2.myriadprotocol.com";
@@ -44,13 +45,13 @@ export async function GET(request: NextRequest) {
       next: { revalidate: 30 }, // Cache for 30 seconds, then revalidate
     });
 
-    console.log(
+    logger.log(
       "📡 Myriad V2 API request:",
       `${MYRIAD_API_URL}/markets?${params}`,
     );
 
     if (!response.ok) {
-      console.error(
+      logger.error(
         "❌ Myriad V2 API error:",
         response.status,
         response.statusText,
@@ -68,7 +69,7 @@ export async function GET(request: NextRequest) {
     const markets = responseData.data || responseData;
     const pagination = responseData.pagination;
 
-    console.log("✅ Myriad V2 API response:", markets.length || 0, "markets");
+    logger.log("✅ Myriad V2 API response:", markets.length || 0, "markets");
 
     return NextResponse.json(markets, {
       headers: {
@@ -78,7 +79,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error fetching markets:", error);
+    logger.error("Error fetching markets:", error);
     return NextResponse.json(
       { error: "Failed to fetch markets from Myriad V2" },
       { status: 500 },

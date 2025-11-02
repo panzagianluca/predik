@@ -22,7 +22,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Predik - El futuro tiene precio",
-  description: "Opera mercados de predicción en la red de Celo, impulsados por Myriad Markets.",
+  description:
+    "Opera mercados de predicción en la red de Celo, impulsados por Myriad Markets.",
 };
 
 export const viewport: Viewport = {
@@ -54,9 +55,7 @@ export default function RootLayout({
               <Navbar />
               <main className="flex-1 mb-16 md:mb-0">
                 {/* mb-16 on mobile for bottom nav, md:mb-0 on desktop */}
-                <div className="max-w-7xl mx-auto px-4 py-4">
-                  {children}
-                </div>
+                <div className="max-w-7xl mx-auto px-4 py-4">{children}</div>
               </main>
               <Footer />
               {/* Mobile Bottom Navigation - Hidden on desktop */}

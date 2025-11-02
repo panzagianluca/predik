@@ -58,8 +58,8 @@ export function TransactionsList({
         const networkId =
           process.env.NEXT_PUBLIC_MYRIAD_NETWORK_ID || "11142220";
 
-        console.log("🔍 Fetching markets via API route");
-        console.log("🔢 On-chain market IDs to lookup:", uniqueMarketIds);
+        logger.log("🔍 Fetching markets via API route");
+        logger.log("🔢 On-chain market IDs to lookup:", uniqueMarketIds);
 
         // Use our Next.js API route to avoid CORS issues
         // Fetch ALL markets (including all states) to get complete list
@@ -77,8 +77,8 @@ export function TransactionsList({
         // Combine all markets from different states
         const allMarkets: MarketInfo[] = marketsArrays.flat();
 
-        console.log(`Fetched ${allMarkets.length} total markets (all states)`);
-        console.log(
+        logger.log(`Fetched ${allMarkets.length} total markets (all states)`);
+        logger.log(
           "Available markets:",
           allMarkets.map((m) => ({
             id: m.id,
@@ -90,22 +90,22 @@ export function TransactionsList({
         // Match by ID directly
         const namesMap = new Map<string, string>();
         uniqueMarketIds.forEach((marketId) => {
-          console.log(`Looking up market ID ${marketId}`);
+          logger.log(`Looking up market ID ${marketId}`);
 
           const market = allMarkets.find((m) => m.id.toString() === marketId);
 
           if (market) {
-            console.log(`  Found: ${market.title}`);
+            logger.log(`  Found: ${market.title}`);
             namesMap.set(marketId, market.title);
           } else {
-            console.log(`  Not found in API response`);
+            logger.log(`  Not found in API response`);
             namesMap.set(marketId, `Market #${marketId}`);
           }
         });
 
         setMarketNames(namesMap);
       } catch (error) {
-        console.error("Error fetching market names:", error);
+        logger.error("Error fetching market names:", error);
         // Fallback: use market IDs as names
         const fallbackMap = new Map<string, string>();
         transactions.forEach((tx) => {

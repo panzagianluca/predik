@@ -47,7 +47,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error deleting comment:", error);
+    logger.error("Error deleting comment:", error);
     return NextResponse.json(
       { error: "Failed to delete comment" },
       { status: 500 },
@@ -134,7 +134,7 @@ export async function PATCH(
       hasVoted,
     });
   } catch (error) {
-    console.error("Error voting on comment:", error);
+    logger.error("Error voting on comment:", error);
     return NextResponse.json(
       { error: "Failed to vote on comment" },
       { status: 500 },

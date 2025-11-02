@@ -74,7 +74,7 @@ export function ProposalCard({
         onVote(proposal.id);
       }
     } catch (error) {
-      console.error("Error voting:", error);
+      logger.error("Error voting:", error);
       // Revert optimistic update
       setHasVoted(hasVoted);
       setVoteCount(voteCount);

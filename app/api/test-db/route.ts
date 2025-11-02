@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
+import { logger } from "@/lib/logger";
 
 export async function GET() {
   try {
@@ -14,7 +15,7 @@ export async function GET() {
       tables: ["users", "user_stats", "email_verification_tokens"],
     });
   } catch (error: any) {
-    console.error("Database connection error:", error);
+    logger.error("Database connection error:", error);
     return NextResponse.json(
       {
         success: false,

@@ -69,7 +69,7 @@ export function GlobalSearch() {
       const data = await response.json();
       setMarkets(data);
     } catch (error) {
-      console.error("Error fetching markets:", error);
+      logger.error("Error fetching markets:", error);
       setMarkets([]);
     } finally {
       setIsLoading(false);

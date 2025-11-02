@@ -1,5 +1,6 @@
 // lib/analytics.ts
 // Analytics initialization utilities
+import { logger } from "./logger";
 
 type ConsentState = {
   necessary: boolean;
@@ -26,7 +27,7 @@ async function detectAdBlocker(): Promise<boolean> {
     clearTimeout(timeoutId);
     return false; // Not blocked
   } catch (error) {
-    console.log("🛡️ Ad blocker or privacy tool detected - analytics disabled");
+    logger.log("🛡️ Ad blocker or privacy tool detected - analytics disabled");
     return true; // Blocked
   }
 }
@@ -53,7 +54,7 @@ export function initGoogleAnalytics(measurementId: string) {
   `;
   document.head.appendChild(script2);
 
-  console.log("📊 Google Analytics initialized:", measurementId);
+  logger.log("📊 Google Analytics initialized:", measurementId);
 }
 
 // Initialize PostHog
@@ -74,11 +75,11 @@ export async function initPostHog(apiKey: string, host: string) {
     persistence: "localStorage+cookie",
     // Reduce retry spam in console
     loaded: (ph) => {
-      console.log("📊 PostHog loaded successfully via reverse proxy");
+      logger.log("📊 PostHog loaded successfully via reverse proxy");
     },
   });
 
-  console.log("📊 PostHog initialized:", apiKey);
+  logger.log("📊 PostHog initialized:", apiKey);
   return posthog.default;
 }
 
@@ -100,14 +101,14 @@ export function hasAnalyticsConsent(): boolean {
 // Initialize all analytics based on consent
 export async function initAnalyticsIfConsented() {
   if (!hasAnalyticsConsent()) {
-    console.log("⚠️ Analytics NOT consented - skipping initialization");
+    logger.log("⚠️ Analytics NOT consented - skipping initialization");
     return;
   }
 
   // Check for ad blocker before initializing
   const isBlocked = await detectAdBlocker();
   if (isBlocked) {
-    console.log(
+    logger.log(
       "⚠️ Analytics blocked by privacy tools - respecting user privacy",
     );
     return;
@@ -118,7 +119,7 @@ export async function initAnalyticsIfConsented() {
 
   try {
     const parsed: ConsentState = JSON.parse(consent);
-    console.log("✅ Analytics consented - initializing...", parsed);
+    logger.log("✅ Analytics consented - initializing...", parsed);
 
     // Google Analytics - only if analytics accepted
     if (parsed.analytics) {
@@ -126,7 +127,7 @@ export async function initAnalyticsIfConsented() {
       if (GA_MEASUREMENT_ID) {
         initGoogleAnalytics(GA_MEASUREMENT_ID);
       } else {
-        console.warn("⚠️ GA_MEASUREMENT_ID not configured");
+        logger.warn("⚠️ GA_MEASUREMENT_ID not configured");
       }
     }
 
@@ -139,10 +140,10 @@ export async function initAnalyticsIfConsented() {
       if (POSTHOG_KEY) {
         await initPostHog(POSTHOG_KEY, POSTHOG_HOST);
       } else {
-        console.warn("⚠️ POSTHOG_KEY not configured");
+        logger.warn("⚠️ POSTHOG_KEY not configured");
       }
     }
   } catch (e) {
-    console.error("Failed to parse consent:", e);
+    logger.error("Failed to parse consent:", e);
   }
 }
