@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { LogoSpinner } from "@/components/ui/logo-spinner";
+import { logger } from "@/lib/logger";
 
 interface Holder {
   address: string;

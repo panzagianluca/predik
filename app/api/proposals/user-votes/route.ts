@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { proposalVotes } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { logger } from "@/lib/logger";
 
 // GET /api/proposals/user-votes - Get all proposal IDs that a user has voted on
 export async function GET(request: NextRequest) {

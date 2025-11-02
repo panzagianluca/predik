@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { RankingSkeleton } from "@/components/ui/skeletons/RankingSkeleton";
 import { Trophy, TrendingUp, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 
 interface RankingUser {
   address: string;

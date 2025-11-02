@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { X, Cookie, Settings } from "lucide-react";
 import { initAnalyticsIfConsented } from "@/lib/analytics";
 import { haptics } from "@/lib/haptics";
+import { logger } from "@/lib/logger";
 
 type ConsentState = {
   necessary: boolean;

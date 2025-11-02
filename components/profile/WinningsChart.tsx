@@ -13,6 +13,7 @@ import { useTheme } from "next-themes";
 import { LogoSpinner } from "@/components/ui/logo-spinner";
 import { UserTransaction, MarketAction } from "@/hooks/use-user-transactions";
 import { formatUnits } from "viem";
+import { logger } from "@/lib/logger";
 
 interface WinningsDataPoint {
   time: number;

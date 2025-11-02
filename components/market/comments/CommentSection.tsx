@@ -6,6 +6,7 @@ import { CommentItem } from "./CommentItem";
 import { CommentForm } from "./CommentForm";
 import { MessageSquare } from "lucide-react";
 import { fetchUserProfile } from "@/lib/userUtils";
+import { logger } from "@/lib/logger";
 
 interface CommentSectionProps {
   marketId: string;

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { UserTransaction, MarketAction } from "@/hooks/use-user-transactions";
 import { formatUnits } from "viem";
+import { logger } from "@/lib/logger";
 import {
   TrendingUp,
   TrendingDown,

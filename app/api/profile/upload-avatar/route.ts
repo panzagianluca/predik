@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
+import { logger } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
   try {

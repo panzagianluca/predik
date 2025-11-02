@@ -21,6 +21,7 @@ import {
 } from "@/components/animate-ui/components/radix/tabs";
 import Image from "next/image";
 import { Upload, Loader2, Check, X } from "lucide-react";
+import { logger } from "@/lib/logger";
 
 interface EditProfileModalProps {
   isOpen: boolean;

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { marketProposals, proposalVotes } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
+import { logger } from "@/lib/logger";
 
 // PATCH /api/proposals/[id]/vote - Toggle vote on a proposal
 export async function PATCH(

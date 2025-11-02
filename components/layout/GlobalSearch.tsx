@@ -13,6 +13,7 @@ import {
 } from "@/components/animate-ui/components/radix/dialog";
 import { Input } from "@/components/ui/input";
 import { Market } from "@/types/market";
+import { logger } from "@/lib/logger";
 
 export function GlobalSearch() {
   const [open, setOpen] = useState(false);

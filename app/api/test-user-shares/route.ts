@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getHolderShares } from "@/lib/getHolderShares";
+import { logger } from "@/lib/logger";
 
 export async function GET() {
   try {

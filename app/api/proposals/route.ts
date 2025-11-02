@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { marketProposals, proposalVotes } from "@/lib/db/schema";
 import { eq, desc, sql } from "drizzle-orm";
+import { logger } from "@/lib/logger";
 
 // GET /api/proposals - Fetch all proposals
 export async function GET(request: NextRequest) {
