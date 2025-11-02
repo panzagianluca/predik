@@ -1,14 +1,15 @@
-'use client'
+"use client";
 
-import { WagmiProvider } from 'wagmi'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { DynamicContextProvider } from '@dynamic-labs/sdk-react-core'
-import { EthereumWalletConnectors } from '@dynamic-labs/ethereum'
-import { config } from '@/lib/wagmi'
-import { ReactNode, useState } from 'react'
+import { WagmiProvider } from "wagmi";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
+import { DynamicWagmiConnector } from "@dynamic-labs/wagmi-connector";
+import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
+import { config } from "@/lib/wagmi";
+import { ReactNode, useState } from "react";
 
 export function Web3Provider({ children }: { children: ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient())
+  const [queryClient] = useState(() => new QueryClient());
 
   return (
     <DynamicContextProvider
@@ -17,11 +18,13 @@ export function Web3Provider({ children }: { children: ReactNode }) {
         walletConnectors: [EthereumWalletConnectors],
       }}
     >
-      <WagmiProvider config={config}>
-        <QueryClientProvider client={queryClient}>
-          {children}
-        </QueryClientProvider>
-      </WagmiProvider>
+      <DynamicWagmiConnector>
+        <WagmiProvider config={config}>
+          <QueryClientProvider client={queryClient}>
+            {children}
+          </QueryClientProvider>
+        </WagmiProvider>
+      </DynamicWagmiConnector>
     </DynamicContextProvider>
-  )
+  );
 }
