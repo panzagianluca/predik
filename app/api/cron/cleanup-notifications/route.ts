@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { notifications } from "@/lib/db/schema";
 import { and, eq, lt, sql as drizzleSql } from "drizzle-orm";
+import { logger } from "@/lib/logger";
 
 /**
  * Cron job to clean up old read notifications
