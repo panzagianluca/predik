@@ -1,3 +1,5 @@
+import { logger } from "./logger";
+
 /**
  * Profile Picture Utility Functions
  *
@@ -6,16 +8,13 @@
  */
 
 const PROFILE_PICTURES = [
-  "/profiles/avatar-1.svg",
-  "/profiles/avatar-2.svg",
-  "/profiles/avatar-3.svg",
-  "/profiles/avatar-4.svg",
-  "/profiles/avatar-5.svg",
-  "/profiles/avatar-6.svg",
-  "/profiles/avatar-7.svg",
-  "/profiles/avatar-8.svg",
-  "/profiles/avatar-9.svg",
-  "/profiles/avatar-10.svg",
+  "/profiles/imgProfile1.jpg",
+  "/profiles/imgProfile2.jpg",
+  "/profiles/imgProfile3.jpg",
+  "/profiles/imgProfile4.jpg",
+  "/profiles/imgProfile5.jpg",
+  "/profiles/imgProfile6.jpg",
+  "/profiles/imgProfile7.jpg",
 ];
 
 const STORAGE_KEY = "predik_user_profiles";
