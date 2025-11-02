@@ -74,9 +74,27 @@ export function getProfilePicture(address: string | undefined): string {
   const normalizedAddress = address.toLowerCase();
   const profiles = getStoredProfiles();
 
-  // If already assigned, return it
+  // Check if already assigned
   if (profiles[normalizedAddress]) {
-    return profiles[normalizedAddress];
+    const existingPath = profiles[normalizedAddress];
+
+    // MIGRATION: If old SVG avatar, migrate to new JPG
+    if (existingPath.includes("avatar-") && existingPath.endsWith(".svg")) {
+      logger.info(
+        `Migrating old SVG profile to JPG for ${normalizedAddress.slice(
+          0,
+          6,
+        )}...`,
+      );
+      // Assign new JPG based on address hash
+      const index = getIndexFromAddress(normalizedAddress);
+      const newPicture = PROFILE_PICTURES[index];
+      profiles[normalizedAddress] = newPicture;
+      saveProfiles(profiles);
+      return newPicture;
+    }
+
+    return existingPath;
   }
 
   // Otherwise, assign based on address hash for consistency
