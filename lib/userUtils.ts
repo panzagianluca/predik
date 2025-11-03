@@ -1,3 +1,5 @@
+import { logger } from "@/lib/logger";
+
 // Hook to fetch user profile data
 export async function fetchUserProfile(walletAddress: string) {
   try {

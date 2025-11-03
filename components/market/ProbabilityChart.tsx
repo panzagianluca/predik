@@ -353,7 +353,8 @@ export function ProbabilityChart({
     };
 
     // Initial marker update with delay to ensure chart has fully rendered
-    setTimeout(() => updatePulseMarkers(), 100);
+    // Increased to 400ms to allow fitContent() animation to complete on data-heavy charts (especially 7d)
+    setTimeout(() => updatePulseMarkers(), 400);
 
     // Update markers when chart is resized or panned
     const handleChartUpdate = () => {
