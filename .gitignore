@@ -13,4 +13,9 @@ node_modules
 .env.test.local
 .env.production.local
 
+# Database migrations - keep in repo for deployment
+# But ignore any local SQL dumps or backups
+*.sql.backup
+*.sql.dump
+
 scripts/seed-proposals.mjs

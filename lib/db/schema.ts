@@ -219,3 +219,37 @@ export const notifications = pgTable(
     ),
   }),
 );
+
+// Market translations table - caches Spanish translations of Myriad markets
+export const marketTranslations = pgTable(
+  "market_translations",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    marketId: integer("market_id").notNull(), // Myriad market ID
+    marketSlug: text("market_slug").notNull(), // Myriad slug
+
+    // Spanish translations (what we serve to users)
+    titleEs: text("title_es").notNull(),
+    descriptionEs: text("description_es").notNull(),
+
+    // Original English (for reference/updates)
+    titleEn: text("title_en").notNull(),
+    descriptionEn: text("description_en").notNull(),
+
+    // Metadata
+    translatedAt: timestamp("translated_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    // Unique constraint - one translation per market
+    marketIdUnique: unique("market_translations_market_id_unique").on(
+      table.marketId,
+    ),
+    // Index for fast slug lookups
+    marketSlugIdx: index("market_translations_slug_idx").on(table.marketSlug),
+    // Index for finding recently translated markets
+    translatedAtIdx: index("market_translations_translated_at_idx").on(
+      table.translatedAt,
+    ),
+  }),
+);

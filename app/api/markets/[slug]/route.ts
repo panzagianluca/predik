@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { setCachedHolders, getCachedHolders } from "@/lib/holdersCache";
 import { logger } from "@/lib/logger";
+import { db } from "@/lib/db";
+import { marketTranslations } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+import { translateMarketToSpanish as translateWithDeepL } from "@/lib/translation/deepl";
 
 const MYRIAD_API_URL =
   process.env.NEXT_PUBLIC_MYRIAD_API_URL || "https://api-v2.myriadprotocol.com";
@@ -95,6 +99,9 @@ export async function GET(
       relatedMarkets,
     };
 
+    // 🌐 TRANSLATION: Get Spanish translation from DB or create it
+    const translatedData = await translateMarketToSpanish(responseData);
+
     // Fire-and-forget: pre-warm holders cache so the Holders tab can show results instantly
     try {
       const NETWORK_ID = process.env.NEXT_PUBLIC_NETWORK_ID || "56";
@@ -144,7 +151,7 @@ export async function GET(
       logger.debug("holders pre-warm error", err);
     }
 
-    return NextResponse.json(responseData, {
+    return NextResponse.json(translatedData, {
       headers: {
         "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60",
       },
@@ -156,4 +163,53 @@ export async function GET(
       { status: 500 },
     );
   }
+}
+
+/**
+ * Translate a single market to Spanish using cached DB translation or DeepL API
+ */
+async function translateMarketToSpanish(market: any): Promise<any> {
+  if (!market) return market;
+
+  // Check if translation exists in DB
+  let translation = await db
+    .select()
+    .from(marketTranslations)
+    .where(eq(marketTranslations.marketSlug, market.slug))
+    .limit(1)
+    .then((rows) => rows[0]);
+
+  // If translation doesn't exist, create it
+  if (!translation) {
+    logger.log(
+      `🆕 New market "${market.title}" (${market.slug}) - translating...`,
+    );
+
+    const { titleEs, descriptionEs } = await translateWithDeepL({
+      title: market.title,
+      description: market.description,
+    });
+
+    // Store in database for future use
+    const [newTranslation] = await db
+      .insert(marketTranslations)
+      .values({
+        marketId: market.id,
+        marketSlug: market.slug,
+        titleEs,
+        descriptionEs,
+        titleEn: market.title,
+        descriptionEn: market.description,
+      })
+      .returning();
+
+    translation = newTranslation;
+  }
+
+  // Return market with Spanish translations
+  return {
+    ...market,
+    title: translation.titleEs,
+    description: translation.descriptionEs,
+  };
 }

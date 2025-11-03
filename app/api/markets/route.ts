@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
+import { db } from "@/lib/db";
+import { marketTranslations } from "@/lib/db/schema";
+import { inArray } from "drizzle-orm";
+import { translateMarketToSpanish } from "@/lib/translation/deepl";
 
 const MYRIAD_API_URL =
   process.env.NEXT_PUBLIC_MYRIAD_API_URL || "https://api-v2.myriadprotocol.com";
@@ -71,7 +75,10 @@ export async function GET(request: NextRequest) {
 
     logger.log("✅ Myriad V2 API response:", markets.length || 0, "markets");
 
-    return NextResponse.json(markets, {
+    // 🌐 TRANSLATION: Get Spanish translations from DB or create them
+    const translatedMarkets = await translateMarketsToSpanish(markets);
+
+    return NextResponse.json(translatedMarkets, {
       headers: {
         "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60",
         // Include pagination info in custom header if needed
@@ -85,4 +92,68 @@ export async function GET(request: NextRequest) {
       { status: 500 },
     );
   }
+}
+
+/**
+ * Translate markets to Spanish using cached DB translations or DeepL API
+ */
+async function translateMarketsToSpanish(markets: any[]): Promise<any[]> {
+  if (!markets || markets.length === 0) return markets;
+
+  // Get market IDs
+  const marketIds = markets.map((m) => m.id);
+
+  // Fetch existing translations from DB
+  const existingTranslations = await db
+    .select()
+    .from(marketTranslations)
+    .where(inArray(marketTranslations.marketId, marketIds));
+
+  // Map translations by market ID for fast lookup
+  const translationMap = new Map(
+    existingTranslations.map((t) => [t.marketId, t]),
+  );
+
+  // Translate markets in parallel
+  const spanishMarkets = await Promise.all(
+    markets.map(async (market) => {
+      let translation = translationMap.get(market.id);
+
+      // If translation doesn't exist, create it
+      if (!translation) {
+        logger.log(
+          `🆕 New market detected: "${market.title}" - translating...`,
+        );
+
+        const { titleEs, descriptionEs } = await translateMarketToSpanish({
+          title: market.title,
+          description: market.description,
+        });
+
+        // Store in database for future use
+        const [newTranslation] = await db
+          .insert(marketTranslations)
+          .values({
+            marketId: market.id,
+            marketSlug: market.slug,
+            titleEs,
+            descriptionEs,
+            titleEn: market.title,
+            descriptionEn: market.description,
+          })
+          .returning();
+
+        translation = newTranslation;
+      }
+
+      // Return market with Spanish translations
+      return {
+        ...market,
+        title: translation.titleEs,
+        description: translation.descriptionEs,
+      };
+    }),
+  );
+
+  return spanishMarkets;
 }

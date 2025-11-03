@@ -1,0 +1,129 @@
+import { NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { marketTranslations } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+import { translateMarketToSpanish } from "@/lib/translation/deepl";
+import { logger } from "@/lib/logger";
+
+const MYRIAD_API_URL =
+  process.env.NEXT_PUBLIC_MYRIAD_API_URL || "https://api-v2.myriadprotocol.com";
+const MYRIAD_API_KEY = process.env.MYRIAD_API_KEY!;
+
+/**
+ * Daily cron job to translate new markets from Myriad to Spanish
+ * Runs every day at 3 AM UTC (configured in vercel.json)
+ * Translates only NEW markets that don't have translations yet
+ */
+export async function GET(request: Request) {
+  try {
+    // Verify this is called by Vercel Cron (security check)
+    const authHeader = request.headers.get("authorization");
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    logger.log("🌐 Starting daily market translation cron job...");
+
+    // Fetch ALL open markets from Myriad (these are the active ones users will see)
+    const response = await fetch(
+      `${MYRIAD_API_URL}/markets?${new URLSearchParams({
+        network_id: "56", // BNB
+        token_address:
+          process.env.NEXT_PUBLIC_USDT_TOKEN_ADDRESS ||
+          "0x55d398326f99059fF775485246999027B3197955",
+        state: "open", // Only translate open markets
+        limit: "100", // Translate up to 100 markets per run
+      })}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": MYRIAD_API_KEY,
+        },
+      },
+    );
+
+    if (!response.ok) {
+      logger.error("Failed to fetch markets from Myriad:", response.statusText);
+      return NextResponse.json(
+        { error: "Failed to fetch markets" },
+        { status: 500 },
+      );
+    }
+
+    const responseData = await response.json();
+    const markets = responseData.data || responseData;
+
+    logger.log(`📊 Found ${markets.length} open markets to check`);
+
+    let translated = 0;
+    let skipped = 0;
+    let errors = 0;
+
+    // Process markets sequentially to avoid rate limits
+    for (const market of markets) {
+      try {
+        // Check if translation already exists
+        const existing = await db
+          .select()
+          .from(marketTranslations)
+          .where(eq(marketTranslations.marketId, market.id))
+          .limit(1);
+
+        if (existing.length > 0) {
+          skipped++;
+          continue;
+        }
+
+        // Translate the new market
+        logger.log(`🆕 Translating new market: "${market.title}"`);
+
+        const { titleEs, descriptionEs } = await translateMarketToSpanish({
+          title: market.title,
+          description: market.description,
+        });
+
+        // Store in database
+        await db.insert(marketTranslations).values({
+          marketId: market.id,
+          marketSlug: market.slug,
+          titleEs,
+          descriptionEs,
+          titleEn: market.title,
+          descriptionEn: market.description,
+        });
+
+        translated++;
+        logger.log(`✅ Translated: "${titleEs}"`);
+
+        // Rate limit: wait 100ms between translations to be nice to DeepL API
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      } catch (error) {
+        logger.error(`Error translating market ${market.id}:`, error);
+        errors++;
+        // Continue with next market even if one fails
+      }
+    }
+
+    const summary = {
+      success: true,
+      total: markets.length,
+      translated,
+      skipped,
+      errors,
+      timestamp: new Date().toISOString(),
+    };
+
+    logger.log("🎉 Translation cron job completed:", summary);
+
+    return NextResponse.json(summary);
+  } catch (error) {
+    logger.error("Error in translation cron job:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    );
+  }
+}
