@@ -82,7 +82,7 @@ export function ProbabilityChart({
         borderColor: "transparent", // Transparent Y-axis line
       },
       timeScale: {
-        rightOffset: 15, // Add empty space on the right side
+        rightOffset: 12, // Add empty space on the right side (~40-60px)
         borderColor: "transparent", // Transparent X-axis line
         timeVisible: true,
         secondsVisible: false,
