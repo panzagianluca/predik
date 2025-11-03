@@ -49,6 +49,11 @@ export function ProbabilityChart({
       ? "rgba(31, 41, 55, 0.5)" // gray-800 at 50% opacity
       : "rgba(243, 244, 246, 0.5)"; // gray-100 at 50% opacity
 
+    // Dynamic right offset based on timeframe
+    // Short timeframes (24h, 7d) need more offset for visibility
+    // Long timeframes (30d, all) have more data points, so less offset needed
+    const rightOffset = timeframe === "24h" ? 20 : timeframe === "7d" ? 12 : 2;
+
     // Chart colors based on theme
     const chartOptions = {
       layout: {
@@ -82,7 +87,7 @@ export function ProbabilityChart({
         borderColor: "transparent", // Transparent Y-axis line
       },
       timeScale: {
-        rightOffset: 12, // Add empty space on the right side (~40-60px)
+        rightOffset, // Dynamic offset based on timeframe
         borderColor: "transparent", // Transparent X-axis line
         timeVisible: true,
         secondsVisible: false,
