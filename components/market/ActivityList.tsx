@@ -145,7 +145,7 @@ export function ActivityList({ marketSlug }: ActivityListProps) {
                 </td>
                 <td className="py-3 px-4 text-right">
                   <span className="text-sm font-medium">
-                    {activity.shares} shares
+                    {parseFloat(activity.shares).toFixed(2)} shares
                   </span>
                 </td>
                 <td className="py-3 px-4 text-right">
