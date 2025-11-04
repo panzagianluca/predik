@@ -198,7 +198,7 @@ export default function MarketDetailPage() {
 
                 <div className="flex-1 min-w-0">
                   <h1 className="text-[20px] md:text-[24px] font-medium">
-                    {market.title}
+                    {market.titleEs || market.title}
                   </h1>
 
                   {/* Badges - Desktop only */}

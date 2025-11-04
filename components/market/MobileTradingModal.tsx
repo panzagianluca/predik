@@ -473,11 +473,11 @@ export function MobileTradingModal({
               <div className="flex items-center gap-3 flex-1 min-w-0">
                 <img
                   src={market.imageUrl}
-                  alt={market.title}
+                  alt={market.titleEs || market.title}
                   className="w-9 h-9 rounded-lg object-cover flex-shrink-0"
                 />
                 <h3 className="font-semibold text-[16px] leading-tight truncate">
-                  {market.title}
+                  {market.titleEs || market.title}
                 </h3>
               </div>
               <button

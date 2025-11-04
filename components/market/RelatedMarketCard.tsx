@@ -3,6 +3,7 @@
 import { Market } from "@/types/market";
 import Link from "next/link";
 import Image from "next/image";
+import { translateOutcomeTitle } from "@/lib/translation/outcomeTranslations";
 
 interface RelatedMarketCardProps {
   market: Market;
@@ -48,13 +49,13 @@ export function RelatedMarketCard({ market }: RelatedMarketCardProps) {
         <div className="flex-1 min-w-0">
           {/* Title */}
           <h4 className="text-sm font-medium leading-tight line-clamp-2 mb-1">
-            {market.title}
+            {market.titleEs || market.title}
           </h4>
 
           {/* Most Probable Outcome */}
           <div className="flex items-center gap-2 text-xs">
             <span className="text-muted-foreground">
-              {mostProbableOutcome.title}:
+              {translateOutcomeTitle(mostProbableOutcome.title)}:
             </span>
             <span className="font-bold" style={{ color: outcomeColor }}>
               {probability.toFixed(2)}%

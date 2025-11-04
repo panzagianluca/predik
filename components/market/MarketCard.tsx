@@ -14,6 +14,7 @@ import Link from "next/link";
 import Image from "next/image";
 import CountUp from "react-countup";
 import { haptics } from "@/lib/haptics";
+import { translateOutcomeTitle } from "@/lib/translation/outcomeTranslations";
 
 interface MarketCardProps {
   market: Market;
@@ -136,7 +137,7 @@ export function MarketCard({ market }: MarketCardProps) {
             prefetch={true}
           >
             <h3 className="text-base font-semibold leading-tight line-clamp-2 hover:text-primary transition-colors duration-200">
-              {market.title}
+              {market.titleEs || market.title}
             </h3>
           </Link>
         </div>
@@ -157,7 +158,9 @@ export function MarketCard({ market }: MarketCardProps) {
             >
               <div className="space-y-1 hover:opacity-80 transition-opacity duration-200">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium">{outcome.title}</span>
+                  <span className="font-medium">
+                    {translateOutcomeTitle(outcome.title)}
+                  </span>
                   <span className="font-bold" style={{ color: outcomeColor }}>
                     <CountUp
                       start={probability > 10 ? probability - 5 : 0}

@@ -5,6 +5,7 @@ import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { translateOutcomeTitle } from "@/lib/translation/outcomeTranslations";
 import {
   Dialog,
   DialogContent,
@@ -157,7 +158,7 @@ export function GlobalSearch() {
                   {/* Market Info */}
                   <div className="flex-1 min-w-0">
                     <h4 className="font-medium line-clamp-2 text-sm">
-                      {market.title}
+                      {market.titleEs || market.title}
                     </h4>
 
                     {/* Outcomes */}
@@ -168,7 +169,7 @@ export function GlobalSearch() {
                           className="flex items-center gap-1 text-xs"
                         >
                           <span className="text-muted-foreground">
-                            {outcome.title}:
+                            {translateOutcomeTitle(outcome.title)}:
                           </span>
                           <span
                             className="font-semibold"

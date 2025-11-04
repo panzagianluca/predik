@@ -5,6 +5,8 @@ export interface Market {
   slug: string;
   title: string;
   description: string;
+  titleEs?: string; // Spanish translation
+  descriptionEs?: string; // Spanish translation
   createdAt?: string;
   expiresAt: string;
   publishedAt: string;
