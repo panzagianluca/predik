@@ -2,12 +2,17 @@ import { MarketsGrid } from "@/components/market/MarketsGrid";
 import { LogoSpinner } from "@/components/ui/logo-spinner";
 import { Suspense } from "react";
 import { logger } from "@/lib/logger";
+import { db } from "@/lib/db";
+import { marketTranslations } from "@/lib/db/schema";
+import { inArray } from "drizzle-orm";
+import { translateMarketToSpanish } from "@/lib/translation/deepl";
+
+const MYRIAD_API_URL =
+  process.env.NEXT_PUBLIC_MYRIAD_API_URL || "https://api-v2.myriadprotocol.com";
+const MYRIAD_API_KEY = process.env.MYRIAD_API_KEY!;
 
 async function getMarkets() {
   try {
-    // Use our internal API endpoint which includes translation logic
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-
     const baseParams = {
       network_id: "56", // BNB Smart Chain
       token_address:
@@ -18,45 +23,61 @@ async function getMarkets() {
       limit: "50",
     };
 
-    // Fetch open, closed, and resolved markets in parallel via our API
+    // Fetch open, closed, and resolved markets in parallel from Myriad
     const [openRes, closedRes, resolvedRes] = await Promise.all([
       fetch(
-        `${baseUrl}/api/markets?${new URLSearchParams({
+        `${MYRIAD_API_URL}/markets?${new URLSearchParams({
           ...baseParams,
           state: "open",
         })}`,
         {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": MYRIAD_API_KEY,
+          },
           next: { revalidate: 30 },
         },
       ),
       fetch(
-        `${baseUrl}/api/markets?${new URLSearchParams({
+        `${MYRIAD_API_URL}/markets?${new URLSearchParams({
           ...baseParams,
           state: "closed",
         })}`,
         {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": MYRIAD_API_KEY,
+          },
           next: { revalidate: 30 },
         },
       ),
       fetch(
-        `${baseUrl}/api/markets?${new URLSearchParams({
+        `${MYRIAD_API_URL}/markets?${new URLSearchParams({
           ...baseParams,
           state: "resolved",
         })}`,
         {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": MYRIAD_API_KEY,
+          },
           next: { revalidate: 30 },
         },
       ),
     ]);
 
     const [openData, closedData, resolvedData] = await Promise.all([
-      openRes.ok ? openRes.json() : [],
-      closedRes.ok ? closedRes.json() : [],
-      resolvedRes.ok ? resolvedRes.json() : [],
+      openRes.ok ? openRes.json() : { data: [] },
+      closedRes.ok ? closedRes.json() : { data: [] },
+      resolvedRes.ok ? resolvedRes.json() : { data: [] },
     ]);
 
-    // Combine all markets and filter out test markets and BNB Candles
-    const allMarkets = [...openData, ...closedData, ...resolvedData].filter(
+    // Combine all markets
+    const allMarkets = [
+      ...(openData.data || []),
+      ...(closedData.data || []),
+      ...(resolvedData.data || []),
+    ].filter(
       (market) =>
         // Exclude test markets
         !market.title.toLowerCase().includes("test usd") &&
@@ -66,22 +87,89 @@ async function getMarkets() {
         !market.slug.includes("bnb-candles"),
     );
 
+    // 🌐 Add Spanish translations
+    const translatedMarkets = await translateMarketsToSpanish(allMarkets);
+
     logger.log(
       "✅ Home page loaded",
-      allMarkets.length,
+      translatedMarkets.length,
       "markets (open:",
-      openData.length || 0,
+      openData.data?.length || 0,
       ", closed:",
-      closedData.length || 0,
+      closedData.data?.length || 0,
       ", resolved:",
-      resolvedData.length || 0,
+      resolvedData.data?.length || 0,
       ")",
     );
-    return allMarkets;
+    return translatedMarkets;
   } catch (err) {
     logger.error("Error loading markets:", err);
     return [];
   }
+}
+
+/**
+ * Translate markets to Spanish using cached DB translations or DeepL API
+ */
+async function translateMarketsToSpanish(markets: any[]): Promise<any[]> {
+  if (!markets || markets.length === 0) return markets;
+
+  // Get market IDs
+  const marketIds = markets.map((m) => m.id);
+
+  // Fetch existing translations from DB
+  const existingTranslations = await db
+    .select()
+    .from(marketTranslations)
+    .where(inArray(marketTranslations.marketId, marketIds));
+
+  // Map translations by market ID for fast lookup
+  const translationMap = new Map(
+    existingTranslations.map((t) => [t.marketId, t]),
+  );
+
+  // Translate markets in parallel
+  const spanishMarkets = await Promise.all(
+    markets.map(async (market) => {
+      let translation = translationMap.get(market.id);
+
+      // If translation doesn't exist, create it
+      if (!translation) {
+        logger.log(
+          `🆕 New market detected: "${market.title}" - translating...`,
+        );
+
+        const { titleEs, descriptionEs } = await translateMarketToSpanish({
+          title: market.title,
+          description: market.description,
+        });
+
+        // Store in database for future use
+        const [newTranslation] = await db
+          .insert(marketTranslations)
+          .values({
+            marketId: market.id,
+            marketSlug: market.slug,
+            titleEs,
+            descriptionEs,
+            titleEn: market.title,
+            descriptionEn: market.description,
+          })
+          .returning();
+
+        translation = newTranslation;
+      }
+
+      // Return market with Spanish translations
+      return {
+        ...market,
+        titleEs: translation.titleEs,
+        descriptionEs: translation.descriptionEs,
+      };
+    }),
+  );
+
+  return spanishMarkets;
 }
 
 export default async function Home() {
