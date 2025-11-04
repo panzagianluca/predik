@@ -3,14 +3,10 @@ import { LogoSpinner } from "@/components/ui/logo-spinner";
 import { Suspense } from "react";
 import { logger } from "@/lib/logger";
 
-const MYRIAD_API_URL =
-  process.env.NEXT_PUBLIC_MYRIAD_API_URL || "https://api-v2.myriadprotocol.com";
-const MYRIAD_API_KEY = process.env.MYRIAD_API_KEY!;
-
 async function getMarkets() {
   try {
-    // Fetch all market states (open, closed, resolved) to enable filtering
-    // Reference: Myriad V2 API requires x-api-key header (see Docs/myriadV2.md)
+    // Use our internal API endpoint which includes translation logic
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
     const baseParams = {
       network_id: "56", // BNB Smart Chain
@@ -19,64 +15,48 @@ async function getMarkets() {
         "0x55d398326f99059fF775485246999027B3197955",
       sort: "volume",
       order: "desc",
-      limit: "50", // Fetch more to have enough for all filters
+      limit: "50",
     };
 
-    // Fetch open, closed, and resolved markets in parallel
+    // Fetch open, closed, and resolved markets in parallel via our API
     const [openRes, closedRes, resolvedRes] = await Promise.all([
       fetch(
-        `${MYRIAD_API_URL}/markets?${new URLSearchParams({
+        `${baseUrl}/api/markets?${new URLSearchParams({
           ...baseParams,
           state: "open",
         })}`,
         {
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": MYRIAD_API_KEY,
-          },
           next: { revalidate: 30 },
         },
       ),
       fetch(
-        `${MYRIAD_API_URL}/markets?${new URLSearchParams({
+        `${baseUrl}/api/markets?${new URLSearchParams({
           ...baseParams,
           state: "closed",
         })}`,
         {
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": MYRIAD_API_KEY,
-          },
           next: { revalidate: 30 },
         },
       ),
       fetch(
-        `${MYRIAD_API_URL}/markets?${new URLSearchParams({
+        `${baseUrl}/api/markets?${new URLSearchParams({
           ...baseParams,
           state: "resolved",
         })}`,
         {
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": MYRIAD_API_KEY,
-          },
           next: { revalidate: 30 },
         },
       ),
     ]);
 
     const [openData, closedData, resolvedData] = await Promise.all([
-      openRes.ok ? openRes.json() : { data: [] },
-      closedRes.ok ? closedRes.json() : { data: [] },
-      resolvedRes.ok ? resolvedRes.json() : { data: [] },
+      openRes.ok ? openRes.json() : [],
+      closedRes.ok ? closedRes.json() : [],
+      resolvedRes.ok ? resolvedRes.json() : [],
     ]);
 
     // Combine all markets and filter out test markets and BNB Candles
-    const allMarkets = [
-      ...(openData.data || []),
-      ...(closedData.data || []),
-      ...(resolvedData.data || []),
-    ].filter(
+    const allMarkets = [...openData, ...closedData, ...resolvedData].filter(
       (market) =>
         // Exclude test markets
         !market.title.toLowerCase().includes("test usd") &&
@@ -90,11 +70,11 @@ async function getMarkets() {
       "✅ Home page loaded",
       allMarkets.length,
       "markets (open:",
-      openData.data?.length || 0,
+      openData.length || 0,
       ", closed:",
-      closedData.data?.length || 0,
+      closedData.length || 0,
       ", resolved:",
-      resolvedData.data?.length || 0,
+      resolvedData.length || 0,
       ")",
     );
     return allMarkets;
