@@ -209,7 +209,7 @@ async function translateMarketToSpanish(market: any): Promise<any> {
   // Return market with Spanish translations
   return {
     ...market,
-    title: translation.titleEs,
-    description: translation.descriptionEs,
+    titleEs: translation.titleEs,
+    descriptionEs: translation.descriptionEs,
   };
 }
