@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import ReactMarkdown from "react-markdown";
 import { logger } from "@/lib/logger";
 import { fetchMarket } from "@/lib/myriad/api";
 import { Market } from "@/types/market";
@@ -415,39 +416,7 @@ export default function MarketDetailPage() {
 
             {/* Description Section */}
             <div className="border-t border-b border-border py-6 space-y-4">
-              {/* Description */}
-              {market.description && (
-                <div>
-                  <h3 className="font-semibold mb-3">Descripción</h3>
-                  <div className="text-foreground break-words leading-relaxed whitespace-pre-line">
-                    {(() => {
-                      // Split at "Market dates:" if it exists
-                      const lowerDesc = market.description.toLowerCase();
-                      const splitPoint = lowerDesc.indexOf("market dates:");
-
-                      let textToShow =
-                        splitPoint !== -1
-                          ? market.description.substring(0, splitPoint)
-                          : market.description;
-
-                      // Remove trailing ** and whitespace
-                      textToShow = textToShow.replace(/\*\*\s*$/, "").trim();
-
-                      // Format bold text (**text**)
-                      const parts = textToShow.split(/(\*\*.*?\*\*)/g);
-                      return parts.map((part, index) => {
-                        if (part.startsWith("**") && part.endsWith("**")) {
-                          const boldText = part.slice(2, -2);
-                          return <strong key={index}>{boldText}</strong>;
-                        }
-                        return <span key={index}>{part}</span>;
-                      });
-                    })()}
-                  </div>
-                </div>
-              )}
-
-              {/* Expandable Details Section */}
+              {/* Expandable Description Section */}
               <div>
                 <button
                   onClick={() => setShowMoreDetails(!showMoreDetails)}
@@ -456,12 +425,12 @@ export default function MarketDetailPage() {
                   {showMoreDetails ? (
                     <>
                       <ChevronUp className="h-4 w-4" />
-                      Ver menos
+                      Ocultar descripción
                     </>
                   ) : (
                     <>
                       <ChevronDown className="h-4 w-4" />
-                      Ver más detalles
+                      Ver descripción
                     </>
                   )}
                 </button>
@@ -470,55 +439,92 @@ export default function MarketDetailPage() {
                   className={cn(
                     "overflow-hidden transition-all duration-500 ease-in-out",
                     showMoreDetails
-                      ? "max-h-[800px] opacity-100 mt-4"
+                      ? "max-h-[2000px] opacity-100 mt-4"
                       : "max-h-0 opacity-0",
                   )}
                 >
                   <div className="space-y-4">
-                    {/* Market Details from Description (Market dates onwards) */}
-                    {market.description &&
-                      market.description
-                        .toLowerCase()
-                        .includes("market dates:") && (
-                        <div>
-                          <div className="text-sm text-foreground whitespace-pre-line">
+                    {/* Full Description */}
+                    {(market.descriptionEs || market.description) && (
+                      <div>
+                        <div className="text-sm text-foreground prose prose-sm max-w-none dark:prose-invert">
+                          <ReactMarkdown
+                            components={{
+                              h1: ({ node, ...props }) => (
+                                <h1
+                                  className="text-lg font-bold mt-4 mb-2"
+                                  {...props}
+                                />
+                              ),
+                              h2: ({ node, ...props }) => (
+                                <h2
+                                  className="text-base font-bold mt-3 mb-2"
+                                  {...props}
+                                />
+                              ),
+                              h3: ({ node, ...props }) => (
+                                <h3
+                                  className="text-sm font-semibold mt-2 mb-1"
+                                  {...props}
+                                />
+                              ),
+                              p: ({ node, ...props }) => (
+                                <p className="mb-2" {...props} />
+                              ),
+                              ul: ({ node, ...props }) => (
+                                <ul
+                                  className="list-disc ml-4 mb-2 space-y-1"
+                                  {...props}
+                                />
+                              ),
+                              ol: ({ node, ...props }) => (
+                                <ol
+                                  className="list-decimal ml-4 mb-2 space-y-1"
+                                  {...props}
+                                />
+                              ),
+                              li: ({ node, ...props }) => (
+                                <li className="ml-2" {...props} />
+                              ),
+                              a: ({ node, ...props }) => (
+                                <a
+                                  className="text-electric-purple hover:underline"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  {...props}
+                                />
+                              ),
+                              strong: ({ node, ...props }) => (
+                                <strong className="font-bold" {...props} />
+                              ),
+                            }}
+                          >
                             {(() => {
-                              const lowerDesc =
-                                market.description.toLowerCase();
-                              const splitPoint =
-                                lowerDesc.indexOf("market dates:");
-                              let detailsText = market.description
-                                .substring(splitPoint)
-                                .trim();
+                              let desc =
+                                market.descriptionEs || market.description;
 
-                              // Wrap "Market dates:" in ** if not already wrapped
-                              if (
-                                !detailsText.startsWith("**Market dates:**")
-                              ) {
-                                detailsText = detailsText.replace(
-                                  /^Market dates:/i,
-                                  "**Market dates:**",
-                                );
-                              }
+                              // Convert broken bold patterns at start of lines to H2 headers
+                              // Patterns like: **Fechas de mercado OR Fechas de mercado**: OR **Fechas de mercado**:
+                              desc = desc.replace(
+                                /^\*\*([^\*\n:]+)(\*\*)?:?\s*$/gm,
+                                "## $1",
+                              );
 
-                              // Format bold text (**text**)
-                              const parts = detailsText.split(/(\*\*.*?\*\*)/g);
-                              return parts.map((part, index) => {
-                                if (
-                                  part.startsWith("**") &&
-                                  part.endsWith("**")
-                                ) {
-                                  const boldText = part.slice(2, -2);
-                                  return (
-                                    <strong key={index}>{boldText}</strong>
-                                  );
-                                }
-                                return <span key={index}>{part}</span>;
-                              });
+                              // Fix remaining broken bold markdown - lines ending with ** but no opening
+                              desc = desc.replace(
+                                /^([^\*\n]+)\*\*:?\s*$/gm,
+                                "**$1**",
+                              );
+
+                              // Fix mid-line broken bold (word**: -> **word**)
+                              desc = desc.replace(/(\w+)\*\*:/g, "**$1**:");
+
+                              return desc;
                             })()}
-                          </div>
+                          </ReactMarkdown>
                         </div>
-                      )}
+                      </div>
+                    )}
 
                     {/* Resolution Source */}
                     {market.resolutionSource && (
