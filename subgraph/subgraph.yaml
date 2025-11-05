@@ -1,0 +1,27 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: PredictionMarket
+    network: bsc # BNB Smart Chain
+    source:
+      address: "0x39E66eE6b2ddaf4DEfDEd3038E0162180dbeF340"
+      abi: PredictionMarketV3_4
+      startBlock: 44000000 # Adjust this to the block when contract was deployed
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - User
+        - MarketTransaction
+        - Position
+        - Market
+      abis:
+        - name: PredictionMarketV3_4
+          file: ./abis/PredictionMarketV3_4.json
+      eventHandlers:
+        - event: MarketActionTx(indexed address,indexed uint8,indexed uint256,uint256,uint256,uint256,uint256)
+          handler: handleMarketActionTx
+      file: ./src/mapping.ts

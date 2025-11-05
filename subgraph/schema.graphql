@@ -1,0 +1,65 @@
+"""
+User entity - aggregated stats per user
+"""
+type User @entity(immutable: false) {
+  id: ID! # User address
+  address: Bytes!
+  totalInvested: BigInt!
+  totalWithdrawn: BigInt!
+  netPosition: BigInt!
+  transactionCount: Int!
+  marketsTraded: [String!]!
+  transactions: [MarketTransaction!]! @derivedFrom(field: "user")
+  positions: [Position!]! @derivedFrom(field: "user")
+  createdAt: BigInt!
+  updatedAt: BigInt!
+}
+
+"""
+MarketTransaction entity - individual transaction records
+"""
+type MarketTransaction @entity(immutable: true) {
+  id: ID! # Transaction hash + log index
+  user: User!
+  transactionHash: Bytes!
+  marketId: BigInt!
+  action: Int! # MarketAction enum value
+  actionLabel: String!
+  outcomeId: BigInt!
+  shares: BigInt!
+  value: BigInt!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+}
+
+"""
+Position entity - tracks user's position in a specific market outcome
+"""
+type Position @entity(immutable: false) {
+  id: ID! # User address + marketId + outcomeId
+  user: User!
+  marketId: BigInt!
+  outcomeId: BigInt!
+  shares: BigInt! # Net shares currently held
+  totalBought: BigInt! # Total shares bought
+  totalSold: BigInt! # Total shares sold
+  invested: BigInt! # Total money spent on buys
+  receivedFromSells: BigInt! # Total money received from sells
+  avgEntryPrice: BigDecimal! # invested / totalBought
+  isOpen: Boolean! # True if shares > 0
+  createdAt: BigInt!
+  updatedAt: BigInt!
+}
+
+"""
+Market metadata entity (optional - can be populated if needed)
+"""
+type Market @entity(immutable: false) {
+  id: ID! # Market ID
+  marketId: BigInt!
+  transactionCount: Int!
+  totalVolume: BigInt!
+  uniqueTraders: [String!]!
+  createdAt: BigInt!
+  updatedAt: BigInt!
+}

@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Generated files
+generated/
+build/
+
+# The Graph
+.graph/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store

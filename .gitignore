@@ -19,3 +19,16 @@ node_modules
 *.sql.dump
 
 scripts/seed-proposals.mjs
+
+# Subgraph documentation - generated files
+SUBGRAPH_DEPLOYMENT.md
+SUBGRAPH_IMPLEMENTATION_SUMMARY.md
+subgraph/QUICK_START.md
+subgraph/ARCHITECTURE.md
+subgraph/QUERIES.md
+subgraph/TROUBLESHOOTING.md
+subgraph/DEPLOYMENT_CHECKLIST.md
+Docs/SUBGRAPH_INTEGRATION.md
+
+# Backup files
+hooks/use-user-transactions-rpc.ts.bak

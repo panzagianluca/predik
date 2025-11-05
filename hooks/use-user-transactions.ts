@@ -1,12 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { usePublicClient } from "wagmi";
-import { Address, parseAbiItem } from "viem";
-import {
-  PREDICTION_MARKET_ABI,
-  MARKET_ACTION_LABELS,
-} from "@/lib/abis/PredictionMarketV3_4";
+import { Address } from "viem";
 import { MarketAction } from "@/lib/abis/PredictionMarketV3_4";
 import { logger } from "@/lib/logger";
 
@@ -35,13 +30,13 @@ export interface TransactionStats {
 
 export interface OpenPosition {
   marketId: string;
-  outcomeId: string; // '0' for NO, '1' for YES
-  shares: bigint; // net shares held
-  totalBought: bigint; // total shares bought
-  totalSold: bigint; // total shares sold
-  invested: bigint; // total money spent on buys
-  receivedFromSells: bigint; // total money from sells
-  avgEntryPrice: number; // invested / totalBought (in token units)
+  outcomeId: string;
+  shares: bigint;
+  totalBought: bigint;
+  totalSold: bigint;
+  invested: bigint;
+  receivedFromSells: bigint;
+  avgEntryPrice: number;
 }
 
 interface UseUserTransactionsResult {
@@ -50,15 +45,50 @@ interface UseUserTransactionsResult {
   positions: OpenPosition[];
   isLoading: boolean;
   error: Error | null;
+  refetch: () => void;
 }
 
-const PM_CONTRACT = (process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS ||
-  "") as Address;
+// GraphQL query for user data
+const USER_DATA_QUERY = `
+  query GetUserData($userAddress: String!) {
+    user(id: $userAddress) {
+      address
+      totalInvested
+      totalWithdrawn
+      netPosition
+      transactionCount
+      marketsTraded
+      transactions(orderBy: timestamp, orderDirection: desc, first: 1000) {
+        id
+        transactionHash
+        marketId
+        action
+        actionLabel
+        outcomeId
+        shares
+        value
+        timestamp
+        blockNumber
+      }
+      positions(where: { isOpen: true }) {
+        marketId
+        outcomeId
+        shares
+        totalBought
+        totalSold
+        invested
+        receivedFromSells
+        avgEntryPrice
+      }
+    }
+  }
+`;
+
+const SUBGRAPH_URL = process.env.NEXT_PUBLIC_SUBGRAPH_URL || "";
 
 export function useUserTransactions(
   userAddress?: Address,
 ): UseUserTransactionsResult {
-  const publicClient = usePublicClient();
   const [transactions, setTransactions] = useState<UserTransaction[]>([]);
   const [positions, setPositions] = useState<OpenPosition[]>([]);
   const [stats, setStats] = useState<TransactionStats>({
@@ -70,9 +100,14 @@ export function useUserTransactions(
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const [refetchTrigger, setRefetchTrigger] = useState(0);
+
+  const refetch = () => {
+    setRefetchTrigger((prev) => prev + 1);
+  };
 
   useEffect(() => {
-    if (!userAddress || !publicClient || !PM_CONTRACT) {
+    if (!userAddress || !SUBGRAPH_URL) {
       setTransactions([]);
       setPositions([]);
       setStats({
@@ -85,179 +120,118 @@ export function useUserTransactions(
       return;
     }
 
-    const fetchTransactions = async () => {
+    const fetchUserData = async () => {
       setIsLoading(true);
       setError(null);
 
       try {
-        // Get current block number
-        const currentBlock = await publicClient.getBlockNumber();
-
-        // Query logs from the last ~30 days (assuming ~2s block time on Abstract)
-        // 30 days * 24 hours * 60 minutes * 60 seconds / 2 seconds per block = ~1,296,000 blocks
-        const blocksToQuery = BigInt(1_296_000);
-        const fromBlock =
-          currentBlock > blocksToQuery
-            ? currentBlock - blocksToQuery
-            : BigInt(0);
-
-        logger.log("🔍 Fetching user transactions...", {
+        logger.log("🔍 Fetching user data from subgraph...", {
           userAddress,
-          pmContract: PM_CONTRACT,
-          fromBlock: fromBlock.toString(),
-          toBlock: currentBlock.toString(),
+          subgraphUrl: SUBGRAPH_URL,
         });
 
-        // Fetch MarketActionTx events for this user
-        const logs = await publicClient.getLogs({
-          address: PM_CONTRACT,
-          event: PREDICTION_MARKET_ABI[0], // MarketActionTx event
-          args: {
-            user: userAddress,
+        const response = await fetch(SUBGRAPH_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-          fromBlock,
-          toBlock: currentBlock,
+          body: JSON.stringify({
+            query: USER_DATA_QUERY,
+            variables: {
+              userAddress: userAddress.toLowerCase(),
+            },
+          }),
         });
 
-        logger.log(`📊 Found ${logs.length} transactions for user`);
+        if (!response.ok) {
+          throw new Error(`Subgraph request failed: ${response.statusText}`);
+        }
 
-        // Parse logs into transactions
-        const parsedTransactions: UserTransaction[] = logs.map((log) => {
-          const {
-            user,
-            action,
-            marketId,
-            outcomeId,
-            shares,
-            value,
-            timestamp,
-          } = log.args;
+        const result = await response.json();
 
-          return {
-            hash: log.transactionHash || "",
-            marketId: marketId || BigInt(0),
-            action: Number(action) as MarketAction,
-            actionLabel:
-              MARKET_ACTION_LABELS[Number(action) as MarketAction] || "Unknown",
-            outcomeId: outcomeId || BigInt(0),
-            shares: shares || BigInt(0),
-            value: value || BigInt(0),
-            timestamp: Number(timestamp || 0),
-            blockNumber: log.blockNumber || BigInt(0),
-          };
-        });
+        if (result.errors) {
+          throw new Error(
+            `GraphQL errors: ${result.errors
+              .map((e: any) => e.message)
+              .join(", ")}`,
+          );
+        }
 
-        // Sort by timestamp descending (newest first)
-        parsedTransactions.sort((a, b) => b.timestamp - a.timestamp);
+        const userData = result.data?.user;
 
-        // Calculate stats
-        let totalInvested = BigInt(0);
-        let totalWithdrawn = BigInt(0);
-        const marketsTraded = new Set<string>();
+        if (!userData) {
+          // User hasn't made any transactions yet
+          logger.log("📊 No user data found in subgraph");
+          setTransactions([]);
+          setPositions([]);
+          setStats({
+            totalInvested: BigInt(0),
+            totalWithdrawn: BigInt(0),
+            netPosition: BigInt(0),
+            transactionCount: 0,
+            marketsTraded: new Set(),
+          });
+          setIsLoading(false);
+          return;
+        }
 
-        parsedTransactions.forEach((tx) => {
-          marketsTraded.add(tx.marketId.toString());
+        logger.log(`📊 Found ${userData.transactions.length} transactions`);
 
-          // Money going in: Buy, Add Liquidity
-          if (
-            tx.action === MarketAction.BUY ||
-            tx.action === MarketAction.ADD_LIQUIDITY
-          ) {
-            totalInvested += tx.value;
-          }
-
-          // Money coming out: Sell, Remove Liquidity, Claims
-          if (
-            tx.action === MarketAction.SELL ||
-            tx.action === MarketAction.REMOVE_LIQUIDITY ||
-            tx.action === MarketAction.CLAIM_WINNINGS ||
-            tx.action === MarketAction.CLAIM_LIQUIDITY ||
-            tx.action === MarketAction.CLAIM_FEES ||
-            tx.action === MarketAction.CLAIM_VOIDED
-          ) {
-            totalWithdrawn += tx.value;
-          }
-        });
-
-        const netPosition = totalWithdrawn - totalInvested;
-
-        // Calculate open positions
-        const positionMap = new Map<string, OpenPosition>();
-
-        parsedTransactions.forEach((tx) => {
-          // Only track BUY and SELL actions for positions
-          if (
-            tx.action !== MarketAction.BUY &&
-            tx.action !== MarketAction.SELL
-          ) {
-            return;
-          }
-
-          const key = `${tx.marketId}-${tx.outcomeId}`;
-          const existing = positionMap.get(key) || {
-            marketId: tx.marketId.toString(),
-            outcomeId: tx.outcomeId.toString(),
-            shares: BigInt(0),
-            totalBought: BigInt(0),
-            totalSold: BigInt(0),
-            invested: BigInt(0),
-            receivedFromSells: BigInt(0),
-            avgEntryPrice: 0,
-          };
-
-          if (tx.action === MarketAction.BUY) {
-            existing.shares += tx.shares;
-            existing.totalBought += tx.shares;
-            existing.invested += tx.value;
-          } else if (tx.action === MarketAction.SELL) {
-            existing.shares -= tx.shares;
-            existing.totalSold += tx.shares;
-            existing.receivedFromSells += tx.value;
-          }
-
-          // Calculate average entry price (value per share in wei)
-          if (existing.totalBought > BigInt(0)) {
-            // Average price = total invested / total shares bought
-            // Both are in wei, so result is dimensionless (price per share)
-            // We'll format it in the UI component
-            const investedNum = Number(existing.invested);
-            const sharesNum = Number(existing.totalBought);
-            existing.avgEntryPrice = investedNum / sharesNum;
-          }
-
-          positionMap.set(key, existing);
-        });
-
-        // Filter to only open positions (shares > 0)
-        const openPositions = Array.from(positionMap.values()).filter(
-          (pos) => pos.shares > BigInt(0),
+        // Parse transactions
+        const parsedTransactions: UserTransaction[] = userData.transactions.map(
+          (tx: any) => ({
+            hash: tx.transactionHash,
+            marketId: BigInt(tx.marketId),
+            action: Number(tx.action) as MarketAction,
+            actionLabel: tx.actionLabel,
+            outcomeId: BigInt(tx.outcomeId),
+            shares: BigInt(tx.shares),
+            value: BigInt(tx.value),
+            timestamp: Number(tx.timestamp),
+            blockNumber: BigInt(tx.blockNumber),
+          }),
         );
 
-        logger.log(`📈 Found ${openPositions.length} open positions`);
+        // Parse positions
+        const parsedPositions: OpenPosition[] = userData.positions.map(
+          (pos: any) => ({
+            marketId: pos.marketId,
+            outcomeId: pos.outcomeId,
+            shares: BigInt(pos.shares),
+            totalBought: BigInt(pos.totalBought),
+            totalSold: BigInt(pos.totalSold),
+            invested: BigInt(pos.invested),
+            receivedFromSells: BigInt(pos.receivedFromSells),
+            avgEntryPrice: Number(pos.avgEntryPrice),
+          }),
+        );
+
+        // Parse stats
+        const parsedStats: TransactionStats = {
+          totalInvested: BigInt(userData.totalInvested),
+          totalWithdrawn: BigInt(userData.totalWithdrawn),
+          netPosition: BigInt(userData.netPosition),
+          transactionCount: userData.transactionCount,
+          marketsTraded: new Set(userData.marketsTraded),
+        };
+
+        logger.log(`📈 Found ${parsedPositions.length} open positions`);
 
         setTransactions(parsedTransactions);
-        setPositions(openPositions);
-        setStats({
-          totalInvested,
-          totalWithdrawn,
-          netPosition,
-          transactionCount: parsedTransactions.length,
-          marketsTraded,
-        });
+        setPositions(parsedPositions);
+        setStats(parsedStats);
       } catch (err) {
-        logger.error("❌ Error fetching transactions:", err);
+        logger.error("❌ Error fetching user data from subgraph:", err);
         setError(
-          err instanceof Error
-            ? err
-            : new Error("Failed to fetch transactions"),
+          err instanceof Error ? err : new Error("Failed to fetch user data"),
         );
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchTransactions();
-  }, [userAddress, publicClient]);
+    fetchUserData();
+  }, [userAddress, refetchTrigger]);
 
   return {
     transactions,
@@ -265,5 +239,6 @@ export function useUserTransactions(
     stats,
     isLoading,
     error,
+    refetch,
   };
 }
