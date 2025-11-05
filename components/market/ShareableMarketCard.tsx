@@ -149,7 +149,7 @@ export function ShareableMarketCard({
                   textShadow: "0 1px 2px rgba(0,0,0,0.2)",
                 }}
               >
-                Última actualización: {lastUpdated.getDate()}{" "}
+                Actualizado al {lastUpdated.getDate()} de{" "}
                 {
                   [
                     "enero",
@@ -168,7 +168,8 @@ export function ShareableMarketCard({
                 }
                 , {lastUpdated.getFullYear()} a las{" "}
                 {String(lastUpdated.getHours()).padStart(2, "0")}:
-                {String(lastUpdated.getMinutes()).padStart(2, "0")}
+                {String(lastUpdated.getMinutes()).padStart(2, "0")} hora
+                Argentina
               </div>
             </div>
           </div>

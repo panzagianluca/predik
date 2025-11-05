@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 import {
   Dialog,
   DialogContent,
@@ -37,6 +38,34 @@ export function DepositModal({
   const [copied, setCopied] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showBridgeTooltip, setShowBridgeTooltip] = useState(false);
+  const { resolvedTheme, setTheme } = useTheme();
+
+  // Prevent LiFi Widget from changing global theme
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const currentTheme = resolvedTheme;
+
+    // Monitor for theme changes and restore
+    const observer = new MutationObserver(() => {
+      const htmlElement = document.documentElement;
+      const currentClass = htmlElement.className;
+
+      // If the widget changed the theme, restore it
+      if (currentTheme === "dark" && !currentClass.includes("dark")) {
+        htmlElement.classList.add("dark");
+      } else if (currentTheme === "light" && currentClass.includes("dark")) {
+        htmlElement.classList.remove("dark");
+      }
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class", "style"],
+    });
+
+    return () => observer.disconnect();
+  }, [isOpen, resolvedTheme]);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(walletAddress);
@@ -52,11 +81,17 @@ export function DepositModal({
   const lifiConfig = {
     integrator: "Predik",
     theme: {
+      palette: {
+        primary: { main: "#8B5CF6" },
+      },
       container: {
         boxShadow: "none",
         borderRadius: "8px",
       },
     },
+    appearance: (resolvedTheme === "dark" ? "dark" : "light") as
+      | "dark"
+      | "light",
   };
 
   return (
@@ -78,7 +113,7 @@ export function DepositModal({
           <Tabs defaultValue="cex" className="w-full mt-4">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="cex">Desde CEX</TabsTrigger>
-              <TabsTrigger value="bridge">Puente</TabsTrigger>
+              <TabsTrigger value="bridge">Bridge</TabsTrigger>
             </TabsList>
 
             {/* Tab 1: CEX */}
@@ -231,7 +266,7 @@ export function DepositModal({
                 </div>
 
                 {/* Li.Fi Widget */}
-                <div className="rounded-lg overflow-hidden">
+                <div className="rounded-lg overflow-hidden [&_*]:!text-inherit">
                   <LiFiWidget integrator="Predik" config={lifiConfig} />
                 </div>
               </div>
