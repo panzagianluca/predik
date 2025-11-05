@@ -23,6 +23,7 @@ import {
 } from "@/components/animate-ui/components/animate/tooltip";
 import { cn } from "@/lib/utils";
 import { haptics } from "@/lib/haptics";
+import { translateOutcomeTitle } from "@/lib/translation/outcomeTranslations";
 
 interface MobileTradingModalProps {
   isOpen: boolean;
@@ -537,7 +538,7 @@ export function MobileTradingModal({
                     >
                       <div className="flex items-center justify-between w-full gap-2">
                         <span className="font-semibold text-sm">
-                          {outcome.title}
+                          {translateOutcomeTitle(outcome.title)}
                         </span>
                         <span className="text-xs opacity-80">
                           {(outcome.price * 100).toFixed(2)}%

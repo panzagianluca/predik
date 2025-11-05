@@ -28,7 +28,9 @@ import {
   TooltipTrigger,
 } from "@/components/animate-ui/components/animate/tooltip";
 import { LogoSpinner } from "@/components/ui/logo-spinner";
+import { haptics } from "@/lib/haptics";
 import { logger } from "@/lib/logger";
+import { translateOutcomeTitle } from "@/lib/translation/outcomeTranslations";
 
 interface TradingPanelProps {
   market: Market;
@@ -625,7 +627,7 @@ export function TradingPanel({
                   )}
                   <div className="flex items-center justify-between w-full gap-2 relative z-10">
                     <span className="font-semibold text-sm">
-                      {outcome.title}
+                      {translateOutcomeTitle(outcome.title)}
                     </span>
                     <span className="text-xs opacity-80">
                       {(outcome.price * 100).toFixed(2)}%

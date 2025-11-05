@@ -45,6 +45,11 @@ import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/animate-ui/primitives/animate/tooltip";
 import CountUp from "react-countup";
 import { haptics } from "@/lib/haptics";
+import {
+  translateStatus,
+  translateTag,
+} from "@/lib/translation/marketTranslations";
+import { translateOutcomeTitle } from "@/lib/translation/outcomeTranslations";
 
 // Helper function to format description with bold markdown
 const formatDescription = (text: string) => {
@@ -79,6 +84,7 @@ export default function MarketDetailPage() {
   const [selectedOutcomeId, setSelectedOutcomeId] = useState<string | null>(
     null,
   );
+  const [countdown, setCountdown] = useState<string>("");
 
   useEffect(() => {
     const loadMarket = async () => {
@@ -100,6 +106,41 @@ export default function MarketDetailPage() {
       loadMarket();
     }
   }, [slug]);
+
+  // Countdown timer for markets closing in less than 24 hours
+  useEffect(() => {
+    if (!market) return;
+
+    const updateCountdown = () => {
+      const now = new Date();
+      const expires = new Date(market.expiresAt);
+      const diff = expires.getTime() - now.getTime();
+
+      if (diff < 0) {
+        setCountdown("");
+        return;
+      }
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+      // Only show countdown if less than 24 hours
+      if (hours < 24) {
+        setCountdown(
+          `${hours.toString().padStart(2, "0")}:${minutes
+            .toString()
+            .padStart(2, "0")}`,
+        );
+      } else {
+        setCountdown("");
+      }
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 60000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, [market]);
 
   const handleTradeComplete = async () => {
     // Reload market data after trade
@@ -205,7 +246,7 @@ export default function MarketDetailPage() {
                       {market.titleEs || market.title}
                     </h1>
 
-                    {/* Badges - Desktop only */}
+                    {/* Badges - Desktop only: Status | Tag | BNB Logo */}
                     <div className="hidden md:flex items-center gap-2 flex-wrap">
                       {/* State Badge */}
                       <span
@@ -228,20 +269,37 @@ export default function MarketDetailPage() {
                         {market.state === "resolved" && (
                           <CheckCircle2 className="h-3 w-3" />
                         )}
-                        {market.state}
+                        {translateStatus(market.state)}
                       </span>
 
-                      {/* Topics/Tags */}
-                      {market.topics &&
-                        market.topics.length > 0 &&
-                        market.topics.map((topic, index) => (
-                          <span
-                            key={index}
-                            className="px-3 py-1 rounded-full text-xs font-semibold bg-muted text-muted-foreground"
-                          >
-                            {topic}
-                          </span>
-                        ))}
+                      {/* Topics/Tags - Only first one */}
+                      {market.topics && market.topics.length > 0 && (
+                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-muted text-muted-foreground">
+                          {translateTag(market.topics[0])}
+                        </span>
+                      )}
+
+                      {/* BNB Chain Badge */}
+                      <a
+                        href={`https://bscscan.com/address/${market.tokenAddress}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center hover:opacity-80 transition-opacity"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          haptics.light();
+                        }}
+                      >
+                        <div className="relative w-4 h-4 flex items-center justify-center">
+                          <Image
+                            src="/bnb-seeklogo.svg"
+                            alt="BNB Chain"
+                            fill
+                            sizes="16px"
+                            className="object-contain"
+                          />
+                        </div>
+                      </a>
                     </div>
                   </div>
 
@@ -278,20 +336,37 @@ export default function MarketDetailPage() {
                     {market.state === "resolved" && (
                       <CheckCircle2 className="h-3 w-3" />
                     )}
-                    {market.state}
+                    {translateStatus(market.state)}
                   </span>
 
-                  {/* Topics/Tags */}
-                  {market.topics &&
-                    market.topics.length > 0 &&
-                    market.topics.map((topic, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 rounded-full text-[12px] font-semibold bg-muted text-muted-foreground"
-                      >
-                        {topic}
-                      </span>
-                    ))}
+                  {/* Topics/Tags - Only first one */}
+                  {market.topics && market.topics.length > 0 && (
+                    <span className="px-3 py-1 rounded-full text-[12px] font-semibold bg-muted text-muted-foreground">
+                      {translateTag(market.topics[0])}
+                    </span>
+                  )}
+
+                  {/* BNB Chain Badge */}
+                  <a
+                    href={`https://bscscan.com/address/${market.tokenAddress}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center hover:opacity-80 transition-opacity"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      haptics.light();
+                    }}
+                  >
+                    <div className="relative w-3.5 h-3.5 flex items-center justify-center">
+                      <Image
+                        src="/bnb-seeklogo.svg"
+                        alt="BNB Chain"
+                        fill
+                        sizes="14px"
+                        className="object-contain"
+                      />
+                    </div>
+                  </a>
                 </div>
 
                 {/* Share Button - Mobile only */}
@@ -312,7 +387,9 @@ export default function MarketDetailPage() {
                     <Calendar className="h-4 w-4" />
                     <span>
                       {market.state === "open"
-                        ? `Cierra en ${getTimeRemaining(market.expiresAt)}`
+                        ? countdown
+                          ? `Cierra en ${countdown}`
+                          : `Cierra en ${getTimeRemaining(market.expiresAt)}`
                         : `Cerrado el ${formatDate(market.expiresAt)}`}
                     </span>
                   </div>
@@ -683,7 +760,9 @@ export default function MarketDetailPage() {
                         key={outcome.id}
                         className="flex items-center justify-between"
                       >
-                        <span className="text-sm">{outcome.title}</span>
+                        <span className="text-sm">
+                          {translateOutcomeTitle(outcome.title)}
+                        </span>
                         <span
                           className="font-bold"
                           style={{ color: index === 0 ? "#22c55e" : "#ef4444" }}
@@ -839,7 +918,9 @@ export default function MarketDetailPage() {
                         key={outcome.id}
                         className="flex items-center justify-between"
                       >
-                        <span className="text-sm">{outcome.title}</span>
+                        <span className="text-sm">
+                          {translateOutcomeTitle(outcome.title)}
+                        </span>
                         <span
                           className="font-bold"
                           style={{ color: index === 0 ? "#22c55e" : "#ef4444" }}
@@ -904,7 +985,7 @@ export default function MarketDetailPage() {
                   : "bg-red-600/75 hover:bg-red-700/75 text-white",
               )}
             >
-              <span>{outcome.title}</span>
+              <span>{translateOutcomeTitle(outcome.title)}</span>
               <span className="text-xs opacity-90">
                 {(outcome.price * 100).toFixed(1)}%
               </span>

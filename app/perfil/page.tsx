@@ -14,6 +14,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   useDynamicContext,
   useUserWallets,
+  DynamicWidget,
 } from "@dynamic-labs/sdk-react-core";
 import { Button } from "@/components/ui/button";
 import {
@@ -102,8 +103,9 @@ export default function ProfilePage() {
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
   // Dynamic multi-wallet support
-  const { setShowAuthFlow } = useDynamicContext();
+  const { primaryWallet } = useDynamicContext();
   const userWallets = useUserWallets();
+  const [showLinkModal, setShowLinkModal] = useState(false);
 
   useEffect(() => {
     if (!isConnected) {
@@ -160,9 +162,8 @@ export default function ProfilePage() {
   };
 
   const handleLinkAccount = () => {
-    // Open Dynamic auth flow to link another wallet/account
-    // This allows users to link Google, Twitter, or another wallet
-    setShowAuthFlow(true);
+    // Show Dynamic Widget which includes linking options
+    setShowLinkModal(true);
   };
 
   const handleSaveProfile = async (data: {
@@ -295,7 +296,7 @@ export default function ProfilePage() {
                   className="w-full gap-2"
                 >
                   <Link2 className="h-4 w-4" />
-                  Vincular Google o Twitter
+                  Vincular Google o X
                 </Button>
                 {userWallets.length > 1 && (
                   <p className="text-xs text-muted-foreground mt-2 text-center">
@@ -497,6 +498,24 @@ export default function ProfilePage() {
             walletAddress={address}
             onSave={handleSaveProfile}
           />
+
+          {/* Link Wallet Modal - Using DynamicWidget */}
+          {showLinkModal && (
+            <div
+              className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center"
+              onClick={() => setShowLinkModal(false)}
+            >
+              <div
+                className="bg-background p-6 rounded-lg max-w-md w-full mx-4"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h3 className="text-lg font-semibold mb-4">
+                  Vincular cuenta adicional
+                </h3>
+                <DynamicWidget />
+              </div>
+            </div>
+          )}
         </motion.div>
       </div>
     </div>
