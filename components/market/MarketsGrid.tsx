@@ -1,15 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MarketCard } from "@/components/market/MarketCard";
 import { Market } from "@/types/market";
-import { TrendingUp, Clock, Calendar, X } from "lucide-react";
+import { TrendingUp, Clock, Calendar, X, Bookmark } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/animate-ui/primitives/animate/tooltip";
 import { motion, AnimatePresence } from "framer-motion";
 import { haptics } from "@/lib/haptics";
+import { useAccount } from "wagmi";
 
-type TimeFilter = "trending" | "recent" | "closing-soon" | "closed";
+type TimeFilter = "trending" | "recent" | "closing-soon" | "closed" | "saved";
 type CategoryFilter =
   | "all"
   | "sports"
@@ -26,11 +27,52 @@ interface MarketsGridProps {
 export function MarketsGrid({ markets }: MarketsGridProps) {
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("trending");
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
+  const [savedMarketIds, setSavedMarketIds] = useState<number[]>([]);
+  const { address } = useAccount();
+
+  // Fetch saved markets from API when user logs in or filter changes to "saved"
+  useEffect(() => {
+    const fetchSavedMarkets = async () => {
+      if (!address) {
+        setSavedMarketIds([]);
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `/api/saved-markets?userAddress=${address}`,
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setSavedMarketIds(data.marketIds);
+        } else {
+          // Fallback to localStorage
+          const saved = localStorage.getItem("savedMarkets");
+          if (saved) {
+            setSavedMarketIds(JSON.parse(saved));
+          }
+        }
+      } catch (error) {
+        // Fallback to localStorage on error
+        const saved = localStorage.getItem("savedMarkets");
+        if (saved) {
+          setSavedMarketIds(JSON.parse(saved));
+        }
+      }
+    };
+
+    if (timeFilter === "saved" || address) {
+      fetchSavedMarkets();
+    }
+  }, [address, timeFilter]);
 
   // Filter markets based on selected filters
   const filteredMarkets = markets.filter((market) => {
     // Time filter logic
-    if (timeFilter === "closed") {
+    if (timeFilter === "saved") {
+      // Show only saved markets
+      if (!savedMarketIds.includes(market.id)) return false;
+    } else if (timeFilter === "closed") {
       // Show only closed or resolved markets
       if (market.state !== "closed" && market.state !== "resolved")
         return false;
@@ -106,6 +148,7 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
     { id: "recent", label: "Recientes", icon: Clock },
     { id: "closing-soon", label: "Cierra Pronto", icon: Calendar },
     { id: "closed", label: "Cerrados", icon: X },
+    { id: "saved", label: "", icon: Bookmark }, // Icon only
   ];
 
   const categoryFilters: Array<{
@@ -159,7 +202,9 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
                     />
                   )}
                   <Icon className="h-4 w-4 relative z-10" />
-                  <span className="relative z-10">{filter.label}</span>
+                  {filter.label && (
+                    <span className="relative z-10">{filter.label}</span>
+                  )}
                 </motion.button>
               );
             })}
@@ -234,7 +279,9 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
                     />
                   )}
                   <Icon className="h-4 w-4 relative z-10" />
-                  <span className="relative z-10">{filter.label}</span>
+                  {filter.label && (
+                    <span className="relative z-10">{filter.label}</span>
+                  )}
                 </motion.button>
               );
             })}

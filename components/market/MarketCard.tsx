@@ -7,7 +7,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/animate-ui/components/animate/tooltip";
-import { Calendar, TrendingUp, Droplet } from "lucide-react";
+import { Calendar, TrendingUp, Droplet, Bookmark } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -15,6 +15,9 @@ import Image from "next/image";
 import CountUp from "react-countup";
 import { haptics } from "@/lib/haptics";
 import { translateOutcomeTitle } from "@/lib/translation/outcomeTranslations";
+import { cn } from "@/lib/utils";
+import { useAccount } from "wagmi";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 interface MarketCardProps {
   market: Market;
@@ -24,12 +27,104 @@ export function MarketCard({ market }: MarketCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const { address } = useAccount();
+  const { setShowAuthFlow } = useDynamicContext();
 
   // Trigger animations on mount
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 100);
     return () => clearTimeout(timer);
   }, []);
+
+  // Check if market is saved
+  useEffect(() => {
+    if (!address) {
+      setIsSaved(false);
+      return;
+    }
+
+    const fetchSavedMarkets = async () => {
+      try {
+        const response = await fetch(
+          `/api/saved-markets?userAddress=${address}`,
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setIsSaved(data.marketIds.includes(market.id));
+        } else {
+          // Fallback to localStorage if API fails
+          const saved = localStorage.getItem("savedMarkets");
+          if (saved) {
+            const savedIds = JSON.parse(saved);
+            setIsSaved(savedIds.includes(market.id));
+          }
+        }
+      } catch (error) {
+        // Fallback to localStorage on error
+        const saved = localStorage.getItem("savedMarkets");
+        if (saved) {
+          const savedIds = JSON.parse(saved);
+          setIsSaved(savedIds.includes(market.id));
+        }
+      }
+    };
+
+    fetchSavedMarkets();
+  }, [market.id, address]);
+
+  // Toggle save state
+  const toggleSave = async (marketId: number) => {
+    // Check if user is logged in
+    if (!address) {
+      setShowAuthFlow(true);
+      return;
+    }
+
+    const newSavedState = !isSaved;
+    setIsSaved(newSavedState);
+
+    try {
+      if (newSavedState) {
+        // Save market
+        await fetch("/api/saved-markets", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userAddress: address,
+            marketId,
+            marketSlug: market.slug,
+          }),
+        });
+      } else {
+        // Remove saved market
+        await fetch(
+          `/api/saved-markets?userAddress=${address}&marketId=${marketId}`,
+          {
+            method: "DELETE",
+          },
+        );
+      }
+
+      // Also update localStorage as backup/cache
+      const saved = localStorage.getItem("savedMarkets") || "[]";
+      let savedIds = JSON.parse(saved);
+
+      if (newSavedState) {
+        if (!savedIds.includes(marketId)) {
+          savedIds.push(marketId);
+        }
+      } else {
+        savedIds = savedIds.filter((id: number) => id !== marketId);
+      }
+
+      localStorage.setItem("savedMarkets", JSON.stringify(savedIds));
+    } catch (error) {
+      console.error("Error toggling save:", error);
+      // Revert UI state on error
+      setIsSaved(!newSavedState);
+    }
+  };
 
   // Format date to relative (e.g., "58 days")
   const formatRelativeDate = (dateString: string) => {
@@ -48,7 +143,7 @@ export function MarketCard({ market }: MarketCardProps) {
     return `${diffDays} days`;
   };
 
-  // Format absolute date (e.g., "Dec 31, 2025")
+  // Format absolute date for Argentina (e.g., "30 de noviembre, 2025")
   const formatAbsoluteDate = (dateString: string) => {
     const date = new Date(dateString);
 
@@ -57,11 +152,31 @@ export function MarketCard({ market }: MarketCardProps) {
       return "Cuando una de las opciones sucede";
     }
 
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
+    // Convert to Argentina timezone
+    const argentinaDate = new Date(
+      date.toLocaleString("en-US", {
+        timeZone: "America/Argentina/Buenos_Aires",
+      }),
+    );
+
+    const monthNames = [
+      "enero",
+      "febrero",
+      "marzo",
+      "abril",
+      "mayo",
+      "junio",
+      "julio",
+      "agosto",
+      "septiembre",
+      "octubre",
+      "noviembre",
+      "diciembre",
+    ];
+
+    return `${argentinaDate.getDate()} de ${
+      monthNames[argentinaDate.getMonth()]
+    }, ${argentinaDate.getFullYear()}`;
   }; // Format volume with K/M suffix
   const formatVolume = (volume?: number) => {
     if (!volume) return "$0.00";
@@ -255,12 +370,13 @@ export function MarketCard({ market }: MarketCardProps) {
           )}
         </div>
 
-        {/* Footer Metadata - Expires | Volume | Liquidity */}
+        {/* Footer Metadata - Date | Volume | BNB, Save */}
         <div className="flex items-center justify-between text-xs text-muted-foreground pt-3 border-t border-border mt-4 gap-1">
-          {/* Close Date with Tooltip */}
+          {/* Close Date */}
+          {/* Left: Date */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center justify-center gap-1 flex-1 hover:text-foreground transition-colors duration-200">
+              <div className="flex items-center gap-1 hover:text-foreground transition-colors duration-200">
                 <Calendar className="w-3 h-3" />
                 <span>{formatRelativeDate(market.expiresAt)}</span>
               </div>
@@ -270,9 +386,7 @@ export function MarketCard({ market }: MarketCardProps) {
             </TooltipContent>
           </Tooltip>
 
-          <span className="text-muted-foreground/50">|</span>
-
-          {/* Volume with Tooltip */}
+          {/* Center: Volume */}
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="flex items-center justify-center gap-1 flex-1 hover:text-foreground transition-colors duration-200">
@@ -285,20 +399,60 @@ export function MarketCard({ market }: MarketCardProps) {
             </TooltipContent>
           </Tooltip>
 
-          <span className="text-muted-foreground/50">|</span>
+          {/* Right: BNB + Save */}
+          <div className="flex items-center gap-2">
+            {/* BNB Network Badge */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <a
+                  href={`https://bscscan.com/address/${market.tokenAddress}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center hover:opacity-80 transition-opacity underline decoration-dotted"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    haptics.light();
+                  }}
+                >
+                  <div className="relative w-3.5 h-3.5 flex items-center justify-center">
+                    <Image
+                      src="/bnb-seeklogo.svg"
+                      alt="BNB"
+                      fill
+                      sizes="14px"
+                      className="object-contain"
+                    />
+                  </div>
+                </a>
+              </TooltipTrigger>
+              <TooltipContent>Mercado en la red de BNB</TooltipContent>
+            </Tooltip>
 
-          {/* Liquidity with Tooltip */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="flex items-center justify-center gap-1 flex-1 hover:text-foreground transition-colors duration-200">
-                <Droplet className="w-3 h-3" />
-                <span>{formatLiquidity(market.liquidity)}</span>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              Liquidez: {formatFullLiquidity(market.liquidity)}
-            </TooltipContent>
-          </Tooltip>
+            {/* Save/Bookmark Button */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleSave(market.id);
+                    haptics.selection();
+                  }}
+                  className="flex items-center hover:text-foreground transition-colors"
+                >
+                  <Bookmark
+                    className={cn(
+                      "w-3.5 h-3.5",
+                      isSaved && "fill-electric-purple text-electric-purple",
+                    )}
+                  />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {isSaved ? "Guardado" : "Guardar mercado"}
+              </TooltipContent>
+            </Tooltip>
+          </div>
         </div>
       </CardContent>
     </Card>

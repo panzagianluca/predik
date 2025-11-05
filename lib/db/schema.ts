@@ -253,3 +253,28 @@ export const marketTranslations = pgTable(
     ),
   }),
 );
+
+// Saved markets table - users can bookmark markets
+export const savedMarkets = pgTable(
+  "saved_markets",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userAddress: varchar("user_address", { length: 42 }).notNull(), // User who saved (lowercase)
+    marketId: integer("market_id").notNull(), // Myriad market ID
+    marketSlug: text("market_slug").notNull(), // For quick reference
+    savedAt: timestamp("saved_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    // Unique constraint - user can only save a market once
+    userMarketUnique: unique("saved_markets_user_market_unique").on(
+      table.userAddress,
+      table.marketId,
+    ),
+    // Index for fetching user's saved markets
+    userAddressIdx: index("saved_markets_user_address_idx").on(
+      table.userAddress,
+    ),
+    // Index for sorting by save date
+    savedAtIdx: index("saved_markets_saved_at_idx").on(table.savedAt),
+  }),
+);
