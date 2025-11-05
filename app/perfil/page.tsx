@@ -9,12 +9,11 @@ import { getProfilePicture } from "@/lib/profileUtils";
 import { useUSDTBalance } from "@/hooks/use-usdt-balance";
 import { useUserTransactions } from "@/hooks/use-user-transactions";
 import { Card } from "@/components/ui/card";
-import { Copy, Check, SquarePen, Link2, Twitter } from "lucide-react";
+import { Copy, Check, SquarePen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   useDynamicContext,
   useUserWallets,
-  DynamicWidget,
 } from "@dynamic-labs/sdk-react-core";
 import { Button } from "@/components/ui/button";
 import {
@@ -103,9 +102,17 @@ export default function ProfilePage() {
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
   // Dynamic multi-wallet support
-  const { primaryWallet } = useDynamicContext();
+  const { primaryWallet, user, setShowDynamicUserProfile } =
+    useDynamicContext();
   const userWallets = useUserWallets();
-  const [showLinkModal, setShowLinkModal] = useState(false);
+
+  // Check for linked social accounts
+  const linkedGoogle = user?.verifiedCredentials?.find(
+    (cred) => cred.oauthProvider === "google",
+  );
+  const linkedTwitter = user?.verifiedCredentials?.find(
+    (cred) => cred.oauthProvider === "twitter",
+  );
 
   useEffect(() => {
     if (!isConnected) {
@@ -162,8 +169,8 @@ export default function ProfilePage() {
   };
 
   const handleLinkAccount = () => {
-    // Show Dynamic Widget which includes linking options
-    setShowLinkModal(true);
+    // Open Dynamic's profile modal directly (skips intermediate popup)
+    setShowDynamicUserProfile?.(true);
   };
 
   const handleSaveProfile = async (data: {
@@ -287,21 +294,68 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* Link Account Button */}
-              <div className="mb-4">
-                <Button
-                  onClick={handleLinkAccount}
-                  variant="outline"
-                  size="sm"
-                  className="w-full gap-2"
-                >
-                  <Link2 className="h-4 w-4" />
-                  Vincular Google o X
-                </Button>
-                {userWallets.length > 1 && (
-                  <p className="text-xs text-muted-foreground mt-2 text-center">
-                    {userWallets.length} cuentas vinculadas
-                  </p>
+              {/* Linked Social Accounts */}
+              <div className="mb-4 space-y-2">
+                {/* Google */}
+                {linkedGoogle ? (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-lg">
+                    <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                    <Image
+                      src="/SocialMedia/PhGoogleLogo.svg"
+                      alt="Google"
+                      width={16}
+                      height={16}
+                      className="flex-shrink-0 dark:invert"
+                    />
+                    <span className="text-sm">Vinculado con Google</span>
+                  </div>
+                ) : (
+                  <Button
+                    onClick={handleLinkAccount}
+                    variant="outline"
+                    size="sm"
+                    className="w-full gap-2 justify-start"
+                  >
+                    <Image
+                      src="/SocialMedia/PhGoogleLogo.svg"
+                      alt="Google"
+                      width={16}
+                      height={16}
+                      className="dark:invert"
+                    />
+                    Vincular con Google
+                  </Button>
+                )}
+
+                {/* Twitter/X */}
+                {linkedTwitter ? (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-lg">
+                    <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                    <Image
+                      src="/SocialMedia/PhXLogo.svg"
+                      alt="X"
+                      width={16}
+                      height={16}
+                      className="flex-shrink-0 dark:invert"
+                    />
+                    <span className="text-sm">Vinculado con X</span>
+                  </div>
+                ) : (
+                  <Button
+                    onClick={handleLinkAccount}
+                    variant="outline"
+                    size="sm"
+                    className="w-full gap-2 justify-start"
+                  >
+                    <Image
+                      src="/SocialMedia/PhXLogo.svg"
+                      alt="X"
+                      width={16}
+                      height={16}
+                      className="dark:invert"
+                    />
+                    Vincular con X
+                  </Button>
                 )}
               </div>
 
@@ -498,24 +552,6 @@ export default function ProfilePage() {
             walletAddress={address}
             onSave={handleSaveProfile}
           />
-
-          {/* Link Wallet Modal - Using DynamicWidget */}
-          {showLinkModal && (
-            <div
-              className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center"
-              onClick={() => setShowLinkModal(false)}
-            >
-              <div
-                className="bg-background p-6 rounded-lg max-w-md w-full mx-4"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <h3 className="text-lg font-semibold mb-4">
-                  Vincular cuenta adicional
-                </h3>
-                <DynamicWidget />
-              </div>
-            </div>
-          )}
         </motion.div>
       </div>
     </div>
