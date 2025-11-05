@@ -95,7 +95,7 @@ export function DepositModal({
                     fgColor="#000000"
                   />
                   <p className="text-xs text-center text-muted-foreground px-4">
-                    Escaneá para enviar USDT a Celo
+                    Escaneá para enviar USDT a BNB Smart Chain
                   </p>
                 </div>
 
@@ -122,7 +122,7 @@ export function DepositModal({
 
                 <div className="border-t pt-4 mb-4">
                   <p className="text-sm font-medium mb-3">
-                    Retirá USDT vía Celo desde:
+                    Retirá USDT vía BNB Smart Chain desde:
                   </p>
                   <ul className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
                     <li className="flex items-center gap-2">
@@ -185,7 +185,8 @@ export function DepositModal({
                           3.
                         </span>
                         <span>
-                          Seleccioná red <strong>Celo</strong>
+                          Seleccioná red <strong>BNB Smart Chain</strong> (o{" "}
+                          <strong>BSC</strong>)
                         </span>
                       </li>
                       <li className="flex gap-2">
@@ -223,7 +224,7 @@ export function DepositModal({
                     {showBridgeTooltip && (
                       <div className="absolute left-0 top-6 z-50 w-64 p-3 bg-popover border rounded-md shadow-lg text-xs text-popover-foreground">
                         Si ya tenés USDT en otra blockchain (Ethereum, Polygon,
-                        etc.), podés hacer bridge a Celo
+                        etc.), podés hacer bridge a BNB Smart Chain
                       </div>
                     )}
                   </div>

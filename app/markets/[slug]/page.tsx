@@ -11,6 +11,8 @@ import { ProbabilityChart } from "@/components/market/ProbabilityChart";
 import { TradingPanel } from "@/components/market/TradingPanel";
 import { MobileTradingModal } from "@/components/market/MobileTradingModal";
 import { RelatedMarketCard } from "@/components/market/RelatedMarketCard";
+import { ShareButton } from "@/components/market/ShareButton";
+import { ShareableMarketCard } from "@/components/market/ShareableMarketCard";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Tabs,
@@ -347,6 +349,15 @@ export default function MarketDetailPage() {
                     </ToggleGroupItem>
                   </ToggleGroup>
                 </div>
+              </div>
+
+              {/* Share Button */}
+              <div className="flex justify-end">
+                <ShareButton
+                  marketId={market.id.toString()}
+                  marketTitle={market.titleEs || market.title}
+                  marketSlug={market.slug}
+                />
               </div>
             </div>
 
@@ -884,6 +895,13 @@ export default function MarketDetailPage() {
           ))}
         </div>
       </div>
+
+      {/* Hidden Shareable Market Card for Image Generation */}
+      <ShareableMarketCard
+        marketId={market.id.toString()}
+        title={market.titleEs || market.title}
+        outcomes={market.outcomes}
+      />
     </div>
   );
 }
