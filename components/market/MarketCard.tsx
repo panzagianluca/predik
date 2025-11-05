@@ -26,8 +26,25 @@ interface MarketCardProps {
 export function MarketCard({ market }: MarketCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [isScrolling, setIsScrolling] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
+
+  // Show fade by default for markets with 3+ outcomes (hide when scrolled to bottom)
+  const [isScrolling, setIsScrolling] = useState(true);
+
+  // Initialize isSaved from localStorage immediately (synchronous)
+  const [isSaved, setIsSaved] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const saved = localStorage.getItem("savedMarkets");
+    if (saved) {
+      try {
+        const savedIds = JSON.parse(saved);
+        return savedIds.includes(market.id);
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  });
+
   const { address } = useAccount();
   const { setShowAuthFlow } = useDynamicContext();
 
@@ -129,16 +146,29 @@ export function MarketCard({ market }: MarketCardProps) {
   // Format date to relative (e.g., "58 days")
   const formatRelativeDate = (dateString: string) => {
     const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = date.getTime() - now.getTime();
+
+    // Check if year is 2099 or beyond (open-ended markets)
+    if (date.getFullYear() >= 2099) return "Abierto";
+
+    // Convert both dates to Argentina timezone for accurate comparison
+    const nowInArgentina = new Date(
+      new Date().toLocaleString("en-US", {
+        timeZone: "America/Argentina/Buenos_Aires",
+      }),
+    );
+
+    const dateInArgentina = new Date(
+      date.toLocaleString("en-US", {
+        timeZone: "America/Argentina/Buenos_Aires",
+      }),
+    );
+
+    const diffTime = dateInArgentina.getTime() - nowInArgentina.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     if (diffDays < 0) return "Closed";
     if (diffDays === 0) return "Today";
     if (diffDays === 1) return "Tomorrow";
-
-    // Check if year is 2099 or beyond (open-ended markets)
-    if (date.getFullYear() >= 2099) return "Abierto";
 
     return `${diffDays} days`;
   };
