@@ -105,8 +105,25 @@ export function MarketCard({ market }: MarketCardProps) {
   };
 
   // Get outcome color
-  const getOutcomeColor = (index: number) => {
-    return index === 0 ? "#22c55e" : "#ef4444"; // Green for first, Red for second
+  const getOutcomeColor = (index: number, totalOutcomes: number) => {
+    // For 2 outcomes: use green/red
+    if (totalOutcomes <= 2) {
+      return index === 0 ? "#22c55e" : "#ef4444"; // Green for first, Red for second
+    }
+
+    // For 3+ outcomes: use diverse color palette
+    const colorPalette = [
+      "#22c55e", // Green
+      "#3b82f6", // Blue
+      "#f59e0b", // Amber
+      "#ef4444", // Red
+      "#8b5cf6", // Purple
+      "#ec4899", // Pink
+      "#14b8a6", // Teal
+      "#f97316", // Orange
+    ];
+
+    return colorPalette[index % colorPalette.length];
   };
 
   // Check if market has multiple outcomes (3+)
@@ -175,7 +192,10 @@ export function MarketCard({ market }: MarketCardProps) {
           >
             {market.outcomes.map((outcome, index) => {
               const probability = outcome.price * 100;
-              const outcomeColor = getOutcomeColor(index);
+              const outcomeColor = getOutcomeColor(
+                index,
+                market.outcomes.length,
+              );
 
               return (
                 <Link
