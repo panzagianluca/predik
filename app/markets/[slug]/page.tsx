@@ -199,83 +199,109 @@ export default function MarketDetailPage() {
                   </div>
                 )}
 
-                <div className="flex-1 min-w-0">
-                  <h1 className="text-[20px] md:text-[24px] font-medium">
-                    {market.titleEs || market.title}
-                  </h1>
+                <div className="flex-1 min-w-0 flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <h1 className="text-[20px] md:text-[24px] font-medium">
+                      {market.titleEs || market.title}
+                    </h1>
 
-                  {/* Badges - Desktop only */}
-                  <div className="hidden md:flex items-center gap-2 flex-wrap">
-                    {/* State Badge */}
-                    <span
-                      className={cn(
-                        "px-3 py-1 rounded-full text-xs font-semibold uppercase flex items-center gap-1",
-                        market.state === "open" &&
-                          "bg-green-500/20 text-green-700 dark:text-green-400",
-                        market.state === "closed" &&
-                          "bg-orange-500/20 text-orange-700 dark:text-orange-400",
-                        market.state === "resolved" &&
-                          "bg-blue-500/20 text-blue-700 dark:text-blue-400",
-                      )}
-                    >
-                      {market.state === "open" && <Clock className="h-3 w-3" />}
-                      {market.state === "closed" && (
-                        <XCircle className="h-3 w-3" />
-                      )}
-                      {market.state === "resolved" && (
-                        <CheckCircle2 className="h-3 w-3" />
-                      )}
-                      {market.state}
-                    </span>
+                    {/* Badges - Desktop only */}
+                    <div className="hidden md:flex items-center gap-2 flex-wrap">
+                      {/* State Badge */}
+                      <span
+                        className={cn(
+                          "px-3 py-1 rounded-full text-xs font-semibold uppercase flex items-center gap-1",
+                          market.state === "open" &&
+                            "bg-green-500/20 text-green-700 dark:text-green-400",
+                          market.state === "closed" &&
+                            "bg-orange-500/20 text-orange-700 dark:text-orange-400",
+                          market.state === "resolved" &&
+                            "bg-blue-500/20 text-blue-700 dark:text-blue-400",
+                        )}
+                      >
+                        {market.state === "open" && (
+                          <Clock className="h-3 w-3" />
+                        )}
+                        {market.state === "closed" && (
+                          <XCircle className="h-3 w-3" />
+                        )}
+                        {market.state === "resolved" && (
+                          <CheckCircle2 className="h-3 w-3" />
+                        )}
+                        {market.state}
+                      </span>
 
-                    {/* Topics/Tags */}
-                    {market.topics &&
-                      market.topics.length > 0 &&
-                      market.topics.map((topic, index) => (
-                        <span
-                          key={index}
-                          className="px-3 py-1 rounded-full text-xs font-semibold bg-muted text-muted-foreground"
-                        >
-                          {topic}
-                        </span>
-                      ))}
+                      {/* Topics/Tags */}
+                      {market.topics &&
+                        market.topics.length > 0 &&
+                        market.topics.map((topic, index) => (
+                          <span
+                            key={index}
+                            className="px-3 py-1 rounded-full text-xs font-semibold bg-muted text-muted-foreground"
+                          >
+                            {topic}
+                          </span>
+                        ))}
+                    </div>
+                  </div>
+
+                  {/* Share Button - Desktop only */}
+                  <div className="hidden md:block flex-shrink-0">
+                    <ShareButton
+                      marketId={market.id.toString()}
+                      marketTitle={market.titleEs || market.title}
+                      marketSlug={market.slug}
+                    />
                   </div>
                 </div>
               </div>
 
               {/* Badges - Mobile only, below image */}
-              <div className="flex md:hidden items-center gap-2 flex-wrap">
-                {/* State Badge */}
-                <span
-                  className={cn(
-                    "px-3 py-1 rounded-full text-[12px] font-semibold uppercase flex items-center gap-1",
-                    market.state === "open" &&
-                      "bg-green-500/20 text-green-700 dark:text-green-400",
-                    market.state === "closed" &&
-                      "bg-orange-500/20 text-orange-700 dark:text-orange-400",
-                    market.state === "resolved" &&
-                      "bg-blue-500/20 text-blue-700 dark:text-blue-400",
-                  )}
-                >
-                  {market.state === "open" && <Clock className="h-3 w-3" />}
-                  {market.state === "closed" && <XCircle className="h-3 w-3" />}
-                  {market.state === "resolved" && (
-                    <CheckCircle2 className="h-3 w-3" />
-                  )}
-                  {market.state}
-                </span>
+              <div className="flex md:hidden items-center gap-2 flex-wrap justify-between">
+                <div className="flex items-center gap-2 flex-wrap">
+                  {/* State Badge */}
+                  <span
+                    className={cn(
+                      "px-3 py-1 rounded-full text-[12px] font-semibold uppercase flex items-center gap-1",
+                      market.state === "open" &&
+                        "bg-green-500/20 text-green-700 dark:text-green-400",
+                      market.state === "closed" &&
+                        "bg-orange-500/20 text-orange-700 dark:text-orange-400",
+                      market.state === "resolved" &&
+                        "bg-blue-500/20 text-blue-700 dark:text-blue-400",
+                    )}
+                  >
+                    {market.state === "open" && <Clock className="h-3 w-3" />}
+                    {market.state === "closed" && (
+                      <XCircle className="h-3 w-3" />
+                    )}
+                    {market.state === "resolved" && (
+                      <CheckCircle2 className="h-3 w-3" />
+                    )}
+                    {market.state}
+                  </span>
 
-                {/* Topics/Tags */}
-                {market.topics &&
-                  market.topics.length > 0 &&
-                  market.topics.map((topic, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 rounded-full text-[12px] font-semibold bg-muted text-muted-foreground"
-                    >
-                      {topic}
-                    </span>
-                  ))}
+                  {/* Topics/Tags */}
+                  {market.topics &&
+                    market.topics.length > 0 &&
+                    market.topics.map((topic, index) => (
+                      <span
+                        key={index}
+                        className="px-3 py-1 rounded-full text-[12px] font-semibold bg-muted text-muted-foreground"
+                      >
+                        {topic}
+                      </span>
+                    ))}
+                </div>
+
+                {/* Share Button - Mobile only */}
+                <div className="flex-shrink-0">
+                  <ShareButton
+                    marketId={market.id.toString()}
+                    marketTitle={market.titleEs || market.title}
+                    marketSlug={market.slug}
+                  />
+                </div>
               </div>
 
               {/* Metadata Bar with Period Selector */}
@@ -349,15 +375,6 @@ export default function MarketDetailPage() {
                     </ToggleGroupItem>
                   </ToggleGroup>
                 </div>
-              </div>
-
-              {/* Share Button */}
-              <div className="flex justify-end">
-                <ShareButton
-                  marketId={market.id.toString()}
-                  marketTitle={market.titleEs || market.title}
-                  marketSlug={market.slug}
-                />
               </div>
             </div>
 
@@ -901,6 +918,8 @@ export default function MarketDetailPage() {
         marketId={market.id.toString()}
         title={market.titleEs || market.title}
         outcomes={market.outcomes}
+        imageUrl={market.imageUrl}
+        lastUpdated={new Date()}
       />
     </div>
   );

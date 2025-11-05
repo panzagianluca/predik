@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Share2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SharePreviewModal } from "./SharePreviewModal";
 import { haptics } from "@/lib/haptics";
 import { logger } from "@/lib/logger";
 
@@ -13,10 +14,10 @@ interface ShareButtonProps {
 }
 
 /**
- * Share button that generates and shares market images
- * - Mobile: Uses Web Share API with image
- * - Desktop: Downloads image
+ * Share button that generates and previews market images
+ * Opens a modal to preview the image before sharing
  * - Uses html2canvas for client-side image generation
+ * - Shows preview modal with share/download options
  */
 export function ShareButton({
   marketId,
@@ -24,8 +25,12 @@ export function ShareButton({
   marketSlug,
 }: ShareButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(
+    null,
+  );
 
-  const generateAndShare = async () => {
+  const generateImage = async () => {
     if (isGenerating) return;
 
     try {
@@ -44,16 +49,17 @@ export function ShareButton({
         throw new Error("Share card element not found");
       }
 
-      // Temporarily make element visible for capture (but invisible to user)
-      const originalPosition = element.style.position;
+      // Temporarily make element visible for capture (but NEVER visible to user)
+      const originalOpacity = element.style.opacity;
       const originalVisibility = element.style.visibility;
-      element.style.position = "fixed";
-      element.style.visibility = "hidden";
-      element.style.left = "0";
-      element.style.top = "0";
+
+      // Make visible for html2canvas BUT keep it off-screen
+      element.style.opacity = "1";
+      element.style.visibility = "visible";
+      // DO NOT change left/top - keep it off-screen!
 
       // Small delay to ensure fonts and images are loaded
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 200));
 
       // Generate canvas
       const canvas = await html2canvas(element, {
@@ -63,53 +69,18 @@ export function ShareButton({
         useCORS: true,
         allowTaint: true,
         width: 1200,
-        height: 1200,
+        height: 800,
       });
 
-      // Restore original position
-      element.style.position = originalPosition;
+      // Restore original visibility
+      element.style.opacity = originalOpacity;
       element.style.visibility = originalVisibility;
 
-      // Convert to blob
-      const blob = await new Promise<Blob>((resolve) => {
-        canvas.toBlob((b) => {
-          if (b) resolve(b);
-        }, "image/png");
-      });
-
-      const file = new File([blob], `predik-${marketSlug}.png`, {
-        type: "image/png",
-      });
-
-      // Try Web Share API first (mobile)
-      if (
-        navigator.share &&
-        navigator.canShare &&
-        navigator.canShare({ files: [file] })
-      ) {
-        await navigator.share({
-          title: `Predik: ${marketTitle}`,
-          text: `Mirá esta predicción en Predik`,
-          url: `${window.location.origin}/markets/${marketSlug}`,
-          files: [file],
-        });
-
-        haptics.success();
-        logger.info("Market shared successfully");
-      } else {
-        // Fallback: Download image
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `predik-${marketSlug}.png`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
-        haptics.success();
-        logger.info("Market image downloaded");
-      }
+      // Convert to data URL
+      const dataUrl = canvas.toDataURL("image/png");
+      setGeneratedImageUrl(dataUrl);
+      setShowPreview(true);
+      haptics.success();
     } catch (error) {
       logger.error("Error generating share image:", error);
       haptics.error();
@@ -119,24 +90,36 @@ export function ShareButton({
   };
 
   return (
-    <Button
-      onClick={generateAndShare}
-      disabled={isGenerating}
-      variant="outline"
-      size="default"
-      className="gap-2 transition-all duration-200 hover:scale-[1.02]"
-    >
-      {isGenerating ? (
-        <>
-          <Loader2 className="h-4 w-4 animate-spin" />
-          <span>Generando...</span>
-        </>
-      ) : (
-        <>
-          <Share2 className="h-4 w-4" />
-          <span>Compartir</span>
-        </>
+    <>
+      <Button
+        onClick={generateImage}
+        disabled={isGenerating}
+        variant="outline"
+        size="default"
+        className="gap-2 transition-all duration-200 hover:scale-[1.02]"
+      >
+        {isGenerating ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span>Generando...</span>
+          </>
+        ) : (
+          <>
+            <Share2 className="h-4 w-4" />
+            <span>Compartir</span>
+          </>
+        )}
+      </Button>
+
+      {generatedImageUrl && (
+        <SharePreviewModal
+          isOpen={showPreview}
+          onClose={() => setShowPreview(false)}
+          imageUrl={generatedImageUrl}
+          marketTitle={marketTitle}
+          marketSlug={marketSlug}
+        />
       )}
-    </Button>
+    </>
   );
 }

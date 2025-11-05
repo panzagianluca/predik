@@ -11,17 +11,21 @@ interface ShareableMarketCardProps {
   marketId: string;
   title: string;
   outcomes: Outcome[];
+  imageUrl?: string;
+  lastUpdated?: Date;
 }
 
 /**
  * Hidden card component used for generating shareable images
- * Fixed 1200x1200px square format - optimal for Instagram, WhatsApp, Stories
+ * Fixed 1200x800px landscape format - optimal for social media sharing
  * Theme-aware: uses share-background-dark.png or share-background-light.png
  */
 export function ShareableMarketCard({
   marketId,
   title,
   outcomes,
+  imageUrl,
+  lastUpdated = new Date(),
 }: ShareableMarketCardProps) {
   const { theme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -45,10 +49,18 @@ export function ShareableMarketCard({
   return (
     <div
       data-share-card={marketId}
-      className="fixed -left-[9999px] -top-[9999px] pointer-events-none"
-      style={{ zIndex: -9999 }}
+      className="fixed -left-[9999px] -top-[9999px] pointer-events-none opacity-0 invisible"
+      style={{
+        zIndex: -9999,
+        position: "fixed",
+        left: "-9999px",
+        top: "-9999px",
+      }}
     >
-      <div className="relative w-[1200px] h-[1200px] overflow-hidden">
+      <div
+        className="relative w-[1200px] h-[800px]"
+        style={{ overflow: "hidden" }}
+      >
         {/* Background Image Layer - Theme Aware */}
         <Image
           src={backgroundImage}
@@ -60,55 +72,105 @@ export function ShareableMarketCard({
         />
 
         {/* Content Overlay */}
-        <div className="absolute inset-0 flex flex-col justify-between p-16">
-          {/* Top: Market Question */}
-          <div className="text-center px-8 pt-8">
-            <h1
-              className="text-6xl font-bold text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] leading-tight"
-              style={{
-                textShadow:
-                  "0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.2)",
-              }}
-            >
-              {title}
-            </h1>
-          </div>
+        <div className="absolute inset-0 flex flex-col p-16">
+          {/* Top: Image and Market Question */}
+          <div className="flex items-start gap-8 px-8 pt-8">
+            {/* Market Image */}
+            {imageUrl && (
+              <div
+                className="flex-shrink-0 w-48 h-48 border-4 border-white/20 shadow-2xl"
+                style={{ borderRadius: "32px", overflow: "hidden" }}
+              >
+                <Image
+                  src={imageUrl}
+                  alt={title}
+                  width={192}
+                  height={192}
+                  className="object-cover w-full h-full"
+                  style={{ borderRadius: "32px" }}
+                  unoptimized
+                />
+              </div>
+            )}
 
-          {/* Middle: Chart */}
-          <div className="flex-1 flex items-center justify-center px-12 py-16">
-            <div className="w-full h-[500px]">
-              <ProbabilityChart
-                outcomes={outcomes}
-                timeframe="all"
-                className="share-chart"
-              />
+            {/* Question */}
+            <div className="flex-1">
+              <h1
+                className="text-5xl font-bold text-white leading-tight text-left font-satoshi"
+                style={{
+                  textShadow:
+                    "0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.2)",
+                }}
+              >
+                {title}
+              </h1>
             </div>
           </div>
 
-          {/* Bottom: Outcome Legends */}
-          <div className="flex justify-around px-8 pb-8">
-            {outcomes.slice(0, 2).map((outcome) => (
-              <div key={outcome.id} className="text-center">
-                <div
-                  className="text-3xl font-semibold text-white/90 mb-2"
-                  style={{
-                    textShadow:
-                      "0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.2)",
-                  }}
-                >
-                  {translateOutcomeTitle(outcome.title)}
-                </div>
-                <div
-                  className="text-7xl font-bold text-white"
-                  style={{
-                    textShadow:
-                      "0 2px 8px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.3)",
-                  }}
-                >
-                  {Math.round(outcome.price * 100)}%
-                </div>
+          {/* Middle: Centered Probabilities and Date */}
+          <div className="flex-1 flex items-center justify-center">
+            <div className="flex flex-col items-center gap-[100px] pb-[88px]">
+              {/* Probabilities */}
+              <div className="flex justify-center gap-48 px-8">
+                {outcomes
+                  .slice(0, 2)
+                  .reverse()
+                  .map((outcome) => (
+                    <div
+                      key={outcome.id}
+                      className="flex items-center gap-40 font-satoshi"
+                    >
+                      <div
+                        className="text-6xl font-bold text-white"
+                        style={{
+                          textShadow:
+                            "0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.2)",
+                        }}
+                      >
+                        {translateOutcomeTitle(outcome.title)}
+                      </div>
+                      <div
+                        className="text-6xl font-bold text-white"
+                        style={{
+                          textShadow:
+                            "0 2px 8px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.3)",
+                        }}
+                      >
+                        {Math.round(outcome.price * 100)}%
+                      </div>
+                    </div>
+                  ))}
               </div>
-            ))}
+
+              {/* Last Updated Timestamp */}
+              <div
+                className="text-2xl text-white/70 font-satoshi text-center"
+                style={{
+                  textShadow: "0 1px 2px rgba(0,0,0,0.2)",
+                }}
+              >
+                Última actualización: {lastUpdated.getDate()}{" "}
+                {
+                  [
+                    "enero",
+                    "febrero",
+                    "marzo",
+                    "abril",
+                    "mayo",
+                    "junio",
+                    "julio",
+                    "agosto",
+                    "septiembre",
+                    "octubre",
+                    "noviembre",
+                    "diciembre",
+                  ][lastUpdated.getMonth()]
+                }
+                , {lastUpdated.getFullYear()} a las{" "}
+                {String(lastUpdated.getHours()).padStart(2, "0")}:
+                {String(lastUpdated.getMinutes()).padStart(2, "0")}
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -18,12 +18,14 @@ interface ProbabilityChartProps {
   outcomes: Outcome[];
   timeframe?: "24h" | "7d" | "30d" | "all";
   className?: string;
+  hideControls?: boolean; // Hide grid, price scale for share images
 }
 
 export function ProbabilityChart({
   outcomes,
   timeframe = "24h",
   className = "",
+  hideControls = false,
 }: ProbabilityChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -60,22 +62,27 @@ export function ProbabilityChart({
         background: { type: ColorType.Solid, color: "transparent" },
         textColor: isDark ? "#9ca3af" : "#6b7280",
       },
+      watermark: {
+        visible: false, // Always hide TradingView watermark
+        color: "transparent",
+        fontSize: 0,
+      },
       grid: {
         vertLines: {
           color: gridColor,
           style: 2, // 2 = dashed, 1 = dotted, 0 = solid
-          visible: true,
+          visible: !hideControls, // Hide grid for share images
         },
         horzLines: {
           color: gridColor,
           style: 2, // 2 = dashed
-          visible: true,
+          visible: !hideControls, // Hide grid for share images
         },
       },
       crosshair: {
         mode: 1,
         vertLine: {
-          visible: true,
+          visible: !hideControls,
           labelVisible: false,
         },
         horzLine: {
@@ -85,12 +92,14 @@ export function ProbabilityChart({
       },
       rightPriceScale: {
         borderColor: "transparent", // Transparent Y-axis line
+        visible: !hideControls, // Hide price scale for share images
       },
       timeScale: {
         rightOffset, // Dynamic offset based on timeframe
         borderColor: "transparent", // Transparent X-axis line
-        timeVisible: true,
+        timeVisible: !hideControls, // Hide time for share images
         secondsVisible: false,
+        visible: !hideControls, // Hide entire time scale for share images
       },
       handleScroll: {
         vertTouchDrag: false,
