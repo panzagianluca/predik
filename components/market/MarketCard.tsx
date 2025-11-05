@@ -23,6 +23,7 @@ interface MarketCardProps {
 export function MarketCard({ market }: MarketCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [isScrolling, setIsScrolling] = useState(false);
 
   // Trigger animations on mount
   useEffect(() => {
@@ -40,20 +41,28 @@ export function MarketCard({ market }: MarketCardProps) {
     if (diffDays < 0) return "Closed";
     if (diffDays === 0) return "Today";
     if (diffDays === 1) return "Tomorrow";
+
+    // Check if year is 2099 or beyond (open-ended markets)
+    if (date.getFullYear() >= 2099) return "Abierto";
+
     return `${diffDays} days`;
   };
 
   // Format absolute date (e.g., "Dec 31, 2025")
   const formatAbsoluteDate = (dateString: string) => {
     const date = new Date(dateString);
+
+    // Check if year is 2099 or beyond (open-ended markets)
+    if (date.getFullYear() >= 2099) {
+      return "Cuando una de las opciones sucede";
+    }
+
     return date.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
     });
-  };
-
-  // Format volume with K/M suffix
+  }; // Format volume with K/M suffix
   const formatVolume = (volume?: number) => {
     if (!volume) return "$0.00";
     if (volume >= 1000000) {
@@ -100,6 +109,9 @@ export function MarketCard({ market }: MarketCardProps) {
     return index === 0 ? "#22c55e" : "#ef4444"; // Green for first, Red for second
   };
 
+  // Check if market has multiple outcomes (3+)
+  const hasMultipleOutcomes = market.outcomes.length > 2;
+
   return (
     <Card
       className="w-full md:max-w-[300px] rounded-xl overflow-hidden transition-all duration-200 ease-in-out"
@@ -143,53 +155,85 @@ export function MarketCard({ market }: MarketCardProps) {
         </div>
       </CardHeader>
 
-      {/* Outcomes Section */}
-      <CardContent className="px-4 pb-4 space-y-2">
-        {market.outcomes.map((outcome, index) => {
-          const probability = outcome.price * 100;
-          const outcomeColor = getOutcomeColor(index);
+      {/* Outcomes Section - Fixed height container */}
+      <CardContent className="px-4 pb-4">
+        <div className="relative h-[76px] overflow-hidden">
+          {/* Scrollable container for all outcomes */}
+          <div
+            className="space-y-2 h-full overflow-y-auto scrollbar-hide"
+            style={{
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+            }}
+            onScroll={(e) => {
+              const target = e.currentTarget;
+              const isAtBottom =
+                target.scrollHeight - target.scrollTop <=
+                target.clientHeight + 5;
+              setIsScrolling(!isAtBottom);
+            }}
+          >
+            {market.outcomes.map((outcome, index) => {
+              const probability = outcome.price * 100;
+              const outcomeColor = getOutcomeColor(index);
 
-          return (
-            <Link
-              key={outcome.id}
-              href={`/markets/${market.slug}?outcome=${outcome.id}`}
-              className="block group"
-              prefetch={true}
-            >
-              <div className="space-y-1 hover:opacity-80 transition-opacity duration-200">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium">
-                    {translateOutcomeTitle(outcome.title)}
-                  </span>
-                  <span className="font-bold" style={{ color: outcomeColor }}>
-                    <CountUp
-                      start={probability > 10 ? probability - 5 : 0}
-                      end={probability}
-                      duration={0.8}
-                      decimals={2}
-                      suffix="%"
-                      preserveValue
-                    />
-                  </span>
-                </div>
+              return (
+                <Link
+                  key={outcome.id}
+                  href={`/markets/${market.slug}?outcome=${outcome.id}`}
+                  className="block group"
+                  prefetch={true}
+                >
+                  <div className="space-y-1 hover:opacity-80 transition-opacity duration-200">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="font-medium">
+                        {translateOutcomeTitle(outcome.title)}
+                      </span>
+                      <span
+                        className="font-bold"
+                        style={{ color: outcomeColor }}
+                      >
+                        <CountUp
+                          start={probability > 10 ? probability - 5 : 0}
+                          end={probability}
+                          duration={0.8}
+                          decimals={2}
+                          suffix="%"
+                          preserveValue
+                        />
+                      </span>
+                    </div>
 
-                {/* Animated Progress Bar */}
-                <div className="w-full bg-muted rounded-full h-2 overflow-hidden relative">
-                  <motion.div
-                    className="h-full rounded-full relative overflow-hidden"
-                    style={{ backgroundColor: outcomeColor }}
-                    initial={{ width: "0%" }}
-                    animate={{ width: isVisible ? `${probability}%` : "0%" }}
-                    transition={{ duration: 0.2, ease: "easeOut", delay: 0.1 }}
-                  >
-                    {/* Shimmer effect */}
-                    <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-                  </motion.div>
-                </div>
-              </div>
-            </Link>
-          );
-        })}
+                    {/* Animated Progress Bar */}
+                    <div className="w-full bg-muted rounded-full h-2 overflow-hidden relative">
+                      <motion.div
+                        className="h-full rounded-full relative overflow-hidden"
+                        style={{ backgroundColor: outcomeColor }}
+                        initial={{ width: "0%" }}
+                        animate={{
+                          width: isVisible ? `${probability}%` : "0%",
+                        }}
+                        transition={{
+                          duration: 0.2,
+                          ease: "easeOut",
+                          delay: 0.1,
+                        }}
+                      >
+                        {/* Shimmer effect */}
+                        <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+                      </motion.div>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Gradient fade at bottom for 3+ outcomes - hidden when scrolled to bottom */}
+          {hasMultipleOutcomes && isScrolling && (
+            <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-card/60 to-transparent pointer-events-none transition-opacity duration-200" />
+          )}
+        </div>
 
         {/* Footer Metadata - Expires | Volume | Liquidity */}
         <div className="flex items-center justify-between text-xs text-muted-foreground pt-3 border-t border-border mt-4 gap-1">
