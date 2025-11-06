@@ -17,6 +17,12 @@ import {
 } from "@dynamic-labs/sdk-react-core";
 import { Button } from "@/components/ui/button";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/animate-ui/components/animate/tooltip";
+import {
   Tabs,
   TabsContent,
   TabsContents,
@@ -294,69 +300,165 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* Linked Social Accounts */}
-              <div className="mb-4 space-y-2">
-                {/* Google */}
-                {linkedGoogle ? (
-                  <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-lg">
-                    <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                    <Image
-                      src="/SocialMedia/PhGoogleLogo.svg"
-                      alt="Google"
-                      width={16}
-                      height={16}
-                      className="flex-shrink-0 dark:invert"
-                    />
-                    <span className="text-sm">Vinculado con Google</span>
-                  </div>
-                ) : (
-                  <Button
-                    onClick={handleLinkAccount}
-                    variant="outline"
-                    size="sm"
-                    className="w-full gap-2 justify-start"
-                  >
-                    <Image
-                      src="/SocialMedia/PhGoogleLogo.svg"
-                      alt="Google"
-                      width={16}
-                      height={16}
-                      className="dark:invert"
-                    />
-                    Vincular con Google
-                  </Button>
-                )}
-
-                {/* Twitter/X */}
-                {linkedTwitter ? (
-                  <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-lg">
-                    <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                    <Image
-                      src="/SocialMedia/PhXLogo.svg"
-                      alt="X"
-                      width={16}
-                      height={16}
-                      className="flex-shrink-0 dark:invert"
-                    />
-                    <span className="text-sm">Vinculado con X</span>
-                  </div>
-                ) : (
-                  <Button
-                    onClick={handleLinkAccount}
-                    variant="outline"
-                    size="sm"
-                    className="w-full gap-2 justify-start"
-                  >
-                    <Image
-                      src="/SocialMedia/PhXLogo.svg"
-                      alt="X"
-                      width={16}
-                      height={16}
-                      className="dark:invert"
-                    />
-                    Vincular con X
-                  </Button>
-                )}
+              {/* Linked Social Accounts - Single Row */}
+              <div className="mb-4">
+                <TooltipProvider>
+                  {linkedGoogle && linkedTwitter ? (
+                    // STATE 1: Both linked - single badge with both logos
+                    <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-lg">
+                      <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                      <span className="text-sm">Vinculado con</span>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="cursor-help">
+                            <Image
+                              src="/SocialMedia/PhGoogleLogo.svg"
+                              alt="Google"
+                              width={20}
+                              height={20}
+                              className="flex-shrink-0 dark:invert"
+                            />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {linkedGoogle.email || "Google Account"}
+                        </TooltipContent>
+                      </Tooltip>
+                      <span className="text-sm">y</span>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="cursor-help">
+                            <Image
+                              src="/SocialMedia/PhXLogo.svg"
+                              alt="X"
+                              width={20}
+                              height={20}
+                              className="flex-shrink-0 dark:invert"
+                            />
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {linkedTwitter.publicIdentifier || "X Account"}
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  ) : linkedGoogle && !linkedTwitter ? (
+                    // STATE 2: Only Google linked
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-lg flex-1">
+                        <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <span className="text-sm">Vinculado con</span>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="cursor-help">
+                              <Image
+                                src="/SocialMedia/PhGoogleLogo.svg"
+                                alt="Google"
+                                width={20}
+                                height={20}
+                                className="flex-shrink-0 dark:invert"
+                              />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {linkedGoogle.email || "Google Account"}
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                      <span className="text-muted-foreground">|</span>
+                      <Button
+                        onClick={handleLinkAccount}
+                        variant="outline"
+                        size="sm"
+                        className="gap-2 flex-1"
+                      >
+                        <Image
+                          src="/SocialMedia/PhXLogo.svg"
+                          alt="X"
+                          width={16}
+                          height={16}
+                          className="dark:invert"
+                        />
+                        Vincular con X
+                      </Button>
+                    </div>
+                  ) : !linkedGoogle && linkedTwitter ? (
+                    // STATE 3: Only X linked
+                    <div className="flex items-center gap-2">
+                      <Button
+                        onClick={handleLinkAccount}
+                        variant="outline"
+                        size="sm"
+                        className="gap-2 flex-1"
+                      >
+                        <Image
+                          src="/SocialMedia/PhGoogleLogo.svg"
+                          alt="Google"
+                          width={16}
+                          height={16}
+                          className="dark:invert"
+                        />
+                        Vincular con Google
+                      </Button>
+                      <span className="text-muted-foreground">|</span>
+                      <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-lg flex-1">
+                        <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <span className="text-sm">Vinculado con</span>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="cursor-help">
+                              <Image
+                                src="/SocialMedia/PhXLogo.svg"
+                                alt="X"
+                                width={20}
+                                height={20}
+                                className="flex-shrink-0 dark:invert"
+                              />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {linkedTwitter.publicIdentifier || "X Account"}
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                    </div>
+                  ) : (
+                    // STATE 4: Neither linked
+                    <div className="flex items-center gap-2">
+                      <Button
+                        onClick={handleLinkAccount}
+                        variant="outline"
+                        size="sm"
+                        className="gap-2 flex-1"
+                      >
+                        <Image
+                          src="/SocialMedia/PhGoogleLogo.svg"
+                          alt="Google"
+                          width={16}
+                          height={16}
+                          className="dark:invert"
+                        />
+                        Vincular con Google
+                      </Button>
+                      <span className="text-muted-foreground">|</span>
+                      <Button
+                        onClick={handleLinkAccount}
+                        variant="outline"
+                        size="sm"
+                        className="gap-2 flex-1"
+                      >
+                        <Image
+                          src="/SocialMedia/PhXLogo.svg"
+                          alt="X"
+                          width={16}
+                          height={16}
+                          className="dark:invert"
+                        />
+                        Vincular con X
+                      </Button>
+                    </div>
+                  )}
+                </TooltipProvider>
               </div>
 
               <div className="border-t border-border my-4" />
