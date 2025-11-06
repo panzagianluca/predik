@@ -23,6 +23,12 @@ import {
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { LiFiWidget } from "@lifi/widget";
+import {
+  trackDepositModalOpened,
+  trackDepositTabSelected,
+  trackAddressCopied,
+  trackBridgeUsed,
+} from "@/lib/posthog";
 
 interface DepositModalProps {
   isOpen: boolean;
@@ -38,7 +44,15 @@ export function DepositModal({
   const [copied, setCopied] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showBridgeTooltip, setShowBridgeTooltip] = useState(false);
+  const [activeTab, setActiveTab] = useState<"address" | "bridge">("address");
   const { resolvedTheme, setTheme } = useTheme();
+
+  // Track modal open
+  useEffect(() => {
+    if (isOpen) {
+      trackDepositModalOpened();
+    }
+  }, [isOpen]);
 
   // Prevent LiFi Widget from changing global theme
   useEffect(() => {
@@ -71,6 +85,9 @@ export function DepositModal({
     await navigator.clipboard.writeText(walletAddress);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+
+    // Track address copy
+    trackAddressCopied("deposit");
   };
 
   const shortenAddress = (address: string) => {
@@ -94,6 +111,93 @@ export function DepositModal({
       | "light",
   };
 
+  // Listen for Li.Fi widget postMessage events to detect completed bridge transfers.
+  // Li.Fi emits messages to the parent window; the payload shape can vary between versions.
+  // We use a best-effort heuristic to detect completed transfers and forward a concise event to PostHog.
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleLiFiMessage = (e: MessageEvent) => {
+      try {
+        const data = e.data;
+        if (!data || typeof data !== "object") return;
+
+        // Common places LiFi may include useful info
+        const status =
+          data.status || data.execution?.status || data.transfer?.status;
+        const amountRaw =
+          data.amount ||
+          data.execution?.amount ||
+          data.transfer?.amount ||
+          data.details?.amount;
+        const token =
+          data.token ||
+          data.execution?.token ||
+          data.transfer?.token ||
+          data.details?.token;
+        const fromChain =
+          data.fromChain ||
+          data.execution?.fromChain ||
+          data.transfer?.fromChain ||
+          data.details?.from_chain;
+        const toChain =
+          data.toChain ||
+          data.execution?.toChain ||
+          data.transfer?.toChain ||
+          data.details?.to_chain;
+
+        // Heuristic: treat these statuses as completed
+        const completedStatuses = new Set([
+          "DONE",
+          "COMPLETED",
+          "SUCCESS",
+          "EXECUTED",
+        ]);
+
+        const isCompleted =
+          typeof status === "string" &&
+          completedStatuses.has(status.toUpperCase());
+
+        // Some LiFi messages don't use the status field — inspect event name variants
+        const eventName = (data.event || data.name || "")
+          .toString()
+          .toLowerCase();
+        const eventIndicatesComplete =
+          eventName.includes("transfer") &&
+          (eventName.includes("complete") ||
+            eventName.includes("done") ||
+            eventName.includes("success"));
+
+        if (isCompleted || eventIndicatesComplete) {
+          // Normalize amount to number when possible
+          let amount: number | undefined = undefined;
+          if (typeof amountRaw === "string") {
+            const parsed = parseFloat(amountRaw.replace(/[^0-9.-]+/g, ""));
+            if (!Number.isNaN(parsed)) amount = parsed;
+          } else if (typeof amountRaw === "number") {
+            amount = amountRaw;
+          }
+
+          // Send event to PostHog with best-effort properties
+          try {
+            // trackBridgeUsed is imported above
+            trackBridgeUsed(fromChain, toChain, amount, token);
+          } catch (err) {
+            // Swallow errors from tracking to avoid breaking the widget
+            // eslint-disable-next-line no-console
+            console.warn("PostHog bridge tracking failed:", err);
+          }
+        }
+      } catch (err) {
+        // Ignore malformed messages from other origins
+      }
+    };
+
+    window.addEventListener("message", handleLiFiMessage);
+
+    return () => window.removeEventListener("message", handleLiFiMessage);
+  }, [isOpen]);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
@@ -110,14 +214,23 @@ export function DepositModal({
 
         {/* Tabs Section - Scrollable */}
         <div className="flex-1 overflow-y-auto px-6 pb-6">
-          <Tabs defaultValue="cex" className="w-full mt-4">
+          <Tabs
+            defaultValue="address"
+            className="w-full mt-4"
+            value={activeTab}
+            onValueChange={(value) => {
+              const tabValue = value as "address" | "bridge";
+              setActiveTab(tabValue);
+              trackDepositTabSelected(tabValue);
+            }}
+          >
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="cex">Desde CEX</TabsTrigger>
+              <TabsTrigger value="address">Desde CEX</TabsTrigger>
               <TabsTrigger value="bridge">Bridge</TabsTrigger>
             </TabsList>
 
             {/* Tab 1: CEX */}
-            <TabsContent value="cex" className="space-y-4 mt-4">
+            <TabsContent value="address" className="space-y-4 mt-4">
               <div className="rounded-lg border bg-card p-4">
                 {/* QR Code */}
                 <div className="flex flex-col items-center gap-3 py-4 bg-white dark:bg-muted rounded-lg mb-4">

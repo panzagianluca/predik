@@ -30,6 +30,11 @@ subgraph/TROUBLESHOOTING.md
 subgraph/DEPLOYMENT_CHECKLIST.md
 Docs/SUBGRAPH_INTEGRATION.md
 
+# Documentation files - ignore all markdown docs
+*.md
+!README.md
+!subgraph/README.md
+
 # Backup files
 hooks/use-user-transactions-rpc.ts.bak
 subgraph/PRODUCTION.md

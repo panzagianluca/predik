@@ -6,7 +6,32 @@ import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import { DynamicWagmiConnector } from "@dynamic-labs/wagmi-connector";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { config } from "@/lib/wagmi";
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
+import { useAccount } from "wagmi";
+import { trackWalletConnected, trackWalletDisconnected } from "@/lib/posthog";
+
+// Inner component to track wallet connections
+function WalletTracker() {
+  const { address, isConnected } = useAccount();
+
+  useEffect(() => {
+    if (isConnected && address) {
+      // Track wallet connection
+      trackWalletConnected(address);
+    }
+  }, [isConnected, address]);
+
+  useEffect(() => {
+    // Track disconnection when component unmounts or wallet disconnects
+    return () => {
+      if (!isConnected) {
+        trackWalletDisconnected();
+      }
+    };
+  }, [isConnected]);
+
+  return null;
+}
 
 export function Web3Provider({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
@@ -24,7 +49,10 @@ export function Web3Provider({ children }: { children: ReactNode }) {
     >
       <WagmiProvider config={config}>
         <QueryClientProvider client={queryClient}>
-          <DynamicWagmiConnector>{children}</DynamicWagmiConnector>
+          <DynamicWagmiConnector>
+            <WalletTracker />
+            {children}
+          </DynamicWagmiConnector>
         </QueryClientProvider>
       </WagmiProvider>
     </DynamicContextProvider>

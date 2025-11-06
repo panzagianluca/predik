@@ -31,6 +31,12 @@ import { LogoSpinner } from "@/components/ui/logo-spinner";
 import { haptics } from "@/lib/haptics";
 import { logger } from "@/lib/logger";
 import { translateOutcomeTitle } from "@/lib/translation/outcomeTranslations";
+import {
+  trackTradeCalculation,
+  trackTradeInitiated,
+  trackTradeCompleted,
+  trackTradeFailed,
+} from "@/lib/posthog";
 
 interface TradingPanelProps {
   market: Market;
@@ -364,6 +370,17 @@ export function TradingPanel({
         maxProfitPercent,
         priceImpact,
       });
+
+      // Track trade calculation
+      trackTradeCalculation(
+        market.id,
+        market.slug,
+        selectedOutcome.id,
+        tradeType,
+        tradeAmount,
+        shares,
+        priceImpact,
+      );
     } catch (err) {
       logger.error("Calculation error:", err);
       setError(
@@ -424,6 +441,15 @@ export function TradingPanel({
 
     setIsExecuting(true);
     setError(null);
+
+    // Track trade initiated
+    trackTradeInitiated(
+      market.id,
+      market.slug,
+      selectedOutcome.id,
+      tradeType,
+      tradeAmount,
+    );
 
     try {
       logger.log("🚀 Starting trade execution:", {
@@ -512,6 +538,18 @@ export function TradingPanel({
         });
 
         logger.log("✅ Buy successful:", buyTx);
+
+        // Track successful trade
+        trackTradeCompleted(
+          market.id,
+          market.slug,
+          selectedOutcome.id,
+          selectedOutcome.title,
+          "buy",
+          tradeAmount,
+          Number(minShares),
+          buyTx?.transactionHash,
+        );
       } else {
         // Execute sell
         const maxShares = await pm.calcSellAmount({
@@ -534,6 +572,18 @@ export function TradingPanel({
         });
 
         logger.log("✅ Sell successful:", sellTx);
+
+        // Track successful trade
+        trackTradeCompleted(
+          market.id,
+          market.slug,
+          selectedOutcome.id,
+          selectedOutcome.title,
+          "sell",
+          tradeAmount,
+          Number(maxShares),
+          sellTx?.transactionHash,
+        );
       }
 
       // Reset form
@@ -552,6 +602,17 @@ export function TradingPanel({
       logger.error("❌ Trade execution error:", err);
       const message = err instanceof Error ? err.message : "Error desconocido";
       setError(`Operación fallida: ${message}`);
+
+      // Track failed trade
+      trackTradeFailed(
+        market.id,
+        market.slug,
+        selectedOutcome.id,
+        tradeType,
+        tradeAmount,
+        message,
+        err instanceof Error ? err.name : "Unknown",
+      );
     } finally {
       setIsExecuting(false);
     }

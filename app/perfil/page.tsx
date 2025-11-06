@@ -41,6 +41,17 @@ const EditProfileModal = dynamic(
   },
 );
 
+const ProfileDebug = dynamic(
+  () =>
+    import("@/components/profile/ProfileDebug").then((mod) => ({
+      default: mod.ProfileDebug,
+    })),
+  {
+    ssr: false,
+    loading: () => null,
+  },
+);
+
 const WinningsChart = dynamic(
   () =>
     import("@/components/profile/WinningsChart").then((mod) => ({
@@ -232,6 +243,9 @@ export default function ProfilePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
+          {/* Debug Component - Remove this after debugging */}
+          <ProfileDebug />
+
           {/* Two Column Grid Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-[30%_70%] gap-6 mb-6">
             {/* Left Column - Profile Info */}
@@ -305,18 +319,18 @@ export default function ProfilePage() {
                 <TooltipProvider>
                   {linkedGoogle && linkedTwitter ? (
                     // STATE 1: Both linked - single badge with both logos
-                    <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-lg">
+                    <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-lg flex-1">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
                       <span className="text-sm">Vinculado con</span>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <div className="cursor-help">
                             <Image
-                              src="/SocialMedia/PhGoogleLogo.svg"
+                              src="/SocialMedia/google-icon-logo-svgrepo-com.svg"
                               alt="Google"
                               width={20}
                               height={20}
-                              className="flex-shrink-0 dark:invert"
+                              className="flex-shrink-0"
                             />
                           </div>
                         </TooltipTrigger>
@@ -352,11 +366,11 @@ export default function ProfilePage() {
                           <TooltipTrigger asChild>
                             <div className="cursor-help">
                               <Image
-                                src="/SocialMedia/PhGoogleLogo.svg"
+                                src="/SocialMedia/google-icon-logo-svgrepo-com.svg"
                                 alt="Google"
                                 width={20}
                                 height={20}
-                                className="flex-shrink-0 dark:invert"
+                                className="flex-shrink-0"
                               />
                             </div>
                           </TooltipTrigger>
@@ -392,11 +406,10 @@ export default function ProfilePage() {
                         className="gap-2 flex-1"
                       >
                         <Image
-                          src="/SocialMedia/PhGoogleLogo.svg"
+                          src="/SocialMedia/google-icon-logo-svgrepo-com.svg"
                           alt="Google"
                           width={16}
                           height={16}
-                          className="dark:invert"
                         />
                         Vincular con Google
                       </Button>
@@ -432,11 +445,10 @@ export default function ProfilePage() {
                         className="gap-2 flex-1"
                       >
                         <Image
-                          src="/SocialMedia/PhGoogleLogo.svg"
+                          src="/SocialMedia/google-icon-logo-svgrepo-com.svg"
                           alt="Google"
                           width={16}
                           height={16}
-                          className="dark:invert"
                         />
                         Vincular con Google
                       </Button>

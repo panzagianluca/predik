@@ -18,6 +18,11 @@ import { translateOutcomeTitle } from "@/lib/translation/outcomeTranslations";
 import { cn } from "@/lib/utils";
 import { useAccount } from "wagmi";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import {
+  trackMarketClick,
+  trackOutcomeClick,
+  trackMarketSave,
+} from "@/lib/posthog";
 
 interface MarketCardProps {
   market: Market;
@@ -100,6 +105,9 @@ export function MarketCard({ market }: MarketCardProps) {
 
     const newSavedState = !isSaved;
     setIsSaved(newSavedState);
+
+    // Track save/unsave action
+    trackMarketSave(marketId, market.slug, newSavedState);
 
     try {
       if (newSavedState) {
@@ -309,6 +317,14 @@ export function MarketCard({ market }: MarketCardProps) {
             href={`/markets/${market.slug}`}
             className="flex-1 min-w-0"
             prefetch={true}
+            onClick={() => {
+              trackMarketClick(
+                market.id,
+                market.slug,
+                market.titleEs || market.title,
+                "market_card_title",
+              );
+            }}
           >
             <h3 className="text-base font-semibold leading-tight line-clamp-2 hover:text-primary transition-colors duration-200">
               {market.titleEs || market.title}
@@ -348,6 +364,15 @@ export function MarketCard({ market }: MarketCardProps) {
                   href={`/markets/${market.slug}?outcome=${outcome.id}`}
                   className="block group"
                   prefetch={true}
+                  onClick={() => {
+                    trackOutcomeClick(
+                      market.id,
+                      market.slug,
+                      outcome.id,
+                      outcome.title,
+                      "market_card_outcome",
+                    );
+                  }}
                 >
                   <div className="space-y-1 hover:opacity-80 transition-opacity duration-200">
                     <div className="flex items-center justify-between text-sm">

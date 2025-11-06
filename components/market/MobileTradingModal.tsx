@@ -24,6 +24,12 @@ import {
 import { cn } from "@/lib/utils";
 import { haptics } from "@/lib/haptics";
 import { translateOutcomeTitle } from "@/lib/translation/outcomeTranslations";
+import {
+  trackTradeCalculation,
+  trackTradeInitiated,
+  trackTradeCompleted,
+  trackTradeFailed,
+} from "@/lib/posthog";
 
 interface MobileTradingModalProps {
   isOpen: boolean;
@@ -247,6 +253,17 @@ export function MobileTradingModal({
         };
 
         setCalculation(calc);
+
+        // Track trade calculation
+        trackTradeCalculation(
+          market.id,
+          market.slug,
+          selectedOutcome.id,
+          "buy",
+          tradeAmount,
+          shares,
+          priceImpact,
+        );
       } else {
         // Use exact same API as desktop
         const calcResult = await predictionMarket.calcSellAmount({
@@ -283,6 +300,17 @@ export function MobileTradingModal({
         };
 
         setCalculation(calc);
+
+        // Track trade calculation
+        trackTradeCalculation(
+          market.id,
+          market.slug,
+          selectedOutcome.id,
+          "sell",
+          tradeAmount,
+          tradeAmount,
+          priceImpact,
+        );
       }
     } catch (err) {
       logger.error("Error calculating trade:", err);
@@ -344,6 +372,15 @@ export function MobileTradingModal({
         amount: tradeAmount,
       });
 
+      // Track trade initiated
+      trackTradeInitiated(
+        market.id,
+        market.slug,
+        selectedOutcome.id,
+        tradeType,
+        tradeAmount,
+      );
+
       if (tradeType === "buy") {
         // Check and approve if needed (same as desktop)
         const spenderAddress =
@@ -395,6 +432,18 @@ export function MobileTradingModal({
 
         logger.log("✅ Buy successful:", buyTx);
         haptics.success();
+
+        // Track successful trade
+        trackTradeCompleted(
+          market.id,
+          market.slug,
+          selectedOutcome.id,
+          selectedOutcome.title,
+          "buy",
+          tradeAmount,
+          Number(minShares),
+          buyTx?.transactionHash,
+        );
       } else {
         // Execute sell (same as desktop)
         const maxShares = await predictionMarket.calcSellAmount({
@@ -418,6 +467,18 @@ export function MobileTradingModal({
 
         logger.log("✅ Sell successful:", sellTx);
         haptics.success();
+
+        // Track successful trade
+        trackTradeCompleted(
+          market.id,
+          market.slug,
+          selectedOutcome.id,
+          selectedOutcome.title,
+          "sell",
+          tradeAmount,
+          Number(maxShares),
+          sellTx?.transactionHash,
+        );
       }
 
       setAmount("");
@@ -428,6 +489,17 @@ export function MobileTradingModal({
       logger.error("Trade execution error:", err);
       haptics.error();
       setError(err.message || "Error al ejecutar la operación");
+
+      // Track failed trade
+      trackTradeFailed(
+        market.id,
+        market.slug,
+        selectedOutcome.id,
+        tradeType,
+        parseFloat(amount),
+        err.message || "Error desconocido",
+        err.name || "Unknown",
+      );
     } finally {
       setIsExecuting(false);
     }
