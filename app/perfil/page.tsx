@@ -41,17 +41,6 @@ const EditProfileModal = dynamic(
   },
 );
 
-const ProfileDebug = dynamic(
-  () =>
-    import("@/components/profile/ProfileDebug").then((mod) => ({
-      default: mod.ProfileDebug,
-    })),
-  {
-    ssr: false,
-    loading: () => null,
-  },
-);
-
 const WinningsChart = dynamic(
   () =>
     import("@/components/profile/WinningsChart").then((mod) => ({
@@ -243,9 +232,6 @@ export default function ProfilePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {/* Debug Component - Remove this after debugging */}
-          <ProfileDebug />
-
           {/* Two Column Grid Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-[30%_70%] gap-6 mb-6">
             {/* Left Column - Profile Info */}
