@@ -664,9 +664,9 @@ export function Navbar() {
                 ) : (
                   // LOGGED IN STATE
                   <div className="flex items-center gap-3">
-                    {/* USDT Balance */}
-                    <div className="flex flex-col items-center justify-center h-9 px-2 sm:px-4">
-                      <span className="text-[10px] sm:text-[12px] leading-tight">
+                    {/* USDT Balance - Shows loading skeleton while fetching */}
+                    <div className="flex flex-col items-center justify-center h-9 px-2 sm:px-4 min-w-[60px] sm:min-w-[80px]">
+                      <span className="text-[10px] sm:text-[12px] leading-tight text-muted-foreground">
                         Balance
                       </span>
                       {isLoadingBalance ? (
@@ -678,7 +678,7 @@ export function Navbar() {
                       )}
                     </div>
 
-                    {/* Depositar Button */}
+                    {/* Depositar Button - Always visible instantly when connected */}
                     <button
                       className="group/button relative inline-flex items-center justify-center overflow-hidden rounded-md bg-electric-purple backdrop-blur-lg px-4 sm:px-6 h-9 text-[14px] sm:text-sm font-semibold text-white transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl hover:shadow-electric-purple/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       onClick={() => setShowDepositModal(true)}
