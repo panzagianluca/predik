@@ -205,6 +205,7 @@ export function TransactionsList({
             const sideInfo = getSideInfo(tx.action);
             const SideIcon = sideInfo.icon;
             const cost = Number(formatUnits(tx.value, tokenDecimals));
+            const shares = Number(formatUnits(tx.shares, 18)); // Shares use 18 decimals (standard ERC20)
             const marketName =
               marketNames.get(tx.marketId.toString()) ||
               `Market #${tx.marketId}`;
@@ -245,7 +246,7 @@ export function TransactionsList({
                 </td>
                 <td className="py-3 px-4 text-right">
                   <span className="text-sm font-semibold">
-                    {Number(formatUnits(tx.shares, tokenDecimals)).toFixed(2)}
+                    {shares.toFixed(2)}
                   </span>
                 </td>
                 <td className="py-3 px-4 text-right">

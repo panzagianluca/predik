@@ -34,10 +34,12 @@ const calculatePositionMetrics = (
   currentPrice: number,
   tokenDecimals: number,
 ) => {
-  const shares = Number(formatUnits(position.shares, tokenDecimals));
+  // Shares always use 18 decimals (standard ERC20)
+  const shares = Number(formatUnits(position.shares, 18));
   // avgEntryPrice is the ratio (invested wei / shares wei) - already normalized
   const avgPrice = position.avgEntryPrice;
   const currentValue = shares * currentPrice;
+  // Invested and received use token decimals (6 for USDT)
   const invested = Number(formatUnits(position.invested, tokenDecimals));
   const receivedFromSells = Number(
     formatUnits(position.receivedFromSells, tokenDecimals),
@@ -147,8 +149,8 @@ function PositionRow({
 
 export function PositionsList({
   positions,
-  tokenDecimals = 18,
-  tokenSymbol = "cUSD",
+  tokenDecimals = 6, // USDT decimals for invested/value amounts
+  tokenSymbol = "USDT",
 }: PositionsListProps) {
   const [marketData, setMarketData] = useState<Map<string, MarketInfo>>(
     new Map(),
