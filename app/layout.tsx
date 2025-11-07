@@ -23,11 +23,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Predik - El futuro tiene precio",
   description:
-    "Opera mercados de predicción en BNB Chain, impulsados por Myriad Markets.",
+    "Opera mercados de predicción en BNB Chain, impulsados por Myriad Protocol.",
   openGraph: {
     title: "Predik - El futuro tiene precio",
     description:
-      "Opera mercados de predicción en BNB Chain, impulsados por Myriad Markets.",
+      "Opera mercados de predicción en BNB Chain, impulsados por Myriad Protocol.",
     url: "https://predik.io",
     siteName: "Predik",
     locale: "es_ES",
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Predik - El futuro tiene precio",
     description:
-      "Opera mercados de predicción en BNB Chain, impulsados por Myriad Markets.",
+      "Opera mercados de predicción en BNB Chain, impulsados por Myriad Protocol.",
     images: ["/og-image.png"],
   },
 };
