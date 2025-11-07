@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import {
   Dialog,
   DialogContent,
@@ -45,11 +44,8 @@ export function DepositModal({
   const [copied, setCopied] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showBridgeTooltip, setShowBridgeTooltip] = useState(false);
-  const [activeTab, setActiveTab] = useState<"address" | "buy" | "bridge">(
-    "address",
-  );
+  const [activeTab, setActiveTab] = useState<"address" | "bridge">("address");
   const { resolvedTheme, setTheme } = useTheme();
-  const { setShowDynamicUserProfile } = useDynamicContext();
 
   // Track modal open
   useEffect(() => {
@@ -57,14 +53,6 @@ export function DepositModal({
       trackDepositModalOpened();
     }
   }, [isOpen]);
-
-  // Handle Buy tab - Open Dynamic on-ramp
-  const handleBuyClick = () => {
-    // Close the deposit modal
-    onClose();
-    // Open Dynamic's user profile with on-ramp view
-    setShowDynamicUserProfile(true);
-  };
 
   // Prevent LiFi Widget from changing global theme
   useEffect(() => {
@@ -231,14 +219,13 @@ export function DepositModal({
             className="w-full mt-4"
             value={activeTab}
             onValueChange={(value) => {
-              const tabValue = value as "address" | "buy" | "bridge";
+              const tabValue = value as "address" | "bridge";
               setActiveTab(tabValue);
               trackDepositTabSelected(tabValue);
             }}
           >
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="address">Depositar</TabsTrigger>
-              <TabsTrigger value="buy">Comprar</TabsTrigger>
               <TabsTrigger value="bridge">Bridge</TabsTrigger>
             </TabsList>
 
@@ -368,49 +355,7 @@ export function DepositModal({
               </div>
             </TabsContent>
 
-            {/* Tab 2: Buy (On-Ramp) */}
-            <TabsContent value="buy" className="space-y-4 mt-4">
-              <div className="rounded-lg border bg-card p-6">
-                <div className="text-center space-y-4">
-                  <div className="mx-auto w-16 h-16 rounded-full bg-electric-purple/10 flex items-center justify-center">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-8 w-8 text-electric-purple"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">
-                      Comprá USDT con tarjeta
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Comprá USDT directamente con tarjeta de débito o crédito y
-                      recibilo en tu wallet
-                    </p>
-                  </div>
-                  <Button
-                    onClick={handleBuyClick}
-                    className="w-full bg-electric-purple hover:bg-electric-purple/90"
-                  >
-                    Abrir Compra
-                  </Button>
-                  <p className="text-xs text-muted-foreground">
-                    Powered by Dynamic
-                  </p>
-                </div>
-              </div>
-            </TabsContent>
-
-            {/* Tab 3: Bridge (Li.Fi Widget) */}
+            {/* Tab 2: Bridge (Li.Fi Widget) */}
             <TabsContent value="bridge" className="space-y-4 mt-4">
               <div className="rounded-lg border bg-card p-4">
                 <div className="flex items-center gap-2 mb-4">

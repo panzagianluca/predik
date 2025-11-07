@@ -321,7 +321,7 @@ export function trackDepositModalOpened(source?: string) {
 /**
  * Track deposit tab selected
  */
-export function trackDepositTabSelected(tab: "address" | "buy" | "bridge") {
+export function trackDepositTabSelected(tab: "address" | "bridge") {
   if (!canTrack()) return;
 
   const posthog = getPostHog();
