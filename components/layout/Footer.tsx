@@ -26,7 +26,7 @@ export function Footer() {
           <div className="flex items-center gap-2">
             <span className="hidden sm:inline">Powered by</span>
             <a
-              href="https://myriad.markets"
+              href="https://myriadprotocol.com"
               target="_blank"
               rel="noopener noreferrer"
               className="text-muted-foreground hover:text-foreground transition-colors"
