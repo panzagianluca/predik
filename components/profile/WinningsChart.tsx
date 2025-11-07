@@ -31,7 +31,7 @@ interface WinningsChartProps {
 
 export function WinningsChart({
   transactions,
-  tokenDecimals = 6,
+  tokenDecimals = 18,
   tokenSymbol = "USDC",
   className = "",
 }: WinningsChartProps) {
