@@ -12,6 +12,7 @@ import { TradingPanel } from "@/components/market/TradingPanel";
 import { MobileTradingModal } from "@/components/market/MobileTradingModal";
 import { RelatedMarketCard } from "@/components/market/RelatedMarketCard";
 import { ShareButton } from "@/components/market/ShareButton";
+import { CopyLinkButton } from "@/components/market/CopyLinkButton";
 import { ShareableMarketCard } from "@/components/market/ShareableMarketCard";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -304,7 +305,8 @@ export default function MarketDetailPage() {
                   </div>
 
                   {/* Share Button - Desktop only */}
-                  <div className="hidden md:block flex-shrink-0">
+                  <div className="hidden md:flex gap-2 flex-shrink-0">
+                    <CopyLinkButton marketSlug={market.slug} />
                     <ShareButton
                       marketId={market.id.toString()}
                       marketTitle={market.titleEs || market.title}
@@ -370,11 +372,13 @@ export default function MarketDetailPage() {
                 </div>
 
                 {/* Share Button - Mobile only */}
-                <div className="flex-shrink-0">
+                <div className="flex gap-2 flex-shrink-0">
+                  <CopyLinkButton marketSlug={market.slug} iconOnly />
                   <ShareButton
                     marketId={market.id.toString()}
                     marketTitle={market.titleEs || market.title}
                     marketSlug={market.slug}
+                    iconOnly
                   />
                 </div>
               </div>

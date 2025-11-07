@@ -11,6 +11,7 @@ interface ShareButtonProps {
   marketId: string;
   marketTitle: string;
   marketSlug: string;
+  iconOnly?: boolean;
 }
 
 /**
@@ -23,6 +24,7 @@ export function ShareButton({
   marketId,
   marketTitle,
   marketSlug,
+  iconOnly = false,
 }: ShareButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
@@ -95,18 +97,18 @@ export function ShareButton({
         onClick={generateImage}
         disabled={isGenerating}
         variant="outline"
-        size="default"
+        size={iconOnly ? "icon" : "default"}
         className="gap-2 transition-all duration-200 hover:scale-[1.02]"
       >
         {isGenerating ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
-            <span>Generando...</span>
+            {!iconOnly && <span>Generando...</span>}
           </>
         ) : (
           <>
             <Share2 className="h-4 w-4" />
-            <span>Compartir</span>
+            {!iconOnly && <span>Compartir</span>}
           </>
         )}
       </Button>
