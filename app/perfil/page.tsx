@@ -492,7 +492,7 @@ export default function ProfilePage() {
                       {Number(
                         formatUnits(
                           stats.totalInvested + stats.totalWithdrawn,
-                          6,
+                          18,
                         ),
                       ).toFixed(2)}
                     </p>
