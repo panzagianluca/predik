@@ -39,11 +39,9 @@ const calculatePositionMetrics = (
   // avgEntryPrice is the ratio (invested wei / shares wei) - already normalized
   const avgPrice = position.avgEntryPrice;
   const currentValue = shares * currentPrice;
-  // Invested and received use token decimals (6 for USDT)
-  const invested = Number(formatUnits(position.invested, tokenDecimals));
-  const receivedFromSells = Number(
-    formatUnits(position.receivedFromSells, tokenDecimals),
-  );
+  // Contract emits values in 18 decimals (wei), not 6 like USDT normally uses
+  const invested = Number(formatUnits(position.invested, 18));
+  const receivedFromSells = Number(formatUnits(position.receivedFromSells, 18));
   const netInvested = invested - receivedFromSells;
   const unrealizedPnL = currentValue - netInvested;
   const pnlPercentage =
@@ -149,7 +147,7 @@ function PositionRow({
 
 export function PositionsList({
   positions,
-  tokenDecimals = 6, // USDT decimals for invested/value amounts
+  tokenDecimals = 18, // Contract uses 18 decimals for all values
   tokenSymbol = "USDT",
 }: PositionsListProps) {
   const [marketData, setMarketData] = useState<Map<string, MarketInfo>>(
