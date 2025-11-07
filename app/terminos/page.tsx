@@ -15,7 +15,7 @@ export default function TerminosPage() {
             Términos de Servicio Preliminares de Predik
           </h1>
           <p className="text-muted-foreground mb-4">
-            Última actualización: 11 de octubre de 2025
+            Última actualización: 7 de noviembre de 2025
           </p>
           <p className="text-lg font-semibold text-foreground">
             POR FAVOR LEA ESTOS TÉRMINOS DETENIDAMENTE ANTES DE UTILIZAR PREDIK
@@ -39,18 +39,18 @@ export default function TerminosPage() {
                 Myriad Foundation
               </a>{" "}
               (la &quot;Fundación Myriad&quot;), la cual opera en varias cadenas
-              de bloques, incluyendo{" "}
+              de bloques, incluyendo BNB Chain, Arbitrum y Linea. Predik
+              presenta únicamente los mercados alojados en{" "}
               <a
-                href="https://celo.org/"
+                href="https://www.bnbchain.org/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-foreground underline hover:text-electric-purple transition-colors"
               >
-                Celo
-              </a>
-              , Arbitrum y Linea. Predik presenta únicamente los mercados
-              alojados en la cadena Celo (Celo, Ethereum L2). Estos Términos de
-              Servicio preliminares (&quot;Términos&quot;) regulan el uso del
+                BNB Chain
+              </a>{" "}
+              utilizando USDT (Tether) como token de operación. Estos Términos
+              de Servicio preliminares (&quot;Términos&quot;) regulan el uso del
               sitio web, aplicaciones y servicios asociados de Predik
               (colectivamente, el &quot;Servicio&quot;).
             </p>
@@ -88,18 +88,19 @@ export default function TerminosPage() {
               >
                 Fundación Myriad
               </a>{" "}
-              en la{" "}
+              en{" "}
               <a
-                href="https://celo.org/"
+                href="https://www.bnbchain.org/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-foreground underline hover:text-electric-purple transition-colors"
               >
-                cadena Celo
-              </a>
-              . Predik no controla, garantiza ni tiene custodia sobre ningún
-              activo digital o contrato. Todas las transacciones se realizan
-              directamente en la plataforma de Myriad.
+                BNB Chain
+              </a>{" "}
+              utilizando USDT (Tether) como token de operación. Predik no
+              controla, garantiza ni tiene custodia sobre ningún activo digital
+              o contrato. Todas las transacciones se realizan directamente en la
+              plataforma de Myriad.
             </p>
           </section>
 
@@ -198,27 +199,20 @@ export default function TerminosPage() {
             <ul className="list-disc list-inside space-y-2 text-muted-foreground ml-4">
               <li>
                 Los mercados y contratos a los que accede están basados en
-                tecnología blockchain, específicamente en la{" "}
+                tecnología blockchain, específicamente en{" "}
                 <a
-                  href="https://celo.org/"
+                  href="https://www.bnbchain.org/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-foreground underline hover:text-electric-purple transition-colors"
                 >
-                  cadena Celo
+                  BNB Chain
                 </a>
                 , la cual conlleva riesgos inherentes tales como posibles fallas
                 técnicas, cambios regulatorios y la naturaleza irreversible de
-                las transacciones. Usted reconoce haber leído y aceptado el{" "}
-                <a
-                  href="https://celo.org/user-agreement"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-foreground underline hover:text-electric-purple transition-colors"
-                >
-                  Acuerdo de Usuario de Celo
-                </a>
-                .
+                las transacciones. Las operaciones se realizan utilizando USDT
+                (Tether), una stablecoin cuyo valor puede fluctuar y está sujeta
+                a riesgos específicos del emisor.
               </li>
               <li>
                 Predik no es responsable por la ejecución de transacciones,

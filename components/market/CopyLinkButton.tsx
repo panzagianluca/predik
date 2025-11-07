@@ -8,17 +8,16 @@ import { haptics } from "@/lib/haptics";
 interface CopyLinkButtonProps {
   marketSlug: string;
   variant?: "default" | "outline" | "ghost";
-  iconOnly?: boolean;
 }
 
 /**
  * Copy link button that copies the market URL to clipboard
  * Shows a checkmark icon with smooth transition for visual feedback
+ * Always displays as icon-only
  */
 export function CopyLinkButton({
   marketSlug,
   variant = "outline",
-  iconOnly = false,
 }: CopyLinkButtonProps) {
   const [copied, setCopied] = useState(false);
 
@@ -43,7 +42,7 @@ export function CopyLinkButton({
     <Button
       onClick={handleCopy}
       variant={variant}
-      size={iconOnly ? "icon" : "default"}
+      size="icon"
       className="gap-2 transition-all duration-200 hover:scale-[1.02] relative"
     >
       <div className="relative w-4 h-4">
@@ -55,14 +54,13 @@ export function CopyLinkButton({
           }`}
         />
         <Check
-          className={`h-4 w-4 absolute inset-0 transition-all duration-300 text-green-500 ${
+          className={`h-4 w-4 absolute inset-0 transition-all duration-300 ${
             copied
               ? "opacity-100 scale-100 rotate-0"
               : "opacity-0 scale-0 -rotate-90"
           }`}
         />
       </div>
-      {!iconOnly && <span>{copied ? "Copiado!" : "Copiar link"}</span>}
     </Button>
   );
 }

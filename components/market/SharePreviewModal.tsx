@@ -119,28 +119,79 @@ export function SharePreviewModal({
 
   const handleShareToTelegram = async () => {
     haptics.light();
-    // Telegram doesn't support direct image upload via URL
-    // Download image first, then open Telegram for manual upload
-    handleDownload();
-    setTimeout(() => {
-      const url = `https://t.me/share/url?url=${encodeURIComponent(
-        pageUrl,
-      )}&text=${encodeURIComponent(shareText)}`;
-      openWindow(url);
-    }, 500);
+
+    // Try Web Share API first (mobile)
+    if (navigator.share) {
+      try {
+        const blob = await getImageBlob();
+        const file = new File([blob], `predik-${marketSlug}.png`, {
+          type: "image/png",
+        });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: `Predik: ${marketTitle}`,
+            text: shareText,
+            url: pageUrl,
+            files: [file],
+          });
+          haptics.success();
+          logger.info("Shared to Telegram via Web Share");
+          return;
+        }
+      } catch (error: any) {
+        if (error.name !== "AbortError") {
+          logger.error("Web Share failed:", error);
+        } else {
+          logger.info("Share cancelled by user");
+          return;
+        }
+      }
+    }
+
+    // Desktop fallback: Open Telegram without auto-download
+    const url = `https://t.me/share/url?url=${encodeURIComponent(
+      pageUrl,
+    )}&text=${encodeURIComponent(shareText)}`;
+    openWindow(url);
   };
 
   const handleShareToX = async () => {
     haptics.light();
-    // X/Twitter doesn't support direct image upload via URL
-    // Download image first, then open X for manual upload
-    handleDownload();
-    setTimeout(() => {
-      const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-        shareText,
-      )}&url=${encodeURIComponent(pageUrl)}`;
-      openWindow(url);
-    }, 500);
+
+    // Try Web Share API first (mobile)
+    if (navigator.share) {
+      try {
+        const blob = await getImageBlob();
+        const file = new File([blob], `predik-${marketSlug}.png`, {
+          type: "image/png",
+        });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: `Predik: ${marketTitle}`,
+            text: shareText,
+            files: [file],
+          });
+          haptics.success();
+          logger.info("Shared to X via Web Share");
+          return;
+        }
+      } catch (error: any) {
+        if (error.name !== "AbortError") {
+          logger.error("Web Share failed:", error);
+        } else {
+          logger.info("Share cancelled by user");
+          return;
+        }
+      }
+    }
+
+    // Desktop fallback: Open X without auto-download
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+      shareText,
+    )}&url=${encodeURIComponent(pageUrl)}`;
+    openWindow(url);
   };
 
   const handleShareToWhatsApp = async () => {
@@ -184,25 +235,74 @@ export function SharePreviewModal({
 
   const handleShareToFacebook = async () => {
     haptics.light();
-    // Facebook doesn't support direct image upload via URL
-    // Download image first, then open Facebook for manual upload
-    handleDownload();
-    setTimeout(() => {
-      const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-        pageUrl,
-      )}`;
-      openWindow(url);
-    }, 500);
+
+    // Try Web Share API first (mobile)
+    if (navigator.share) {
+      try {
+        const blob = await getImageBlob();
+        const file = new File([blob], `predik-${marketSlug}.png`, {
+          type: "image/png",
+        });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: `Predik: ${marketTitle}`,
+            text: shareText,
+            files: [file],
+          });
+          haptics.success();
+          logger.info("Shared to Facebook via Web Share");
+          return;
+        }
+      } catch (error: any) {
+        if (error.name !== "AbortError") {
+          logger.error("Web Share failed:", error);
+        } else {
+          logger.info("Share cancelled by user");
+          return;
+        }
+      }
+    }
+
+    // Desktop fallback: Open Facebook without auto-download
+    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+      pageUrl,
+    )}`;
+    openWindow(url);
   };
 
   const handleShareToInstagram = async () => {
     haptics.light();
-    // Instagram requires manual upload
-    // Download image and open Instagram
+
+    // Try Web Share API first (mobile)
+    if (navigator.share) {
+      try {
+        const blob = await getImageBlob();
+        const file = new File([blob], `predik-${marketSlug}.png`, {
+          type: "image/png",
+        });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: `Predik: ${marketTitle}`,
+            files: [file],
+          });
+          haptics.success();
+          logger.info("Shared to Instagram via Web Share");
+          return;
+        }
+      } catch (error: any) {
+        if (error.name !== "AbortError") {
+          logger.error("Web Share failed:", error);
+        } else {
+          logger.info("Share cancelled by user");
+          return;
+        }
+      }
+    }
+
+    // Desktop fallback: Just download for manual upload
     handleDownload();
-    setTimeout(() => {
-      openWindow("https://www.instagram.com/");
-    }, 500);
   };
 
   return (

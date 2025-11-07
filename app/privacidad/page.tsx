@@ -15,7 +15,7 @@ export default function PrivacidadPage() {
             Política de Privacidad Preliminar de Predik
           </h1>
           <p className="text-muted-foreground mb-4">
-            Última actualización: 11 de octubre de 2025
+            Última actualización: 7 de noviembre de 2025
           </p>
         </div>
 
@@ -38,15 +38,16 @@ export default function PrivacidadPage() {
               </a>{" "}
               (&quot;Myriad&quot;), en la cadena de bloques{" "}
               <a
-                href="https://celo.org/"
+                href="https://www.bnbchain.org/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-foreground underline hover:text-electric-purple transition-colors"
               >
-                Celo
+                BNB Chain
               </a>{" "}
-              (&quot;Celo Chain&quot;). Todas las transacciones se realizan
-              exclusivamente a través del protocolo de Myriad.
+              utilizando USDT (Tether) como token de operación. Todas las
+              transacciones se realizan exclusivamente a través del protocolo de
+              Myriad.
             </p>
             <p className="text-muted-foreground leading-relaxed">
               Aunque Predik no está formalmente constituida en la Unión Europea,

@@ -373,7 +373,7 @@ export default function MarketDetailPage() {
 
                 {/* Share Button - Mobile only */}
                 <div className="flex gap-2 flex-shrink-0">
-                  <CopyLinkButton marketSlug={market.slug} iconOnly />
+                  <CopyLinkButton marketSlug={market.slug} />
                   <ShareButton
                     marketId={market.id.toString()}
                     marketTitle={market.titleEs || market.title}
