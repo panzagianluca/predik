@@ -14,7 +14,7 @@ import {
   TooltipTrigger,
 } from "@/components/animate-ui/components/animate/tooltip";
 import { Button } from "@/components/ui/button";
-import { Download, Share2 } from "lucide-react";
+import { Download, Share2, Copy, Loader2 } from "lucide-react";
 import { haptics } from "@/lib/haptics";
 import { logger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
@@ -67,21 +67,54 @@ export function SharePreviewModal({
         });
 
         haptics.success();
-        logger.info("Market shared successfully");
+        logger.info("Market shared successfully via Web Share");
         onClose();
       } else {
-        // If Web Share not available, just download
-        handleDownload();
+        // If Web Share not available, show message
+        logger.info("Web Share API not available");
+        haptics.error();
       }
     } catch (error: any) {
       if (error.name !== "AbortError") {
         logger.error("Error sharing:", error);
         haptics.error();
+      } else {
+        // User cancelled share - just log it
+        logger.info("Share cancelled by user");
       }
-      // User cancelled share - just log it
-      logger.info("Share cancelled by user");
     } finally {
       setIsSharing(false);
+    }
+  };
+
+  const handleCopyImage = async () => {
+    try {
+      haptics.light();
+
+      // Convert data URL to blob
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+
+      // Try Clipboard API
+      if (navigator.clipboard && navigator.clipboard.write) {
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            "image/png": blob,
+          }),
+        ]);
+
+        haptics.success();
+        logger.info("Image copied to clipboard");
+      } else {
+        // Fallback to download if clipboard not supported
+        logger.info("Clipboard API not available, downloading instead");
+        handleDownload();
+      }
+    } catch (error) {
+      logger.error("Error copying image:", error);
+      haptics.error();
+      // Fallback to download
+      handleDownload();
     }
   };
 
@@ -119,37 +152,6 @@ export function SharePreviewModal({
 
   const handleShareToTelegram = async () => {
     haptics.light();
-
-    // Try Web Share API first (mobile)
-    if (navigator.share) {
-      try {
-        const blob = await getImageBlob();
-        const file = new File([blob], `predik-${marketSlug}.png`, {
-          type: "image/png",
-        });
-
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            title: `Predik: ${marketTitle}`,
-            text: shareText,
-            url: pageUrl,
-            files: [file],
-          });
-          haptics.success();
-          logger.info("Shared to Telegram via Web Share");
-          return;
-        }
-      } catch (error: any) {
-        if (error.name !== "AbortError") {
-          logger.error("Web Share failed:", error);
-        } else {
-          logger.info("Share cancelled by user");
-          return;
-        }
-      }
-    }
-
-    // Desktop fallback: Open Telegram without auto-download
     const url = `https://t.me/share/url?url=${encodeURIComponent(
       pageUrl,
     )}&text=${encodeURIComponent(shareText)}`;
@@ -158,36 +160,6 @@ export function SharePreviewModal({
 
   const handleShareToX = async () => {
     haptics.light();
-
-    // Try Web Share API first (mobile)
-    if (navigator.share) {
-      try {
-        const blob = await getImageBlob();
-        const file = new File([blob], `predik-${marketSlug}.png`, {
-          type: "image/png",
-        });
-
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            title: `Predik: ${marketTitle}`,
-            text: shareText,
-            files: [file],
-          });
-          haptics.success();
-          logger.info("Shared to X via Web Share");
-          return;
-        }
-      } catch (error: any) {
-        if (error.name !== "AbortError") {
-          logger.error("Web Share failed:", error);
-        } else {
-          logger.info("Share cancelled by user");
-          return;
-        }
-      }
-    }
-
-    // Desktop fallback: Open X without auto-download
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
       shareText,
     )}&url=${encodeURIComponent(pageUrl)}`;
@@ -196,75 +168,14 @@ export function SharePreviewModal({
 
   const handleShareToWhatsApp = async () => {
     haptics.light();
-    // Try Web Share API first (works on mobile)
-    try {
-      const blob = await getImageBlob();
-      const file = new File([blob], `predik-${marketSlug}.png`, {
-        type: "image/png",
-      });
-
-      if (
-        navigator.share &&
-        navigator.canShare &&
-        navigator.canShare({ files: [file] })
-      ) {
-        await navigator.share({
-          title: `Predik: ${marketTitle}`,
-          text: shareText,
-          files: [file],
-        });
-        haptics.success();
-        logger.info("Shared to WhatsApp via Web Share");
-        return;
-      }
-    } catch (error: any) {
-      if (error.name !== "AbortError") {
-        logger.error("Web Share failed:", error);
-      }
-    }
-
-    // Fallback: download image and open WhatsApp
-    handleDownload();
-    setTimeout(() => {
-      const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(
-        shareText + " " + pageUrl,
-      )}`;
-      openWindow(url);
-    }, 500);
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(
+      shareText + " " + pageUrl,
+    )}`;
+    openWindow(url);
   };
 
   const handleShareToFacebook = async () => {
     haptics.light();
-
-    // Try Web Share API first (mobile)
-    if (navigator.share) {
-      try {
-        const blob = await getImageBlob();
-        const file = new File([blob], `predik-${marketSlug}.png`, {
-          type: "image/png",
-        });
-
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            title: `Predik: ${marketTitle}`,
-            text: shareText,
-            files: [file],
-          });
-          haptics.success();
-          logger.info("Shared to Facebook via Web Share");
-          return;
-        }
-      } catch (error: any) {
-        if (error.name !== "AbortError") {
-          logger.error("Web Share failed:", error);
-        } else {
-          logger.info("Share cancelled by user");
-          return;
-        }
-      }
-    }
-
-    // Desktop fallback: Open Facebook without auto-download
     const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
       pageUrl,
     )}`;
@@ -273,36 +184,8 @@ export function SharePreviewModal({
 
   const handleShareToInstagram = async () => {
     haptics.light();
-
-    // Try Web Share API first (mobile)
-    if (navigator.share) {
-      try {
-        const blob = await getImageBlob();
-        const file = new File([blob], `predik-${marketSlug}.png`, {
-          type: "image/png",
-        });
-
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            title: `Predik: ${marketTitle}`,
-            files: [file],
-          });
-          haptics.success();
-          logger.info("Shared to Instagram via Web Share");
-          return;
-        }
-      } catch (error: any) {
-        if (error.name !== "AbortError") {
-          logger.error("Web Share failed:", error);
-        } else {
-          logger.info("Share cancelled by user");
-          return;
-        }
-      }
-    }
-
-    // Desktop fallback: Just download for manual upload
-    handleDownload();
+    // Instagram doesn't support URL sharing, just open it
+    openWindow("https://www.instagram.com/");
   };
 
   return (
@@ -335,15 +218,42 @@ export function SharePreviewModal({
         <div className="p-4 border-t bg-muted/30">
           <TooltipProvider>
             <div className="flex items-center justify-between gap-4">
-              {/* Download Button */}
-              <Button
-                onClick={handleDownload}
-                variant="outline"
-                className="gap-2 flex-shrink-0"
-              >
-                <Download className="h-4 w-4" />
-                Descargar
-              </Button>
+              {/* Left side: Download + Copy Image (desktop) / Share (mobile) */}
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={handleDownload}
+                  variant="outline"
+                  className="gap-2 flex-shrink-0"
+                >
+                  <Download className="h-4 w-4" />
+                  Descargar
+                </Button>
+
+                {/* Copy Image - Desktop only */}
+                <Button
+                  onClick={handleCopyImage}
+                  variant="outline"
+                  className="gap-2 flex-shrink-0 hidden md:flex"
+                >
+                  <Copy className="h-4 w-4" />
+                  Copiar Imagen
+                </Button>
+
+                {/* Share - Mobile only */}
+                <Button
+                  onClick={handleShare}
+                  disabled={isSharing}
+                  variant="outline"
+                  className="gap-2 flex-shrink-0 md:hidden"
+                >
+                  {isSharing ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Share2 className="h-4 w-4" />
+                  )}
+                  Compartir
+                </Button>
+              </div>
 
               {/* Social Share Buttons */}
               <div className="flex items-center gap-2">
