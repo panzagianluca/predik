@@ -96,6 +96,8 @@ export const notifications = pgTable("notifications", {
   title: varchar("title", { length: 255 }).notNull(),
   body: text("body").notNull(),
   link: text("link"),
+  is_read: boolean("is_read").default(false).notNull(),
+  read_at: timestamp("read_at"),
   expires_at: timestamp("expires_at"),
   created_at: timestamp("created_at").defaultNow().notNull(),
 });
@@ -109,6 +111,19 @@ export const announcements = pgTable("announcements", {
   is_active: boolean("is_active").default(true).notNull(),
   created_at: timestamp("created_at").defaultNow().notNull(),
   expires_at: timestamp("expires_at"),
+});
+
+// Market translations table - caches Spanish translations of Myriad markets
+export const marketTranslations = pgTable("market_translations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  market_id: integer("market_id").notNull().unique(), // Myriad market ID
+  market_slug: text("market_slug").notNull(), // Myriad slug
+  title_es: text("title_es").notNull(), // Spanish translation
+  description_es: text("description_es").notNull(), // Spanish translation
+  title_en: text("title_en").notNull(), // Original English
+  description_en: text("description_en").notNull(), // Original English
+  translated_at: timestamp("translated_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
 });
 
 // Admin users table (for defense-in-depth auth)

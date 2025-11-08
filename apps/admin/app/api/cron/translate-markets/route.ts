@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { marketTranslations } from "@/lib/db/schema";
+import { db, marketTranslations } from "@predik/database";
 import { eq } from "drizzle-orm";
-import { translateMarketToSpanish } from "@/lib/translation/deepl";
-import { logger } from "@/lib/logger";
 
 const MYRIAD_API_URL =
   process.env.NEXT_PUBLIC_MYRIAD_API_URL || "https://api-v2.myriadprotocol.com";
 const MYRIAD_API_KEY = process.env.MYRIAD_API_KEY!;
+const DEEPL_API_KEY = process.env.DEEPL_API_KEY!;
 
 /**
  * Daily cron job to translate new markets from Myriad to Spanish
@@ -22,7 +20,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    logger.log("🌐 Starting daily market translation cron job...");
+    console.log("🌐 Starting daily market translation cron job...");
 
     // Fetch ALL open markets from Myriad (these are the active ones users will see)
     const response = await fetch(
@@ -43,7 +41,10 @@ export async function GET(request: Request) {
     );
 
     if (!response.ok) {
-      logger.error("Failed to fetch markets from Myriad:", response.statusText);
+      console.error(
+        "Failed to fetch markets from Myriad:",
+        response.statusText,
+      );
       return NextResponse.json(
         { error: "Failed to fetch markets" },
         { status: 500 },
@@ -53,7 +54,7 @@ export async function GET(request: Request) {
     const responseData = await response.json();
     const markets = responseData.data || responseData;
 
-    logger.log(`📊 Found ${markets.length} open markets to check`);
+    console.log(`📊 Found ${markets.length} open markets to check`);
 
     let translated = 0;
     let skipped = 0;
@@ -66,7 +67,7 @@ export async function GET(request: Request) {
         const existing = await db
           .select()
           .from(marketTranslations)
-          .where(eq(marketTranslations.marketId, market.id))
+          .where(eq(marketTranslations.market_id, market.id))
           .limit(1);
 
         if (existing.length > 0) {
@@ -75,7 +76,7 @@ export async function GET(request: Request) {
         }
 
         // Translate the new market
-        logger.log(`🆕 Translating new market: "${market.title}"`);
+        console.log(`🆕 Translating new market: "${market.title}"`);
 
         const { titleEs, descriptionEs } = await translateMarketToSpanish({
           title: market.title,
@@ -84,21 +85,21 @@ export async function GET(request: Request) {
 
         // Store in database
         await db.insert(marketTranslations).values({
-          marketId: market.id,
-          marketSlug: market.slug,
-          titleEs,
-          descriptionEs,
-          titleEn: market.title,
-          descriptionEn: market.description,
+          market_id: market.id,
+          market_slug: market.slug,
+          title_es: titleEs,
+          description_es: descriptionEs,
+          title_en: market.title,
+          description_en: market.description,
         });
 
         translated++;
-        logger.log(`✅ Translated: "${titleEs}"`);
+        console.log(`✅ Translated: "${titleEs}"`);
 
         // Rate limit: wait 100ms between translations to be nice to DeepL API
         await new Promise((resolve) => setTimeout(resolve, 100));
       } catch (error) {
-        logger.error(`Error translating market ${market.id}:`, error);
+        console.error(`Error translating market ${market.id}:`, error);
         errors++;
         // Continue with next market even if one fails
       }
@@ -113,11 +114,11 @@ export async function GET(request: Request) {
       timestamp: new Date().toISOString(),
     };
 
-    logger.log("🎉 Translation cron job completed:", summary);
+    console.log("🎉 Translation cron job completed:", summary);
 
     return NextResponse.json(summary);
   } catch (error) {
-    logger.error("Error in translation cron job:", error);
+    console.error("Error in translation cron job:", error);
     return NextResponse.json(
       {
         success: false,
@@ -126,4 +127,41 @@ export async function GET(request: Request) {
       { status: 500 },
     );
   }
+}
+
+/**
+ * Translate market data to Spanish using DeepL API
+ */
+async function translateMarketToSpanish({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}): Promise<{ titleEs: string; descriptionEs: string }> {
+  const response = await fetch("https://api-free.deepl.com/v2/translate", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization: `DeepL-Auth-Key ${DEEPL_API_KEY}`,
+    },
+    body: new URLSearchParams({
+      text: [title, description].join("\n\n"),
+      target_lang: "ES",
+      source_lang: "EN",
+      formality: "default",
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`DeepL API error: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  const translations = data.translations.map((t: any) => t.text);
+
+  return {
+    titleEs: translations[0],
+    descriptionEs: translations[1],
+  };
 }

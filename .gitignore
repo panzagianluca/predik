@@ -41,3 +41,4 @@ MANTECA_CREDENTIALS.md
 # Backup files
 hooks/use-user-transactions-rpc.ts.bak
 subgraph/PRODUCTION.md
+.vercel

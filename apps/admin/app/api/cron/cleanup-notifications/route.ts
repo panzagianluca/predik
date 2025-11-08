@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { notifications } from "@/lib/db/schema";
-import { and, eq, lt, sql as drizzleSql } from "drizzle-orm";
-import { logger } from "@/lib/logger";
+import { db, notifications } from "@predik/database";
+import { and, eq, lt } from "drizzle-orm";
 
 /**
  * Cron job to clean up old read notifications
@@ -26,13 +24,13 @@ export async function GET(request: Request) {
       .delete(notifications)
       .where(
         and(
-          eq(notifications.isRead, true),
-          lt(notifications.readAt, twentyFourHoursAgo),
+          eq(notifications.is_read, true),
+          lt(notifications.read_at, twentyFourHoursAgo),
         ),
       )
       .returning({ id: notifications.id });
 
-    logger.log(`🧹 Cleaned up ${deleted.length} old notifications`);
+    console.log(`🧹 Cleaned up ${deleted.length} old notifications`);
 
     return NextResponse.json({
       success: true,
@@ -41,7 +39,7 @@ export async function GET(request: Request) {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    logger.error("Error cleaning up notifications:", error);
+    console.error("Error cleaning up notifications:", error);
     return NextResponse.json(
       {
         success: false,
