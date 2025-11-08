@@ -35,16 +35,16 @@ export async function POST(request: NextRequest) {
             "md-api-key": process.env.MANTECA_API_KEY!,
           },
           body: JSON.stringify({
-            userExternalId: userExternalId,
+            userExternalId: `predik-${userExternalId}`, // Prefix to avoid 24-hex restriction
+            returnUrl: `${
+              process.env.NEXT_PUBLIC_BASE_URL
+            }/api/manteca/widget-chain?userExternalId=${userExternalId}&walletAddress=${walletAddress}&finalReturnUrl=${encodeURIComponent(
+              returnUrl,
+            )}`,
+            failureUrl: returnUrl,
             options: {
               email: userEmail,
               exchange: "ARGENTINA", // For ARS operations
-              returnUrl: `${
-                process.env.NEXT_PUBLIC_BASE_URL
-              }/api/manteca/widget-chain?userExternalId=${userExternalId}&walletAddress=${walletAddress}&finalReturnUrl=${encodeURIComponent(
-                returnUrl,
-              )}`,
-              failureUrl: returnUrl,
             },
           }),
         },
@@ -72,10 +72,10 @@ export async function POST(request: NextRequest) {
             "md-api-key": process.env.MANTECA_API_KEY!,
           },
           body: JSON.stringify({
-            userExternalId: userExternalId,
+            userExternalId: `predik-${userExternalId}`, // Prefix to avoid 24-hex restriction
+            returnUrl,
+            failureUrl: returnUrl,
             options: {
-              returnUrl,
-              failureUrl: returnUrl,
               operation: {
                 type: "RAMP_OPERATION",
                 side: "BUY",
