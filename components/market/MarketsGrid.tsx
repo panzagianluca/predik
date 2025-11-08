@@ -335,7 +335,12 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
         >
           {sortedMarkets.length > 0 ? (
             <TooltipProvider>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div
+                className="grid gap-4"
+                style={{
+                  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+                }}
+              >
                 {sortedMarkets.map((market, index) => (
                   <motion.div
                     key={`${market.id}-${market.slug || index}`}

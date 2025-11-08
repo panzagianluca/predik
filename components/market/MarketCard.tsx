@@ -284,7 +284,7 @@ export function MarketCard({ market }: MarketCardProps) {
 
   return (
     <Card
-      className="w-full md:max-w-[300px] rounded-xl overflow-hidden transition-all duration-200 ease-in-out"
+      className="w-full rounded-xl overflow-hidden transition-all duration-200 ease-in-out"
       style={{
         transform: isHovered ? "translateY(-2px)" : "translateY(0)",
         boxShadow: isHovered
