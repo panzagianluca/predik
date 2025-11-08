@@ -35,15 +35,17 @@ export async function POST(request: NextRequest) {
             "md-api-key": process.env.MANTECA_API_KEY!,
           },
           body: JSON.stringify({
-            externalId: userExternalId,
-            email: userEmail,
-            exchange: "ARGENTINA", // For ARS operations
-            returnUrl: `${
-              process.env.NEXT_PUBLIC_BASE_URL
-            }/api/manteca/widget-chain?userExternalId=${userExternalId}&walletAddress=${walletAddress}&finalReturnUrl=${encodeURIComponent(
-              returnUrl,
-            )}`,
-            failureUrl: returnUrl,
+            userExternalId: userExternalId,
+            options: {
+              email: userEmail,
+              exchange: "ARGENTINA", // For ARS operations
+              returnUrl: `${
+                process.env.NEXT_PUBLIC_BASE_URL
+              }/api/manteca/widget-chain?userExternalId=${userExternalId}&walletAddress=${walletAddress}&finalReturnUrl=${encodeURIComponent(
+                returnUrl,
+              )}`,
+              failureUrl: returnUrl,
+            },
           }),
         },
       );
@@ -70,18 +72,20 @@ export async function POST(request: NextRequest) {
             "md-api-key": process.env.MANTECA_API_KEY!,
           },
           body: JSON.stringify({
-            externalId: userExternalId,
-            returnUrl,
-            failureUrl: returnUrl,
-            operation: {
-              type: "RAMP_OPERATION",
-              side: "BUY",
-              asset: "USDT",
-              against: "ARS",
-              minAmount: "100",
-              maxAmount: "500000",
-              withdrawNetwork: "BSC", // BNB Smart Chain for USDT delivery
-              withdrawAddress: walletAddress,
+            userExternalId: userExternalId,
+            options: {
+              returnUrl,
+              failureUrl: returnUrl,
+              operation: {
+                type: "RAMP_OPERATION",
+                side: "BUY",
+                asset: "USDT",
+                against: "ARS",
+                minAmount: "100",
+                maxAmount: "500000",
+                withdrawNetwork: "BSC", // BNB Smart Chain for USDT delivery
+                withdrawAddress: walletAddress,
+              },
             },
           }),
         },
