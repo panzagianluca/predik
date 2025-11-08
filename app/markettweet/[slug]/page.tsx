@@ -541,7 +541,7 @@ export default function MarketTweetPage() {
             {/* Twitter Profile + Tweets Chart */}
             <div className="flex items-end justify-between gap-6 py-2">
               {/* Left: Profile Info */}
-              <div className="flex items-center gap-4">
+              <div className="flex items-start gap-4">
                 <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
                   <Image
                     src="https://pbs.twimg.com/profile_images/1553931112262549505/XTcdwp0b_400x400.jpg"
