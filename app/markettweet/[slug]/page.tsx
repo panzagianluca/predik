@@ -583,7 +583,7 @@ export default function MarketTweetPage() {
               </div>
 
               {/* Right: En Vivo + Tweet Bar Charts */}
-              <div className="flex flex-col items-end gap-1 flex-1">
+              <div className="flex flex-col items-end gap-1 ml-auto">
                 <div className="flex items-center gap-2">
                   <div className="relative flex-shrink-0">
                     <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
@@ -594,44 +594,44 @@ export default function MarketTweetPage() {
                   </span>
                 </div>
                 <TooltipProvider>
-                  <div className="flex items-end gap-0.5 h-16 w-full max-w-md">
-                    {Array.from({ length: 30 }, (_, i) => {
-                      const day = i + 1;
-                      const dayData = twitterData?.november.dailyData?.find(
-                        (d) => d.day === day,
-                      );
-                      const count = dayData?.count || 0;
-                      const allCounts = twitterData?.november.dailyData?.map(
-                        (d) => d.count,
-                      ) || [1];
-                      const maxCount = Math.max(...allCounts, 1);
-                      const height = count > 0 ? (count / maxCount) * 100 : 5;
-                      const opacity =
-                        count > 0 ? 0.3 + (count / maxCount) * 0.7 : 0.1;
+                  <div className="flex items-end gap-0.5 h-16">
+                    {twitterData?.november.dailyData &&
+                      Array.from({ length: 30 }, (_, i) => {
+                        const day = i + 1;
+                        const dayData = twitterData.november.dailyData.find(
+                          (d) => d.day === day,
+                        );
+                        const count = dayData?.count ?? 0;
+                        const allCounts = twitterData.november.dailyData.map(
+                          (d) => d.count,
+                        );
+                        const maxCount = Math.max(...allCounts, 1);
+                        const height = count > 0 ? (count / maxCount) * 100 : 5;
+                        const opacity =
+                          count > 0 ? 0.3 + (count / maxCount) * 0.7 : 0.1;
 
-                      return (
-                        <Tooltip key={day}>
-                          <TooltipTrigger asChild>
-                            <div
-                              className="flex-1 bg-muted-foreground/30 rounded-t-sm transition-all hover:bg-foreground/40 cursor-pointer"
-                              style={{
-                                height: `${height}%`,
-                                opacity: opacity,
-                                maxWidth: "8px",
-                              }}
-                            />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <div className="text-xs">
-                              <div className="font-semibold">{day} Nov</div>
-                              <div>
-                                Tweets: {count > 0 ? count : "Sin datos"}
+                        return (
+                          <Tooltip key={`${day}-${count}`}>
+                            <TooltipTrigger asChild>
+                              <div
+                                className="w-3 bg-muted-foreground/30 rounded-t-sm transition-all hover:bg-foreground/40 cursor-pointer"
+                                style={{
+                                  height: `${height}%`,
+                                  opacity: opacity,
+                                }}
+                              />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <div className="text-xs">
+                                <div className="font-semibold">{day} Nov</div>
+                                <div>
+                                  Tweets: {count > 0 ? count : "Sin datos"}
+                                </div>
                               </div>
-                            </div>
-                          </TooltipContent>
-                        </Tooltip>
-                      );
-                    })}
+                            </TooltipContent>
+                          </Tooltip>
+                        );
+                      })}
                   </div>
                 </TooltipProvider>
               </div>
