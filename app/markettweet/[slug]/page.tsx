@@ -43,7 +43,12 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { TooltipProvider } from "@/components/animate-ui/primitives/animate/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TooltipProvider,
+} from "@/components/animate-ui/components/animate/tooltip";
 import CountUp from "react-countup";
 import { haptics } from "@/lib/haptics";
 import {
@@ -51,7 +56,6 @@ import {
   translateTag,
 } from "@/lib/translation/marketTranslations";
 import { translateOutcomeTitle } from "@/lib/translation/outcomeTranslations";
-import { TwitterProfileCard } from "@/components/market/TwitterProfileCard";
 
 // Helper function to format description with bold markdown
 const formatDescription = (text: string) => {
@@ -87,6 +91,13 @@ export default function MarketTweetPage() {
     null,
   );
   const [countdown, setCountdown] = useState<string>("");
+  const [twitterData, setTwitterData] = useState<{
+    currentDay: { date: string; retweets: number };
+    november: {
+      total: number;
+      dailyData: Array<{ day: number; count: number }>;
+    };
+  } | null>(null);
 
   useEffect(() => {
     const loadMarket = async () => {
@@ -108,6 +119,20 @@ export default function MarketTweetPage() {
       loadMarket();
     }
   }, [slug]);
+
+  // Fetch Twitter metrics
+  useEffect(() => {
+    const fetchTwitterMetrics = async () => {
+      try {
+        const response = await fetch("/api/twitter-metrics");
+        const data = await response.json();
+        setTwitterData(data);
+      } catch (err) {
+        logger.error("Failed to load Twitter metrics:", err);
+      }
+    };
+    fetchTwitterMetrics();
+  }, []);
 
   // Countdown timer for markets closing in less than 24 hours
   useEffect(() => {
@@ -209,167 +234,6 @@ export default function MarketTweetPage() {
     <div className="pb-12">
       {/* Container with same max-width as navbar */}
       <div className="max-w-7xl mx-auto">
-        {/* Top Section: Profile Card + Who to Follow - Same grid as market content */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_318px] gap-6">
-          {/* LEFT: Twitter Profile Card */}
-          <div>
-            <TwitterProfileCard
-              displayName="Javier Milei"
-              username="JMilei"
-              bio="Economista"
-              profileImageUrl="https://pbs.twimg.com/profile_images/1553931112262549505/XTcdwp0b_400x400.jpg"
-              bannerImageUrl="https://pbs.twimg.com/profile_banners/4020276615/1458666862/1500x500"
-              tweetCount={8547}
-              novemberTweets={247}
-              followers={6400000}
-              following={198}
-              verified={true}
-              twitterUrl="https://x.com/JMilei"
-            />
-          </div>
-
-          {/* RIGHT: Who to Follow */}
-          <div className="hidden lg:block">
-            <div className="w-full h-fit border border-border rounded-2xl overflow-hidden">
-              <div className="px-4 py-3">
-                <h2 className="text-xl font-bold">A quién seguir</h2>
-              </div>
-
-              {/* Recommended Account 1 - PredikApp */}
-              <div className="px-4 py-3 hover:bg-muted/50 transition-colors cursor-pointer">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="relative w-10 h-10 rounded-full overflow-hidden">
-                      <img
-                        src="https://pbs.twimg.com/profile_images/1975619945930067968/7iLGcIUD_400x400.jpg"
-                        alt="Predik"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-1">
-                        <span className="font-bold text-sm">Predik</span>
-                      </div>
-                      <span className="text-muted-foreground text-sm">
-                        @predikapp
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() =>
-                      window.open(
-                        "https://x.com/predikapp",
-                        "_blank",
-                        "noopener,noreferrer",
-                      )
-                    }
-                    className="px-4 py-1.5 rounded-full bg-foreground text-background text-sm font-bold hover:bg-foreground/90"
-                  >
-                    Seguir
-                  </button>
-                </div>
-              </div>
-
-              {/* Recommended Account 2 - Myriad Protocol */}
-              <div className="px-4 py-3 hover:bg-muted/50 transition-colors cursor-pointer">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="relative w-10 h-10 rounded-full overflow-hidden">
-                      <img
-                        src="https://pbs.twimg.com/profile_images/1943293609622519808/Re6MG_4Z_400x400.jpg"
-                        alt="Myriad Protocol"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-1">
-                        <span className="font-bold text-sm">
-                          Myriad Protocol
-                        </span>
-                        <svg
-                          viewBox="0 0 22 22"
-                          aria-label="Verified"
-                          className="w-4 h-4 text-blue-500 fill-current"
-                        >
-                          <g>
-                            <path d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"></path>
-                          </g>
-                        </svg>
-                      </div>
-                      <span className="text-muted-foreground text-sm">
-                        @myriadprotocol
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() =>
-                      window.open(
-                        "https://x.com/MyriadProtocol",
-                        "_blank",
-                        "noopener,noreferrer",
-                      )
-                    }
-                    className="px-4 py-1.5 rounded-full bg-foreground text-background text-sm font-bold hover:bg-foreground/90"
-                  >
-                    Seguir
-                  </button>
-                </div>
-              </div>
-
-              {/* Recommended Account 3 - BNB Chain */}
-              <div className="px-4 py-3 hover:bg-muted/50 transition-colors cursor-pointer border-b-0">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="relative w-10 h-10 rounded-full overflow-hidden">
-                      <img
-                        src="https://pbs.twimg.com/profile_images/1985451299559649280/VQJTh593_400x400.jpg"
-                        alt="BNB Chain"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-1">
-                        <span className="font-bold text-sm">BNB Chain</span>
-                        <svg
-                          viewBox="0 0 22 22"
-                          aria-label="Verified"
-                          className="w-4 h-4 text-yellow-500 fill-current"
-                        >
-                          <g>
-                            <path d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"></path>
-                          </g>
-                        </svg>
-                      </div>
-                      <span className="text-muted-foreground text-sm">
-                        @BNBCHAIN
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() =>
-                      window.open(
-                        "https://x.com/BNBCHAIN",
-                        "_blank",
-                        "noopener,noreferrer",
-                      )
-                    }
-                    className="px-4 py-1.5 rounded-full bg-foreground text-background text-sm font-bold hover:bg-foreground/90"
-                  >
-                    Seguir
-                  </button>
-                </div>
-              </div>
-
-              {/* Show More Link */}
-              <div className="px-4 py-3 hover:bg-muted/50 transition-colors cursor-pointer">
-                <span className="text-electric-purple text-sm">
-                  Mostrar más
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Market Content Section - Same grid layout */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_318px] gap-6 pt-6">
           {/* LEFT COLUMN - Market Content */}
@@ -668,6 +532,108 @@ export default function MarketTweetPage() {
                     Todo
                   </ToggleGroupItem>
                 </ToggleGroup>
+              </div>
+            </div>
+
+            {/* DIVIDER */}
+            <div className="border-t border-border" />
+
+            {/* Twitter Profile + Tweets Chart */}
+            <div className="flex items-end justify-between gap-6 py-2">
+              {/* Left: Profile Info */}
+              <div className="flex items-center gap-4">
+                <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+                  <Image
+                    src="https://pbs.twimg.com/profile_images/1553931112262549505/XTcdwp0b_400x400.jpg"
+                    alt="Javier Milei"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-1">
+                    <span className="font-bold text-foreground">
+                      Javier Milei
+                    </span>
+                    <svg
+                      viewBox="0 0 22 22"
+                      aria-label="Verified"
+                      className="w-4 h-4 text-blue-500 fill-current"
+                    >
+                      <g>
+                        <path d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"></path>
+                      </g>
+                    </svg>
+                  </div>
+                  <span className="text-sm text-muted-foreground">@JMilei</span>
+                  {twitterData?.november?.total && (
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-lg font-bold text-foreground">
+                        <CountUp
+                          end={twitterData.november.total}
+                          duration={2}
+                        />
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        Tweets durante Noviembre
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Right: En Vivo + Tweet Bar Charts */}
+              <div className="flex flex-col items-end gap-1 flex-1">
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-shrink-0">
+                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                    <div className="absolute inset-0 w-2 h-2 bg-red-500 rounded-full animate-ping"></div>
+                  </div>
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    En vivo
+                  </span>
+                </div>
+                <TooltipProvider>
+                  <div className="flex items-end gap-0.5 h-16 w-full max-w-md">
+                    {Array.from({ length: 30 }, (_, i) => {
+                      const day = i + 1;
+                      const dayData = twitterData?.november.dailyData?.find(
+                        (d) => d.day === day,
+                      );
+                      const count = dayData?.count || 0;
+                      const allCounts = twitterData?.november.dailyData?.map(
+                        (d) => d.count,
+                      ) || [1];
+                      const maxCount = Math.max(...allCounts, 1);
+                      const height = count > 0 ? (count / maxCount) * 100 : 5;
+                      const opacity =
+                        count > 0 ? 0.3 + (count / maxCount) * 0.7 : 0.1;
+
+                      return (
+                        <Tooltip key={day}>
+                          <TooltipTrigger asChild>
+                            <div
+                              className="flex-1 bg-muted-foreground/30 rounded-t-sm transition-all hover:bg-foreground/40 cursor-pointer"
+                              style={{
+                                height: `${height}%`,
+                                opacity: opacity,
+                                maxWidth: "8px",
+                              }}
+                            />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <div className="text-xs">
+                              <div className="font-semibold">{day} Nov</div>
+                              <div>
+                                Tweets: {count > 0 ? count : "Sin datos"}
+                              </div>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    })}
+                  </div>
+                </TooltipProvider>
               </div>
             </div>
 
