@@ -35,6 +35,9 @@ Docs/SUBGRAPH_INTEGRATION.md
 !README.md
 !subgraph/README.md
 
+# Manteca.dev credentials - NEVER COMMIT
+MANTECA_CREDENTIALS.md
+
 # Backup files
 hooks/use-user-transactions-rpc.ts.bak
 subgraph/PRODUCTION.md

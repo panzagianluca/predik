@@ -321,7 +321,7 @@ export function trackDepositModalOpened(source?: string) {
 /**
  * Track deposit tab selected
  */
-export function trackDepositTabSelected(tab: "address" | "bridge") {
+export function trackDepositTabSelected(tab: "address" | "manteca" | "bridge") {
   if (!canTrack()) return;
 
   const posthog = getPostHog();
@@ -352,6 +352,22 @@ export function trackBridgeUsed(
   });
 
   logger.log("📊 Bridge used:", { fromChain, toChain, amount, token });
+}
+
+/**
+ * Track Manteca.dev on-ramp button click
+ */
+export function trackMantecaOnrampClicked() {
+  if (!canTrack()) return;
+
+  const posthog = getPostHog();
+  posthog.capture("manteca_onramp_clicked", {
+    provider: "manteca.dev",
+    currency: "ARS",
+    destination_token: "USDT",
+  });
+
+  logger.log("📊 Manteca on-ramp clicked");
 }
 
 /**

@@ -28,6 +28,7 @@ import {
   trackDepositTabSelected,
   trackAddressCopied,
   trackBridgeUsed,
+  trackMantecaOnrampClicked,
 } from "@/lib/posthog";
 
 interface DepositModalProps {
@@ -44,7 +45,9 @@ export function DepositModal({
   const [copied, setCopied] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showBridgeTooltip, setShowBridgeTooltip] = useState(false);
-  const [activeTab, setActiveTab] = useState<"address" | "bridge">("address");
+  const [activeTab, setActiveTab] = useState<"address" | "manteca" | "bridge">(
+    "address",
+  );
   const { resolvedTheme, setTheme } = useTheme();
 
   // Track modal open
@@ -219,13 +222,14 @@ export function DepositModal({
             className="w-full mt-4"
             value={activeTab}
             onValueChange={(value) => {
-              const tabValue = value as "address" | "bridge";
+              const tabValue = value as "address" | "manteca" | "bridge";
               setActiveTab(tabValue);
               trackDepositTabSelected(tabValue);
             }}
           >
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="address">Depositar</TabsTrigger>
+              <TabsTrigger value="manteca">Comprar ARS</TabsTrigger>
               <TabsTrigger value="bridge">Bridge</TabsTrigger>
             </TabsList>
 
@@ -355,7 +359,78 @@ export function DepositModal({
               </div>
             </TabsContent>
 
-            {/* Tab 2: Bridge (Li.Fi Widget) */}
+            {/* Tab 2: Manteca.dev On-ramp (Argentine Peso) */}
+            <TabsContent value="manteca" className="space-y-4 mt-4">
+              <div className="rounded-lg border bg-card p-6">
+                <div className="text-center space-y-4">
+                  <div className="mx-auto w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-8 w-8 text-blue-500"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">
+                      Comprá USDT con pesos argentinos
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Usá Manteca.dev para comprar USDT directamente con ARS.
+                      Transferencia bancaria, efectivo o billetera digital.
+                    </p>
+                  </div>
+
+                  {/* Features */}
+                  <div className="text-left space-y-2 mb-4">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-green-500" />
+                      <span>Transferencia bancaria (CBU/CVU)</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-green-500" />
+                      <span>Efectivo en sucursales</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-green-500" />
+                      <span>Billeteras digitales (Mercado Pago, Ualá)</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-green-500" />
+                      <span>Recibí USDT directo en tu wallet</span>
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={() => {
+                      trackMantecaOnrampClicked();
+                      // Open Manteca.dev widget or redirect
+                      window.open("https://manteca.dev", "_blank");
+                    }}
+                    className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+                  >
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Comprar con Manteca.dev
+                  </Button>
+
+                  <div className="text-xs text-muted-foreground space-y-1">
+                    <p>• Procesamiento rápido y seguro</p>
+                    <p>• KYC requerido según normativas locales</p>
+                    <p>• Soporte 24/7 en español</p>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Tab 3: Bridge (Li.Fi Widget) */}
             <TabsContent value="bridge" className="space-y-4 mt-4">
               <div className="rounded-lg border bg-card p-4">
                 <div className="flex items-center gap-2 mb-4">
