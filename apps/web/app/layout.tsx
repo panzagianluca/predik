@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   title: "Predik - El futuro tiene precio",
   description:
     "Opera mercados de predicción en BNB Chain, impulsados por Myriad Protocol.",
+  icons: {
+    icon: "/favicon.ico",
+  },
   openGraph: {
     title: "Predik - El futuro tiene precio",
     description:
