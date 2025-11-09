@@ -1,5 +1,6 @@
 import { MarketCard } from "@/components/market/MarketCard";
 import { Market } from "@/types/market";
+import { GlowingButton } from "@/components/ui/glowing-button";
 
 async function getFeaturedMarkets(): Promise<Market[]> {
   try {
@@ -37,18 +38,9 @@ export default async function Home() {
           Predecí en política, dólar, deportes y más
         </p>
         <div className="flex gap-4 mt-8">
-          <a
-            href="https://app.predik.io"
-            className="px-8 py-4 bg-[hsl(var(--electric-purple))] text-white rounded-lg font-semibold hover:bg-[hsl(var(--electric-purple))]/90 transition-colors shadow-xl hover:shadow-2xl hover:shadow-[hsl(var(--electric-purple))]/50"
-          >
-            Comenzar a Predecir
-          </a>
-          <a
-            href="#how-it-works"
-            className="px-8 py-4 border-2 border-foreground/30 text-foreground rounded-lg font-semibold hover:bg-foreground/10 backdrop-blur-sm transition-colors"
-          >
-            Cómo Funciona
-          </a>
+          <GlowingButton href="https://app.predik.io">
+            {["Comenzar", "a Predecir"]}
+          </GlowingButton>
         </div>
       </div>
 

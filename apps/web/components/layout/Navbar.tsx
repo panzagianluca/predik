@@ -34,7 +34,7 @@ export function Navbar() {
 
   const topLevelTriggerClasses = cn(
     navigationMenuTriggerStyle(),
-    "bg-transparent hover:bg-[hsl(var(--electric-purple))]/10 focus:bg-[hsl(var(--electric-purple))]/10 data-[state=open]:bg-[hsl(var(--electric-purple))]/15 data-[state=open]:hover:bg-[hsl(var(--electric-purple))]/15 data-[state=open]:focus:bg-[hsl(var(--electric-purple))]/15",
+    "!bg-transparent hover:bg-[hsl(var(--electric-purple))]/10 focus:bg-[hsl(var(--electric-purple))]/10 data-[state=open]:bg-[hsl(var(--electric-purple))]/15 data-[state=open]:hover:bg-[hsl(var(--electric-purple))]/15 data-[state=open]:focus:bg-[hsl(var(--electric-purple))]/15",
   );
 
   return (
