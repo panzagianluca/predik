@@ -39,7 +39,7 @@
     "lightweight-charts": "^5.0.9",
     "lucide-react": "^0.544.0",
     "motion": "^12.23.22",
-    "next": "^15.5.4",
+    "next": "^16.0.1",
     "next-themes": "^0.4.6",
     "pino-pretty": "^13.1.2",
     "polkamarkets-js": "^3.2.0",
@@ -58,6 +58,8 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@next/swc-linux-x64-gnu": "16.0.1",
+    "@next/swc-linux-x64-musl": "16.0.1",
     "@types/node": "^24.6.2",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
@@ -65,7 +67,7 @@
     "@typescript-eslint/parser": "^8.46.1",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.37.0",
-    "eslint-config-next": "^15.5.4",
+    "eslint-config-next": "^16.0.1",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.18",
     "typescript": "^5.9.3"
