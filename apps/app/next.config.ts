@@ -18,10 +18,8 @@ const nextConfig: NextConfig = {
   // Turbopack configuration for Next.js 16+
   turbopack: {
     resolveAlias: {
-      "@react-native-async-storage/async-storage": path.resolve(
-        __dirname,
-        "lib/stubs/asyncStorage",
-      ),
+      "@react-native-async-storage/async-storage":
+        "./lib/stubs/asyncStorage.ts",
     },
   },
 

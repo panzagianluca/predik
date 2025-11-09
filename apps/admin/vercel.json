@@ -1,6 +1,5 @@
 {
-  "buildCommand": "npm install && npm run build",
-  "installCommand": "npm install --prefix ../.. && npm install",
+  "framework": "nextjs",
   "crons": [
     {
       "path": "/api/cron/cleanup-notifications",
