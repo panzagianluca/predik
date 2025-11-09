@@ -1,5 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { ThemeProvider } from "next-themes";
+import { Navbar } from "@/components/layout/Navbar";
+import { BackgroundWrapper } from "@/components/layout/BackgroundWrapper";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -60,11 +63,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
+          {/* Animated Gradient Background - BOTTOM LAYER - THEME AWARE */}
+          <BackgroundWrapper />
+
+          {/* Content - ON TOP OF GRADIENT */}
+          <div className="relative z-10">
+            <Navbar />
+            {children}
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );

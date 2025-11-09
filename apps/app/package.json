@@ -58,7 +58,6 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
-    "@next/swc-linux-x64-gnu": "16.0.1",
     "@types/node": "^24.6.2",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
