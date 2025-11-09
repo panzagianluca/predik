@@ -338,7 +338,9 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
 
                   {/* Términos */}
                   <Link
-                    href="/terminos"
+                    href="https://predik.io/terminos"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     onClick={handleLinkClick}
                     className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors min-h-[44px] hover:bg-electric-purple/10 active:bg-electric-purple/20"
                   >
@@ -348,7 +350,9 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
 
                   {/* Privacidad */}
                   <Link
-                    href="/privacidad"
+                    href="https://predik.io/privacidad"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     onClick={handleLinkClick}
                     className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors min-h-[44px] hover:bg-electric-purple/10 active:bg-electric-purple/20"
                   >

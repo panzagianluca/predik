@@ -595,13 +595,21 @@ export function Navbar() {
 
                         <DropdownMenuSeparator />
 
-                        <Link href="/terminos">
+                        <Link
+                          href="https://predik.io/terminos"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
                           <DropdownMenuItem className="justify-start">
                             <FileText className="mr-2 h-4 w-4" />
                             <span>Términos</span>
                           </DropdownMenuItem>
                         </Link>
-                        <Link href="/privacidad">
+                        <Link
+                          href="https://predik.io/privacidad"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
                           <DropdownMenuItem className="justify-start">
                             <Shield className="mr-2 h-4 w-4" />
                             <span>Privacidad</span>
@@ -773,7 +781,12 @@ export function Navbar() {
                           <DropdownMenuSeparator />
 
                           {/* Términos */}
-                          <Link href="/terminos" prefetch={true}>
+                          <Link
+                            href="https://predik.io/terminos"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            prefetch={false}
+                          >
                             <DropdownMenuItem className="justify-start">
                               <FileText className="mr-2 h-4 w-4" />
                               <span>Términos</span>
@@ -781,7 +794,12 @@ export function Navbar() {
                           </Link>
 
                           {/* Privacidad */}
-                          <Link href="/privacidad" prefetch={true}>
+                          <Link
+                            href="https://predik.io/privacidad"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            prefetch={false}
+                          >
                             <DropdownMenuItem className="justify-start">
                               <Shield className="mr-2 h-4 w-4" />
                               <span>Privacidad</span>
