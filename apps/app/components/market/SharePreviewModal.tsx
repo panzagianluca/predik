@@ -191,7 +191,7 @@ export function SharePreviewModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        className="max-w-2xl w-full p-0 gap-0 overflow-hidden"
+        className="max-w-[1240px] w-full p-0 gap-0 overflow-hidden"
         from="bottom"
       >
         <DialogTitle className="sr-only">
@@ -203,13 +203,14 @@ export function SharePreviewModal({
           <h3 className="text-lg font-semibold">Vista previa</h3>
         </div>
 
-        {/* Image Preview - 1200x800 aspect ratio (3:2) */}
-        <div className="relative w-full aspect-[3/2] bg-muted">
+        {/* Image Preview - Exact size: 1200x800 (3:2) */}
+        <div className="relative w-full bg-muted flex items-center justify-center">
           <Image
             src={imageUrl}
             alt="Share preview"
-            fill
-            className="object-contain"
+            width={1200}
+            height={800}
+            className="object-contain max-w-full h-auto"
             unoptimized
           />
         </div>
