@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { setCachedHolders, getCachedHolders } from "@/lib/holdersCache";
 import { logger } from "@/lib/logger";
 import { db } from "@/lib/db";
-import { marketTranslations } from "@/lib/db/schema";
+import { marketTranslations } from "@predik/database";
 import { eq } from "drizzle-orm";
 import { translateMarketToSpanish as translateWithDeepL } from "@/lib/translation/deepl";
 

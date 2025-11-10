@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
 import { db } from "@/lib/db";
-import { marketTranslations } from "@/lib/db/schema";
+import { marketTranslations } from "@predik/database";
 import { inArray } from "drizzle-orm";
 import { translateMarketToSpanish } from "@/lib/translation/deepl";
 

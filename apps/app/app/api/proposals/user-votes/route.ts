@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { proposalVotes } from "@/lib/db/schema";
+import { proposalVotes } from "@predik/database";
 import { eq } from "drizzle-orm";
 import { logger } from "@/lib/logger";
 

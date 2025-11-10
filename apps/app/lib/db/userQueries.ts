@@ -9,7 +9,7 @@
  */
 
 import { db } from "@/lib/db";
-import { users } from "@/lib/db/schema";
+import { users } from "@predik/database";
 import { eq, or } from "drizzle-orm";
 import { logger } from "@/lib/logger";
 

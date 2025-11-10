@@ -3,9 +3,11 @@ import { LogoSpinner } from "@/components/ui/logo-spinner";
 import { Suspense } from "react";
 import { logger } from "@/lib/logger";
 import { db } from "@/lib/db";
-import { marketTranslations } from "@/lib/db/schema";
+import { marketTranslations } from "@predik/database";
 import { inArray } from "drizzle-orm";
 import { translateMarketToSpanish } from "@/lib/translation/deepl";
+
+// Force dynamic rendering (don't prerender at build time)
 
 const MYRIAD_API_URL =
   process.env.NEXT_PUBLIC_MYRIAD_API_URL || "https://api-v2.myriadprotocol.com";

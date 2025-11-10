@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { savedMarkets } from "@/lib/db/schema";
+import { savedMarkets } from "@predik/database";
 import { eq, and, desc } from "drizzle-orm";
 
 /**
