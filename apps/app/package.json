@@ -53,11 +53,14 @@
     "recharts": "^3.2.1",
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
-    "viem": "^2.38.0",
-    "wagmi": "^2.18.0",
+    "viem": "^2.38.6",
+    "wagmi": "^2.19.2",
     "zustand": "^5.0.8"
   },
   "overrides": {
+    "@noble/hashes": "^1.6.1"
+  },
+  "resolutions": {
     "@noble/hashes": "^1.6.1"
   },
   "devDependencies": {
