@@ -478,6 +478,7 @@ export default function MarketTweetPage() {
                 <ProbabilityChart
                   outcomes={market.outcomes}
                   timeframe={selectedTimeframe}
+                  marketState={market.state}
                   className="h-[400px] w-full"
                 />
               ) : (

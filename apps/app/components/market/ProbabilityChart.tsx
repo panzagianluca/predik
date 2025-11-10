@@ -19,6 +19,7 @@ interface ProbabilityChartProps {
   timeframe?: "24h" | "7d" | "30d" | "all";
   className?: string;
   hideControls?: boolean; // Hide grid, price scale for share images
+  marketState?: "open" | "closed" | "resolved"; // Market state to conditionally show pulse
 }
 
 export function ProbabilityChart({
@@ -26,6 +27,7 @@ export function ProbabilityChart({
   timeframe = "24h",
   className = "",
   hideControls = false,
+  marketState = "open", // Default to open for backward compatibility
 }: ProbabilityChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -426,38 +428,39 @@ export function ProbabilityChart({
     <div className={`relative w-full overflow-hidden ${className}`}>
       <div ref={chartContainerRef} className="w-full" />
 
-      {/* Pulsing dots at current values */}
-      {pulseMarkers.map((marker, index) => (
-        <div
-          key={index}
-          className="absolute pointer-events-none"
-          style={{
-            left: `${marker.x}px`,
-            top: `${marker.y}px`,
-            transform: "translate(-50%, -50%)",
-          }}
-        >
-          {/* Single continuous pulse */}
+      {/* Pulsing dots at current values - only show for open markets */}
+      {marketState === "open" &&
+        pulseMarkers.map((marker, index) => (
           <div
-            className="absolute w-3 h-3 rounded-full"
+            key={index}
+            className="absolute pointer-events-none"
             style={{
-              backgroundColor: marker.color,
-              animation:
-                "glowPulse 1.5s cubic-bezier(0.42, 0, 0.58, 1) infinite",
-            }}
-          />
-          {/* Solid center dot (always visible) */}
-          <div
-            className="absolute w-2 h-2 rounded-full"
-            style={{
-              backgroundColor: marker.color,
-              left: "50%",
-              top: "50%",
+              left: `${marker.x}px`,
+              top: `${marker.y}px`,
               transform: "translate(-50%, -50%)",
             }}
-          />
-        </div>
-      ))}
+          >
+            {/* Single continuous pulse */}
+            <div
+              className="absolute w-3 h-3 rounded-full"
+              style={{
+                backgroundColor: marker.color,
+                animation:
+                  "glowPulse 1.5s cubic-bezier(0.42, 0, 0.58, 1) infinite",
+              }}
+            />
+            {/* Solid center dot (always visible) */}
+            <div
+              className="absolute w-2 h-2 rounded-full"
+              style={{
+                backgroundColor: marker.color,
+                left: "50%",
+                top: "50%",
+                transform: "translate(-50%, -50%)",
+              }}
+            />
+          </div>
+        ))}
 
       {/* Custom Tooltip with Shadcn styling */}
       <div

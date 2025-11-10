@@ -955,6 +955,7 @@ export default function UITestPage() {
                       <ProbabilityChart
                         outcomes={selectedMarketDetails.outcomes}
                         timeframe={selectedTimeframe}
+                        marketState={selectedMarketDetails.state}
                         className="h-[400px]"
                       />
                     </div>

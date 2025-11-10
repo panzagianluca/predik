@@ -466,6 +466,7 @@ export default function MarketDetailPage() {
                 <ProbabilityChart
                   outcomes={market.outcomes}
                   timeframe={selectedTimeframe}
+                  marketState={market.state}
                   className="h-[400px] w-full"
                 />
               ) : (

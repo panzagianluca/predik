@@ -151,12 +151,17 @@ export function MarketCard({ market }: MarketCardProps) {
     }
   };
 
-  // Format date to relative (e.g., "58 days")
+  // Format date to relative (e.g., "58 días") OR status for closed/resolved
   const formatRelativeDate = (dateString: string) => {
+    // Check market state first - show status for closed/resolved
+    if (market.state === "closed") return "Cerrado";
+    if (market.state === "resolved") return "Resuelto";
+
+    // For open markets, show days remaining
     const date = new Date(dateString);
 
     // Check if year is 2099 or beyond (open-ended markets)
-    if (date.getFullYear() >= 2099) return "Abierto";
+    if (date.getFullYear() >= 2099) return "Indefinido";
 
     // Convert both dates to Argentina timezone for accurate comparison
     const nowInArgentina = new Date(
@@ -174,11 +179,11 @@ export function MarketCard({ market }: MarketCardProps) {
     const diffTime = dateInArgentina.getTime() - nowInArgentina.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays < 0) return "Closed";
-    if (diffDays === 0) return "Today";
-    if (diffDays === 1) return "Tomorrow";
+    if (diffDays < 0) return "Cerrado";
+    if (diffDays === 0) return "Hoy";
+    if (diffDays === 1) return "Mañana";
 
-    return `${diffDays} days`;
+    return `${diffDays} días`;
   };
 
   // Format absolute date for Argentina (e.g., "30 de noviembre, 2025")

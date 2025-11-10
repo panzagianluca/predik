@@ -22,18 +22,20 @@ repos:
         stages: [commit]
 
   # JavaScript/TypeScript linting with ESLint
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.16.0
-    hooks:
-      - id: eslint
-        files: \.(js|jsx|ts|tsx)$
-        types: [file]
-        args: ["--fix"]
-        additional_dependencies:
-          - eslint@8.57.0
-          - "@typescript-eslint/eslint-plugin@7.0.0"
-          - "@typescript-eslint/parser@7.0.0"
-          - eslint-config-next@15.0.0
+  # DISABLED: Incompatible with Next.js 15's eslint-config-next due to circular dependency bug in ESLint 8.57.0
+  # ESLint still runs in VS Code and CI/CD
+  # - repo: https://github.com/pre-commit/mirrors-eslint
+  #   rev: v9.16.0
+  #   hooks:
+  #     - id: eslint
+  #       files: \.(js|jsx|ts|tsx)$
+  #       types: [file]
+  #       args: ["--fix"]
+  #       additional_dependencies:
+  #         - eslint@8.57.0
+  #         - "@typescript-eslint/eslint-plugin@7.0.0"
+  #         - "@typescript-eslint/parser@7.0.0"
+  #         - eslint-config-next@15.0.0
 
   # TypeScript type checking
   - repo: local
