@@ -24,8 +24,8 @@ export async function GET(request: Request) {
       .delete(notifications)
       .where(
         and(
-          eq(notifications.is_read, true),
-          lt(notifications.read_at, twentyFourHoursAgo),
+          eq(notifications.isRead, true),
+          lt(notifications.readAt, twentyFourHoursAgo),
         ),
       )
       .returning({ id: notifications.id });
