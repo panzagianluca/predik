@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Fetch top-level comments (parent_id is null)
+    // Fetch top-level comments (parent_id is null, show even if hidden with "[Comentario eliminado]")
     const topLevelComments = await db
       .select()
       .from(comments)
@@ -161,6 +161,28 @@ export async function POST(request: NextRequest) {
         { error: "Comment content must be 300 characters or less" },
         { status: 400 },
       );
+    }
+
+    // 🚨 CHECK IF USER IS BANNED
+    const banCheck = await fetch(
+      `${
+        request.nextUrl.origin
+      }/api/moderation/check-ban?userAddress=${userAddress.toLowerCase()}`,
+    );
+
+    if (banCheck.ok) {
+      const banStatus = await banCheck.json();
+      if (banStatus.isBanned) {
+        const expiryMessage = banStatus.expiresAt
+          ? ` until ${new Date(banStatus.expiresAt).toLocaleDateString()}`
+          : " permanently";
+        return NextResponse.json(
+          {
+            error: `You are banned from commenting${expiryMessage}. Reason: ${banStatus.reason}`,
+          },
+          { status: 403 },
+        );
+      }
     }
 
     // If this is a reply, verify parent exists and is not already a reply

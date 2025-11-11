@@ -35,13 +35,15 @@ type ActionType =
 type ResourceType =
   | "comment"
   | "comment_report"
+  | "report"
+  | "user"
   | "banned_user"
   | "market_metadata"
   | "market_proposal"
   | "notification";
 
 interface LogAdminActionParams {
-  adminEmail: string; // From Cloudflare header: cf-access-authenticated-user-email
+  adminEmail?: string; // From Cloudflare header: cf-access-authenticated-user-email (optional for dev)
   actionType: ActionType;
   resourceType: ResourceType;
   resourceId?: string; // UUID of affected resource
@@ -68,8 +70,10 @@ export async function logAdminAction({
   details,
 }: LogAdminActionParams): Promise<void> {
   try {
+    const email = adminEmail || "gianluca@predik.io"; // Default for dev
+
     await db.insert(adminActions).values({
-      adminEmail,
+      adminEmail: email,
       actionType,
       resourceType,
       resourceId: resourceId || null,
@@ -77,7 +81,7 @@ export async function logAdminAction({
     });
 
     console.log(
-      `[Admin Action] ${adminEmail} performed ${actionType} on ${resourceType}${
+      `[Admin Action] ${email} performed ${actionType} on ${resourceType}${
         resourceId ? ` (${resourceId})` : ""
       }`,
     );

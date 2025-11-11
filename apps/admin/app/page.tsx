@@ -43,136 +43,40 @@ async function getDashboardStats() {
   };
 }
 
-export default async function AdminHomePage() {
-  const stats = await getDashboardStats();
+import { AppSidebar } from "@/components/app-sidebar";
+import { ChartAreaInteractive } from "@/components/chart-area-interactive";
+import { DataTable } from "@/components/data-table";
+import { SectionCards } from "@/components/section-cards";
+import { SiteHeader } from "@/components/site-header";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
+import data from "./dashboard/data.json";
+
+export default function Page() {
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div>
-          <h1 className="text-4xl font-bold tracking-tight">
-            Predik Admin Panel
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Manage platform content and moderation
-          </p>
+    <SidebarProvider
+      style={
+        {
+          "--sidebar-width": "calc(var(--spacing) * 72)",
+          "--header-height": "calc(var(--spacing) * 12)",
+        } as React.CSSProperties
+      }
+    >
+      <AppSidebar variant="inset" />
+      <SidebarInset>
+        <SiteHeader />
+        <div className="flex flex-1 flex-col">
+          <div className="@container/main flex flex-1 flex-col gap-2">
+            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+              <SectionCards />
+              <div className="px-4 lg:px-6">
+                <ChartAreaInteractive />
+              </div>
+              <DataTable data={data} />
+            </div>
+          </div>
         </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalUsers}</div>
-              <p className="text-xs text-muted-foreground">
-                Registered wallets
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total Comments
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalComments}</div>
-              <p className="text-xs text-muted-foreground">All time</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total Proposals
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalProposals}</div>
-              <p className="text-xs text-muted-foreground">Market requests</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Pending Reports
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.pendingReports}</div>
-              <p className="text-xs text-muted-foreground">Needs review</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Link href="/moderation">
-            <Card className="hover:bg-accent cursor-pointer transition-colors">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  Comment Moderation
-                  {stats.pendingReports > 0 && (
-                    <Badge variant="destructive">{stats.pendingReports}</Badge>
-                  )}
-                </CardTitle>
-                <CardDescription>
-                  Review reported comments and manage user bans
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </Link>
-
-          <Link href="/featured-markets">
-            <Card className="hover:bg-accent cursor-pointer transition-colors">
-              <CardHeader>
-                <CardTitle>Featured Markets</CardTitle>
-                <CardDescription>
-                  Pin up to 4 markets on homepage
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </Link>
-
-          <Link href="/proposals">
-            <Card className="hover:bg-accent cursor-pointer transition-colors">
-              <CardHeader>
-                <CardTitle>Proposals Review</CardTitle>
-                <CardDescription>
-                  Approve or reject market requests
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </Link>
-
-          <Link href="/announcements">
-            <Card className="hover:bg-accent cursor-pointer transition-colors">
-              <CardHeader>
-                <CardTitle>Announcements</CardTitle>
-                <CardDescription>
-                  Create broadcast notifications
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </Link>
-
-          <Link href="/audit-log">
-            <Card className="hover:bg-accent cursor-pointer transition-colors">
-              <CardHeader>
-                <CardTitle>Audit Log</CardTitle>
-                <CardDescription>
-                  View all admin actions history
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </Link>
-        </div>
-      </div>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
