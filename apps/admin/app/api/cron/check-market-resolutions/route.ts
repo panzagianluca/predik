@@ -210,13 +210,11 @@ export async function GET(request: Request) {
             }
 
             // Get user's current shares
-            const result = await contract.methods
+            const result = (await contract.methods
               .getUserMarketShares(market.id, userAddress)
-              .call();
+              .call()) as { liquidity: string; outcomes: string[] };
 
-            const outcomeShares = (result.outcomes as string[]).map((s) =>
-              BigInt(s),
-            );
+            const outcomeShares = result.outcomes.map((s) => BigInt(s));
             const hasShares = outcomeShares.some(
               (shares) => shares > BigInt(0),
             );
