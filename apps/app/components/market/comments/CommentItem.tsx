@@ -193,8 +193,22 @@ export function CommentItem({
 
         {/* Report Dialog */}
         {showReportDialog && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-background border border-border rounded-lg p-6 max-w-md w-full space-y-4">
+          <div
+            className="fixed inset-0 bg-black/50 flex items-center justify-center p-4"
+            style={{ zIndex: 9999 }}
+            onClick={(e) => {
+              // Close if clicking the backdrop
+              if (e.target === e.currentTarget) {
+                setShowReportDialog(false);
+                setReportReason("");
+                setReportDetails("");
+              }
+            }}
+          >
+            <div
+              className="bg-background border border-border rounded-lg p-6 max-w-md w-full space-y-4"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div>
                 <h3 className="text-lg font-semibold">Reportar Comentario</h3>
                 <p className="text-sm text-muted-foreground mt-1">

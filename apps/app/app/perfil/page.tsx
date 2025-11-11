@@ -365,7 +365,6 @@ export default function ProfilePage() {
                           </TooltipContent>
                         </Tooltip>
                       </div>
-                      <span className="text-muted-foreground">|</span>
                       <Button
                         onClick={handleLinkAccount}
                         variant="outline"
@@ -399,7 +398,6 @@ export default function ProfilePage() {
                         />
                         Vincular con Google
                       </Button>
-                      <span className="text-muted-foreground">|</span>
                       <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-lg flex-1">
                         <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
                         <span className="text-sm">Vinculado con</span>

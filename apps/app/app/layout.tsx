@@ -7,6 +7,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { CookieConsentBanner } from "@/components/layout/CookieConsent";
 import { BottomNav } from "@/components/layout/BottomNav";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -74,6 +75,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Web3Provider>
+            <Toaster position="top-right" richColors />
             <CookieConsentBanner />
             <div className="flex flex-col min-h-screen">
               <Navbar />
