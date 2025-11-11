@@ -43,6 +43,13 @@
       "when": 1762361329267,
       "tag": "0005_fine_abomination",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1762821222246,
+      "tag": "0006_unique_havok",
+      "breakpoints": true
     }
   ]
 }

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,33 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Predik - El futuro tiene precio",
-  description:
-    "Opera mercados de predicción en BNB Chain, impulsados por Myriad Protocol.",
-  openGraph: {
-    title: "Predik - El futuro tiene precio",
-    description:
-      "Opera mercados de predicción en BNB Chain, impulsados por Myriad Protocol.",
-    url: "https://predik.io",
-    siteName: "Predik",
-    locale: "es_ES",
-    type: "website",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Predik - El futuro tiene precio",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Predik - El futuro tiene precio",
-    description:
-      "Opera mercados de predicción en BNB Chain, impulsados por Myriad Protocol.",
-    images: ["/og-image.png"],
-  },
+  title: "Predik Admin Panel",
+  description: "Admin panel for managing Predik platform",
 };
 
 export const viewport: Viewport = {
@@ -62,6 +38,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <Toaster />
       </body>
     </html>
   );

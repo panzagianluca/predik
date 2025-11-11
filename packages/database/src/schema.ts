@@ -411,3 +411,33 @@ export const adminActions = pgTable(
     createdAtIdx: index("admin_actions_created_at_idx").on(table.createdAt),
   }),
 );
+
+/**
+ * Banned Users - Users blocked from commenting
+ *
+ * Progressive ban system:
+ * - 1st offense: Warning (notification only)
+ * - 2nd offense: 7-day ban
+ * - 3rd offense: 30-day ban
+ * - 4th+ offense: Permanent ban
+ *
+ * Admin can override and set custom durations or permanent bans.
+ * Auto-unban when ban_expires_at passes (checked on comment POST).
+ */
+export const bannedUsers = pgTable(
+  "banned_users",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userAddress: varchar("user_address", { length: 42 }).notNull().unique(),
+    reason: text("reason").notNull(), // Admin's ban reason
+    violationCount: integer("violation_count").default(1).notNull(), // Track progressive offenses
+    banExpiresAt: timestamp("ban_expires_at"), // NULL = permanent ban
+    bannedBy: varchar("banned_by", { length: 255 }).notNull(), // Admin email
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    userAddressIdx: index("banned_users_address_idx").on(table.userAddress),
+    expiresAtIdx: index("banned_users_expires_idx").on(table.banExpiresAt),
+  }),
+);
