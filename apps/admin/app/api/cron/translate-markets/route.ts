@@ -67,7 +67,7 @@ export async function GET(request: Request) {
         const existing = await db
           .select()
           .from(marketTranslations)
-          .where(eq(marketTranslations.market_id, market.id))
+          .where(eq(marketTranslations.marketId, market.id))
           .limit(1);
 
         if (existing.length > 0) {
@@ -85,12 +85,12 @@ export async function GET(request: Request) {
 
         // Store in database
         await db.insert(marketTranslations).values({
-          market_id: market.id,
-          market_slug: market.slug,
-          title_es: titleEs,
-          description_es: descriptionEs,
-          title_en: market.title,
-          description_en: market.description,
+          marketId: market.id,
+          marketSlug: market.slug,
+          titleEs: titleEs,
+          descriptionEs: descriptionEs,
+          titleEn: market.title,
+          descriptionEn: market.description,
         });
 
         translated++;

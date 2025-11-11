@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@predik/database";
-import { comments } from "@predik/database/schema";
+import { db, comments } from "@predik/database";
 import { eq } from "drizzle-orm";
 import { logAdminAction } from "@/lib/admin-logger";
 
