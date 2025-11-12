@@ -55,7 +55,7 @@ export function UserPositionCard({
         return;
       }
 
-      // Use polkamarkets SDK portfolio method per official docs
+      // Use SDK exactly like TradingPanel does
       const polkamarketsjs = await import("polkamarkets-js");
       const web3Module = await import("web3");
       const Web3 = web3Module.default || web3Module;
@@ -74,13 +74,13 @@ export function UserPositionCard({
           process.env.NEXT_PUBLIC_PREDICTION_MARKET_QUERIER || "",
       });
 
-      // Use direct contract method like TradingPanel (proven working pattern)
+      // Use getContract().methods like TradingPanel (NOT getPortfolio)
       const userMarketShares = await pm
         .getContract()
         .methods.getUserMarketShares(market.id, userAddress)
         .call();
 
-      const outcomeShares = userMarketShares[1];
+      const outcomeShares = userMarketShares[1]; // Array of shares per outcome
       logger.log("User market shares:", { userMarketShares, outcomeShares });
 
       // Find which outcome has shares

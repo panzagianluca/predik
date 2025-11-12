@@ -21,7 +21,9 @@ export async function getHolderShares(
   marketId: number,
   holderAddress: string,
 ): Promise<{ liquidityShares: bigint; outcomeShares: bigint[] }> {
-  const web3 = new Web3("https://alfajores-forno.celo-testnet.org");
+  const web3 = new Web3(
+    process.env.NEXT_PUBLIC_RPC_URL || "https://bsc-dataseed.binance.org/",
+  );
 
   const contract = new web3.eth.Contract(
     PM_ABI as any,
