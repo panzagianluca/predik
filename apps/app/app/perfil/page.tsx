@@ -319,7 +319,9 @@ export default function ProfilePage() {
                           </div>
                         </TooltipTrigger>
                         <TooltipContent>
-                          {linkedGoogle.email || "Google Account"}
+                          {(linkedGoogle as any).email ||
+                            (linkedGoogle as any).publicIdentifier ||
+                            "Google Account"}
                         </TooltipContent>
                       </Tooltip>
                       <span className="text-sm">y</span>
@@ -336,7 +338,11 @@ export default function ProfilePage() {
                           </div>
                         </TooltipTrigger>
                         <TooltipContent>
-                          {linkedTwitter.publicIdentifier || "X Account"}
+                          {(linkedTwitter as any).username
+                            ? `@${(linkedTwitter as any).username}`
+                            : (linkedTwitter as any).publicIdentifier
+                            ? `@${(linkedTwitter as any).publicIdentifier}`
+                            : "X Account"}
                         </TooltipContent>
                       </Tooltip>
                     </div>
@@ -359,7 +365,9 @@ export default function ProfilePage() {
                             </div>
                           </TooltipTrigger>
                           <TooltipContent>
-                            {linkedGoogle.email || "Google Account"}
+                            {(linkedGoogle as any).email ||
+                              (linkedGoogle as any).publicIdentifier ||
+                              "Google Account"}
                           </TooltipContent>
                         </Tooltip>
                       </div>
@@ -412,7 +420,11 @@ export default function ProfilePage() {
                             </div>
                           </TooltipTrigger>
                           <TooltipContent>
-                            {linkedTwitter.publicIdentifier || "X Account"}
+                            {(linkedTwitter as any).username
+                              ? `@${(linkedTwitter as any).username}`
+                              : (linkedTwitter as any).publicIdentifier
+                              ? `@${(linkedTwitter as any).publicIdentifier}`
+                              : "X Account"}
                           </TooltipContent>
                         </Tooltip>
                       </div>
@@ -488,7 +500,7 @@ export default function ProfilePage() {
                       {Number(
                         formatUnits(
                           stats.totalInvested + stats.totalWithdrawn,
-                          6,
+                          18,
                         ),
                       ).toFixed(2)}
                     </p>
@@ -563,7 +575,7 @@ export default function ProfilePage() {
                             <p className="text-2xl font-bold mt-1">
                               $
                               {Number(
-                                formatUnits(stats.totalInvested, 6),
+                                formatUnits(stats.totalInvested, 18),
                               ).toFixed(2)}
                             </p>
                           )}
@@ -584,7 +596,7 @@ export default function ProfilePage() {
                             >
                               {stats.netPosition >= BigInt(0) ? "+" : ""}$
                               {Number(
-                                formatUnits(stats.netPosition, 6),
+                                formatUnits(stats.netPosition, 18),
                               ).toFixed(2)}
                             </p>
                           )}
@@ -610,7 +622,7 @@ export default function ProfilePage() {
                         </h3>
                         <WinningsChart
                           transactions={transactions}
-                          tokenDecimals={6}
+                          tokenDecimals={18}
                           tokenSymbol="USDT"
                         />
                       </div>
@@ -621,7 +633,7 @@ export default function ProfilePage() {
                   <TabsContent value="posiciones" className="mt-6">
                     <PositionsList
                       positions={positions}
-                      tokenDecimals={6}
+                      tokenDecimals={18}
                       tokenSymbol="USDT"
                     />
                   </TabsContent>
@@ -630,7 +642,7 @@ export default function ProfilePage() {
                   <TabsContent value="transacciones" className="mt-6">
                     <TransactionsList
                       transactions={transactions}
-                      tokenDecimals={6}
+                      tokenDecimals={18}
                       tokenSymbol="USDT"
                     />
                   </TabsContent>
