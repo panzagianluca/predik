@@ -57,7 +57,7 @@ export function UserPositionCard({
 
       // Fetch position via API (always uses BNB RPC, regardless of wallet network)
       const response = await fetch(
-        `/api/markets/${market.id}/position/${userAddress}`,
+        `/api/user-position/${market.id}/${userAddress}`,
       );
 
       if (!response.ok) {
