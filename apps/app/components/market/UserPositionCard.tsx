@@ -50,38 +50,23 @@ export function UserPositionCard({
     try {
       setIsLoading(true);
 
-      if (!window.ethereum || !market.token) {
+      if (!market.token) {
         setIsLoading(false);
         return;
       }
 
-      // Use SDK exactly like TradingPanel does
-      const polkamarketsjs = await import("polkamarkets-js");
-      const web3Module = await import("web3");
-      const Web3 = web3Module.default || web3Module;
+      // Fetch position via API (always uses BNB RPC, regardless of wallet network)
+      const response = await fetch(
+        `/api/markets/${market.id}/position/${userAddress}`,
+      );
 
-      const polkamarkets = new polkamarketsjs.Application({
-        web3Provider: window.ethereum,
-      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch user position");
+      }
 
-      const web3 = new Web3(window.ethereum as any);
-      (window as any).web3 = web3;
-      (polkamarkets as any).web3 = web3;
-
-      const pm = polkamarkets.getPredictionMarketV3PlusContract({
-        contractAddress: process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS!,
-        querierContractAddress:
-          process.env.NEXT_PUBLIC_PREDICTION_MARKET_QUERIER || "",
-      });
-
-      // Use getContract().methods like TradingPanel (NOT getPortfolio)
-      const userMarketShares = await pm
-        .getContract()
-        .methods.getUserMarketShares(market.id, userAddress)
-        .call();
-
-      const outcomeShares = userMarketShares[1]; // Array of shares per outcome
-      logger.log("User market shares:", { userMarketShares, outcomeShares });
+      const data = await response.json();
+      const outcomeShares = data.outcomeShares; // Array of shares as strings
+      logger.log("User market shares from API:", data);
 
       // Find which outcome has shares
       let userOutcome: UserPosition | null = null;
@@ -147,6 +132,35 @@ export function UserPositionCard({
       setIsClaiming(true);
       haptics.medium();
 
+      // Check if wallet is on correct network before claiming
+      if (window.ethereum) {
+        const chainId = String(
+          await window.ethereum.request({
+            method: "eth_chainId",
+          }),
+        );
+        const expectedChainId = "0x38"; // BNB Chain = 56 = 0x38
+
+        if (chainId !== expectedChainId) {
+          // Prompt user to switch to BNB Chain for transaction
+          try {
+            await window.ethereum.request({
+              method: "wallet_switchEthereumChain",
+              params: [{ chainId: expectedChainId }],
+            });
+          } catch (switchError: any) {
+            // User rejected or chain not added
+            if (switchError.code === 4902) {
+              toast.error("Por favor agregá BNB Chain a tu wallet");
+            } else {
+              toast.error("Por favor cambiá a BNB Chain para reclamar");
+            }
+            setIsClaiming(false);
+            return;
+          }
+        }
+      }
+
       const polkamarketsjs = await import("polkamarkets-js");
       const web3Module = await import("web3");
       const Web3 = web3Module.default || web3Module;
@@ -158,8 +172,6 @@ export function UserPositionCard({
       const web3 = new Web3(window.ethereum as any);
       (window as any).web3 = web3;
       (polkamarkets as any).web3 = web3;
-
-      // User is already connected - no need to request accounts again
 
       logger.log("Claiming winnings for market:", market.id);
 
