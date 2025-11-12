@@ -71,55 +71,62 @@ export function UserPositionCard({
 
       const pm = polkamarkets.getPredictionMarketV3PlusContract({
         contractAddress: process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS!,
+        querierContractAddress:
+          process.env.NEXT_PUBLIC_PREDICTION_MARKET_QUERIER || "",
       });
 
       // Get user's shares for this market
-      const result = await pm
+      const userMarketShares = await pm
         .getContract()
         .methods.getUserMarketShares(market.id, userAddress)
         .call();
 
-      const outcomeShares = result.outcomes || result[1];
-      logger.log("User market shares:", outcomeShares);
+      // Extract outcomes array from result (similar to TradingPanel)
+      const outcomeShares = userMarketShares[1];
+      logger.log("User market shares:", { userMarketShares, outcomeShares });
 
       // Find which outcome has shares
       let userOutcome: UserPosition | null = null;
 
       for (let i = 0; i < market.outcomes.length; i++) {
         const outcome = market.outcomes[i];
-        const shares = BigInt(outcomeShares[i]);
+        const sharesRaw = outcomeShares[i];
 
-        if (shares > BigInt(0)) {
-          const decimals = market.token?.decimals || 18;
-          const sharesFormatted = Number(formatUnits(shares, decimals));
-          const currentValue = sharesFormatted * outcome.price;
-
-          // Estimate invested amount (shares * avg price, approximation)
-          const avgPrice = outcome.price; // Simplified, ideally track actual buy price
-          const invested = sharesFormatted * avgPrice;
-          const pnl = currentValue - invested;
-          const pnlPercent = invested > 0 ? (pnl / invested) * 100 : 0;
-
-          const isWinner =
-            market.state === "resolved" &&
-            market.resolvedOutcomeId === outcome.id;
-
-          userOutcome = {
-            outcomeId: outcome.id,
-            outcomeName: outcome.title,
-            shares,
-            sharesFormatted,
-            avgPrice,
-            currentValue,
-            invested,
-            pnl,
-            pnlPercent,
-            isWinner,
-            hasShares: true,
-          };
-
-          break; // User typically has shares in one outcome
+        // Skip if no shares
+        if (!sharesRaw || sharesRaw === "0" || Number(sharesRaw) === 0) {
+          continue;
         }
+
+        const shares = BigInt(sharesRaw);
+        const decimals = market.token?.decimals || 18;
+        const sharesFormatted = Number(sharesRaw) / Math.pow(10, decimals);
+        const currentValue = sharesFormatted * outcome.price;
+
+        // Estimate invested amount (shares * avg price, approximation)
+        const avgPrice = outcome.price; // Simplified, ideally track actual buy price
+        const invested = sharesFormatted * avgPrice;
+        const pnl = currentValue - invested;
+        const pnlPercent = invested > 0 ? (pnl / invested) * 100 : 0;
+
+        const isWinner =
+          market.state === "resolved" &&
+          market.resolvedOutcomeId === outcome.id;
+
+        userOutcome = {
+          outcomeId: outcome.id,
+          outcomeName: outcome.title,
+          shares,
+          sharesFormatted,
+          avgPrice,
+          currentValue,
+          invested,
+          pnl,
+          pnlPercent,
+          isWinner,
+          hasShares: true,
+        };
+
+        break; // User typically has shares in one outcome
       }
 
       setPosition(userOutcome);
