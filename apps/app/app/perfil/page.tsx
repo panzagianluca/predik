@@ -101,9 +101,7 @@ export default function ProfilePage() {
   } = useUserTransactions(address);
   const [copied, setCopied] = useState(false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [currentAvatar, setCurrentAvatar] = useState<string>(
-    "/profiles/profile1.png",
-  ); // Default fallback
+  const [currentAvatar, setCurrentAvatar] = useState<string>("");
   const [username, setUsername] = useState<string>("");
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
@@ -126,8 +124,8 @@ export default function ProfilePage() {
       return;
     }
 
-    // Set default avatar based on address
-    if (address && !currentAvatar.startsWith("/profiles/profile")) {
+    // Set default avatar based on address if not already set
+    if (address && !currentAvatar) {
       setCurrentAvatar(getProfilePicture(address));
     }
 

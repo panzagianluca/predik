@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { logger } from "@/lib/logger";
+import { getProfilePicture } from "@/lib/profileUtils";
 
 interface CommentFormProps {
   marketId: string;
@@ -38,12 +39,9 @@ export function CommentForm({
   const maxChars = 300;
   const remaining = maxChars - content.length;
 
-  // Use custom avatar if provided, otherwise generate from address
+  // Use custom avatar if provided, otherwise use getProfilePicture for consistency
   const displayAvatar =
-    avatarUrl ||
-    (userAddress
-      ? `https://api.dicebear.com/7.x/identicon/svg?seed=${userAddress}`
-      : null);
+    avatarUrl || (userAddress && getProfilePicture(userAddress)) || null;
 
   const insertMarkdown = (before: string, after: string = before) => {
     const textarea = textareaRef.current;

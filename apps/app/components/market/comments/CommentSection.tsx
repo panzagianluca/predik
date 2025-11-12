@@ -7,6 +7,7 @@ import { CommentForm } from "./CommentForm";
 import { MessageSquare } from "lucide-react";
 import { fetchUserProfile } from "@/lib/userUtils";
 import { logger } from "@/lib/logger";
+import { getProfilePicture } from "@/lib/profileUtils";
 
 interface CommentSectionProps {
   marketId: string;
@@ -163,11 +164,14 @@ export function CommentSection({ marketId, userAddress }: CommentSectionProps) {
 
   return (
     <div className="overflow-visible">
-      {/* Comment Form */}
+      {/* Comment Input */}
       <CommentForm
         marketId={marketId}
         userAddress={userAddress}
-        avatarUrl={userProfile?.customAvatar}
+        avatarUrl={
+          userProfile?.customAvatar ||
+          (userAddress && getProfilePicture(userAddress))
+        }
         onSubmit={handleNewComment}
         placeholder={
           !userAddress
@@ -200,7 +204,10 @@ export function CommentSection({ marketId, userAddress }: CommentSectionProps) {
                   <CommentForm
                     marketId={marketId}
                     userAddress={userAddress}
-                    avatarUrl={userProfile?.customAvatar}
+                    avatarUrl={
+                      userProfile?.customAvatar ||
+                      (userAddress && getProfilePicture(userAddress))
+                    }
                     parentId={comment.id}
                     onSubmit={handleNewComment}
                     onCancel={() => setReplyingTo(null)}

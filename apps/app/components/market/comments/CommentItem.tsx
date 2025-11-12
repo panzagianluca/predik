@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { logger } from "@/lib/logger";
 import { useState } from "react";
 import { toast } from "sonner";
+import { createPortal } from "react-dom";
 
 interface CommentItemProps {
   comment: Comment;
@@ -191,82 +192,84 @@ export function CommentItem({
           </div>
         </div>
 
-        {/* Report Dialog */}
-        {showReportDialog && (
-          <div
-            className="fixed inset-0 bg-black/50 flex items-center justify-center p-4"
-            style={{ zIndex: 9999 }}
-            onClick={(e) => {
-              // Close if clicking the backdrop
-              if (e.target === e.currentTarget) {
-                setShowReportDialog(false);
-                setReportReason("");
-                setReportDetails("");
-              }
-            }}
-          >
+        {/* Report Dialog - Rendered via Portal */}
+        {showReportDialog &&
+          createPortal(
             <div
-              className="bg-background border border-border rounded-lg p-6 max-w-md w-full space-y-4"
-              onClick={(e) => e.stopPropagation()}
+              className="fixed inset-0 bg-black/50 flex items-center justify-center p-4"
+              style={{ zIndex: 9999 }}
+              onClick={(e) => {
+                // Close if clicking the backdrop
+                if (e.target === e.currentTarget) {
+                  setShowReportDialog(false);
+                  setReportReason("");
+                  setReportDetails("");
+                }
+              }}
             >
-              <div>
-                <h3 className="text-lg font-semibold">Reportar Comentario</h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Selecciona una razón para reportar este comentario
-                </p>
-              </div>
+              <div
+                className="bg-background border border-border rounded-lg p-6 max-w-md w-full space-y-4"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div>
+                  <h3 className="text-lg font-semibold">Reportar Comentario</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Selecciona una razón para reportar este comentario
+                  </p>
+                </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Razón</label>
-                <select
-                  value={reportReason}
-                  onChange={(e) => setReportReason(e.target.value)}
-                  className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm"
-                >
-                  <option value="">Seleccionar...</option>
-                  <option value="spam">Spam</option>
-                  <option value="offensive">Ofensivo</option>
-                  <option value="abuse">Abuso</option>
-                  <option value="other">Otro</option>
-                </select>
-              </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Razón</label>
+                  <select
+                    value={reportReason}
+                    onChange={(e) => setReportReason(e.target.value)}
+                    className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm"
+                  >
+                    <option value="">Seleccionar...</option>
+                    <option value="spam">Spam</option>
+                    <option value="offensive">Ofensivo</option>
+                    <option value="abuse">Abuso</option>
+                    <option value="other">Otro</option>
+                  </select>
+                </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Detalles (opcional)
-                </label>
-                <textarea
-                  value={reportDetails}
-                  onChange={(e) => setReportDetails(e.target.value)}
-                  placeholder="Proporciona más información..."
-                  className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm min-h-[80px]"
-                  maxLength={500}
-                />
-              </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">
+                    Detalles (opcional)
+                  </label>
+                  <textarea
+                    value={reportDetails}
+                    onChange={(e) => setReportDetails(e.target.value)}
+                    placeholder="Proporciona más información..."
+                    className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm min-h-[80px]"
+                    maxLength={500}
+                  />
+                </div>
 
-              <div className="flex gap-2 justify-end">
-                <button
-                  onClick={() => {
-                    setShowReportDialog(false);
-                    setReportReason("");
-                    setReportDetails("");
-                  }}
-                  className="px-4 py-2 text-sm hover:bg-muted rounded-lg"
-                  disabled={isReporting}
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleReport}
-                  disabled={!reportReason || isReporting}
-                  className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isReporting ? "Reportando..." : "Reportar"}
-                </button>
+                <div className="flex gap-2 justify-end">
+                  <button
+                    onClick={() => {
+                      setShowReportDialog(false);
+                      setReportReason("");
+                      setReportDetails("");
+                    }}
+                    className="px-4 py-2 text-sm hover:bg-muted rounded-lg"
+                    disabled={isReporting}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleReport}
+                    disabled={!reportReason || isReporting}
+                    className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isReporting ? "Reportando..." : "Reportar"}
+                  </button>
+                </div>
               </div>
-            </div>
-          </div>
-        )}
+            </div>,
+            document.body,
+          )}
 
         {/* Nested Replies */}
         {hasReplies && (
