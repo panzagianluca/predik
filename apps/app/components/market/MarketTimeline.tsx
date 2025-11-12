@@ -72,9 +72,9 @@ export function MarketTimeline({ market }: MarketTimelineProps) {
 
   return (
     <Card className="w-full">
-      <CardHeader className="pb-3">
+      <CardContent className="p-4 space-y-4">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-[14px] font-semibold">Timeline</CardTitle>
+          <h3 className="text-[14px] font-semibold">Timeline</h3>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
             className="p-1 hover:bg-muted rounded transition-colors"
@@ -86,10 +86,8 @@ export function MarketTimeline({ market }: MarketTimelineProps) {
             )}
           </button>
         </div>
-      </CardHeader>
 
-      {isExpanded && (
-        <CardContent className="pt-0 pb-4">
+        {isExpanded && (
           <div className="space-y-0">
             {timelineEvents.map((event, index) => {
               const Icon = event.icon;
@@ -148,8 +146,8 @@ export function MarketTimeline({ market }: MarketTimelineProps) {
               );
             })}
           </div>
-        </CardContent>
-      )}
+        )}
+      </CardContent>
     </Card>
   );
 }

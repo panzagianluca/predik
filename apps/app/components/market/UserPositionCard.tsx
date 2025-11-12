@@ -67,7 +67,7 @@ export function UserPositionCard({
       (window as any).web3 = web3;
       (polkamarkets as any).web3 = web3;
 
-      await window.ethereum.request({ method: "eth_requestAccounts" });
+      // No need to request accounts - user is already connected (we have userAddress)
 
       const pm = polkamarkets.getPredictionMarketV3PlusContract({
         contractAddress: process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS!,
@@ -156,9 +156,7 @@ export function UserPositionCard({
       (window as any).web3 = web3;
       (polkamarkets as any).web3 = web3;
 
-      if (window.ethereum) {
-        await window.ethereum.request({ method: "eth_requestAccounts" });
-      }
+      // User is already connected - no need to request accounts again
 
       logger.log("Claiming winnings for market:", market.id);
 
