@@ -302,56 +302,59 @@ export default function ProfilePage() {
               <div className="mb-4">
                 <TooltipProvider>
                   {linkedGoogle && linkedTwitter ? (
-                    // STATE 1: Both linked - single badge with both logos
-                    <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-lg flex-1">
-                      <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span className="text-sm">Vinculado con</span>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div className="cursor-help">
-                            <Image
-                              src="/SocialMedia/google-icon-logo-svgrepo-com.svg"
-                              alt="Google"
-                              width={20}
-                              height={20}
-                              className="flex-shrink-0"
-                            />
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          {(linkedGoogle as any).email ||
-                            (linkedGoogle as any).publicIdentifier ||
-                            "Google Account"}
-                        </TooltipContent>
-                      </Tooltip>
-                      <span className="text-sm">y</span>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div className="cursor-help">
-                            <Image
-                              src="/SocialMedia/PhXLogo.svg"
-                              alt="X"
-                              width={20}
-                              height={20}
-                              className="flex-shrink-0 dark:invert"
-                            />
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          {(linkedTwitter as any).username
-                            ? `@${(linkedTwitter as any).username}`
-                            : (linkedTwitter as any).publicIdentifier
-                            ? `@${(linkedTwitter as any).publicIdentifier}`
-                            : "X Account"}
-                        </TooltipContent>
-                      </Tooltip>
+                    // STATE 1: Both linked - two separate badges
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-lg flex-1">
+                        <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <span className="text-sm">Vinculado</span>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="cursor-help">
+                              <Image
+                                src="/SocialMedia/google-icon-logo-svgrepo-com.svg"
+                                alt="Google"
+                                width={20}
+                                height={20}
+                                className="flex-shrink-0"
+                              />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {(linkedGoogle as any).email ||
+                              (linkedGoogle as any).publicIdentifier ||
+                              "Google Account"}
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                      <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-lg flex-1">
+                        <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <span className="text-sm">Vinculado</span>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="cursor-help">
+                              <Image
+                                src="/SocialMedia/PhXLogo.svg"
+                                alt="X"
+                                width={20}
+                                height={20}
+                                className="flex-shrink-0 dark:invert"
+                              />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {(linkedTwitter as any).username ||
+                              (linkedTwitter as any).publicIdentifier ||
+                              "X Account"}
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
                     </div>
                   ) : linkedGoogle && !linkedTwitter ? (
                     // STATE 2: Only Google linked
                     <div className="flex items-center gap-2">
                       <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-lg flex-1">
                         <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span className="text-sm">Vinculado con</span>
+                        <span className="text-sm">Vinculado</span>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <div className="cursor-help">
@@ -377,6 +380,7 @@ export default function ProfilePage() {
                         size="sm"
                         className="gap-2 flex-1"
                       >
+                        Vincular
                         <Image
                           src="/SocialMedia/PhXLogo.svg"
                           alt="X"
@@ -384,7 +388,6 @@ export default function ProfilePage() {
                           height={16}
                           className="dark:invert"
                         />
-                        Vincular con X
                       </Button>
                     </div>
                   ) : !linkedGoogle && linkedTwitter ? (
@@ -396,17 +399,17 @@ export default function ProfilePage() {
                         size="sm"
                         className="gap-2 flex-1"
                       >
+                        Vincular
                         <Image
                           src="/SocialMedia/google-icon-logo-svgrepo-com.svg"
                           alt="Google"
                           width={16}
                           height={16}
                         />
-                        Vincular con Google
                       </Button>
                       <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-lg flex-1">
                         <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span className="text-sm">Vinculado con</span>
+                        <span className="text-sm">Vinculado</span>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <div className="cursor-help">
@@ -420,11 +423,9 @@ export default function ProfilePage() {
                             </div>
                           </TooltipTrigger>
                           <TooltipContent>
-                            {(linkedTwitter as any).username
-                              ? `@${(linkedTwitter as any).username}`
-                              : (linkedTwitter as any).publicIdentifier
-                              ? `@${(linkedTwitter as any).publicIdentifier}`
-                              : "X Account"}
+                            {(linkedTwitter as any).username ||
+                              (linkedTwitter as any).publicIdentifier ||
+                              "X Account"}
                           </TooltipContent>
                         </Tooltip>
                       </div>
@@ -438,21 +439,21 @@ export default function ProfilePage() {
                         size="sm"
                         className="gap-2 flex-1"
                       >
+                        Vincular
                         <Image
                           src="/SocialMedia/google-icon-logo-svgrepo-com.svg"
                           alt="Google"
                           width={16}
                           height={16}
                         />
-                        Vincular con Google
                       </Button>
-                      <span className="text-muted-foreground">|</span>
                       <Button
                         onClick={handleLinkAccount}
                         variant="outline"
                         size="sm"
                         className="gap-2 flex-1"
                       >
+                        Vincular
                         <Image
                           src="/SocialMedia/PhXLogo.svg"
                           alt="X"
@@ -460,7 +461,6 @@ export default function ProfilePage() {
                           height={16}
                           className="dark:invert"
                         />
-                        Vincular con X
                       </Button>
                     </div>
                   )}
