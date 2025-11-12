@@ -64,13 +64,21 @@ function PositionRow({
   tokenDecimals: number;
   tokenSymbol: string;
 }) {
-  const marketName = market?.title || `Market #${position.marketId}`;
+  const marketName = market?.title || `Mercado #${position.marketId}`;
   const outcome = market?.outcomes?.find(
     (o) => o.id.toString() === position.outcomeId,
   );
   const outcomeName =
     outcome?.title || (position.outcomeId === "1" ? "YES" : "NO");
-  const currentPrice = outcome?.price || 0;
+
+  // For resolved markets, use resolved price (1.0 for winner, 0.0 for loser)
+  let currentPrice = outcome?.price || 0;
+  if (market?.state === "resolved" && (market as any).resolvedOutcomeId) {
+    currentPrice =
+      (market as any).resolvedOutcomeId.toString() === position.outcomeId
+        ? 1.0
+        : 0.0;
+  }
 
   const { shares, avgPrice, currentValue, unrealizedPnL, pnlPercentage } =
     calculatePositionMetrics(position, currentPrice, tokenDecimals);

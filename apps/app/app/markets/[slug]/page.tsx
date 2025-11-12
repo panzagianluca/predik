@@ -10,6 +10,7 @@ import { Market } from "@/types/market";
 import { ProbabilityChart } from "@/components/market/ProbabilityChart";
 import { TradingPanel } from "@/components/market/TradingPanel";
 import { UserPositionCard } from "@/components/market/UserPositionCard";
+import { MarketTimeline } from "@/components/market/MarketTimeline";
 import { MobileTradingModal } from "@/components/market/MobileTradingModal";
 import { RelatedMarketCard } from "@/components/market/RelatedMarketCard";
 import { ShareButton } from "@/components/market/ShareButton";
@@ -955,6 +956,9 @@ export default function MarketDetailPage() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Timeline - Desktop Only */}
+            <MarketTimeline market={market} />
 
             {/* Related Markets */}
             {market.relatedMarkets && market.relatedMarkets.length > 0 && (
