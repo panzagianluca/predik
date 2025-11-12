@@ -55,6 +55,7 @@ export function UserPositionCard({
         return;
       }
 
+      // Use polkamarkets SDK portfolio method per official docs
       const polkamarketsjs = await import("polkamarkets-js");
       const web3Module = await import("web3");
       const Web3 = web3Module.default || web3Module;
@@ -67,43 +68,43 @@ export function UserPositionCard({
       (window as any).web3 = web3;
       (polkamarkets as any).web3 = web3;
 
-      // No need to request accounts - user is already connected (we have userAddress)
-
       const pm = polkamarkets.getPredictionMarketV3PlusContract({
         contractAddress: process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS!,
         querierContractAddress:
-          process.env.NEXT_PUBLIC_PREDICTION_MARKET_QUERIER || "",
+          process.env.NEXT_PUBLIC_PREDICTION_MARKET_QUERIER_ADDRESS,
       });
 
-      // Get user's shares for this market
-      const userMarketShares = await pm
-        .getContract()
-        .methods.getUserMarketShares(market.id, userAddress)
-        .call();
+      // Get portfolio for this user - returns holdings and claim status for each outcome
+      const portfolio = await pm.getPortfolio({ user: userAddress });
 
-      // Extract outcomes array from result (similar to TradingPanel)
-      const outcomeShares = userMarketShares[1];
-      logger.log("User market shares:", { userMarketShares, outcomeShares });
+      logger.log("User portfolio:", portfolio);
+
+      // Get this market's data from portfolio
+      const marketPortfolio = portfolio[market.id];
+
+      if (!marketPortfolio || !marketPortfolio.outcomes) {
+        setPosition(null);
+        setIsLoading(false);
+        return;
+      }
 
       // Find which outcome has shares
       let userOutcome: UserPosition | null = null;
 
       for (let i = 0; i < market.outcomes.length; i++) {
         const outcome = market.outcomes[i];
-        const sharesRaw = outcomeShares[i];
+        const outcomeData = marketPortfolio.outcomes[i];
 
-        // Skip if no shares
-        if (!sharesRaw || sharesRaw === "0" || Number(sharesRaw) === 0) {
+        if (!outcomeData || !outcomeData.shares || outcomeData.shares === 0) {
           continue;
         }
 
-        const shares = BigInt(sharesRaw);
-        const decimals = market.token?.decimals || 18;
-        const sharesFormatted = Number(sharesRaw) / Math.pow(10, decimals);
-        const currentValue = sharesFormatted * outcome.price;
+        const shares = BigInt(Math.floor(outcomeData.shares));
+        const sharesFormatted = outcomeData.shares;
+        const currentValue = sharesFormatted * outcomeData.price;
 
-        // Estimate invested amount (shares * avg price, approximation)
-        const avgPrice = outcome.price; // Simplified, ideally track actual buy price
+        // Calculate PnL (SDK provides price, we estimate invested)
+        const avgPrice = outcomeData.price;
         const invested = sharesFormatted * avgPrice;
         const pnl = currentValue - invested;
         const pnlPercent = invested > 0 ? (pnl / invested) * 100 : 0;
@@ -131,11 +132,10 @@ export function UserPositionCard({
 
       setPosition(userOutcome);
 
-      // Check if already claimed (simplified - check if shares are 0 after resolution)
+      // Check claim status from SDK
       if (userOutcome && userOutcome.isWinner && market.state === "resolved") {
-        // In a real scenario, you'd check blockchain for claim transaction
-        // For now, we assume if shares exist, not claimed yet
-        setHasClaimed(false);
+        const claimStatus = marketPortfolio.claimStatus;
+        setHasClaimed(claimStatus?.winningsClaimed || false);
       }
     } catch (error) {
       console.error("Error loading user position:", error);
