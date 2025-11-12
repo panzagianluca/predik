@@ -9,7 +9,15 @@ import { cn } from "@/lib/utils";
 import { logger } from "@/lib/logger";
 import { useState } from "react";
 import { toast } from "sonner";
-import { createPortal } from "react-dom";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogPortal,
+  DialogOverlay,
+} from "@/components/animate-ui/primitives/radix/dialog";
+import { Button } from "@/components/ui/button";
 
 interface CommentItemProps {
   comment: Comment;
@@ -192,32 +200,21 @@ export function CommentItem({
           </div>
         </div>
 
-        {/* Report Dialog - Rendered via Portal */}
-        {showReportDialog &&
-          createPortal(
-            <div
-              className="fixed inset-0 bg-black/50 flex items-center justify-center p-4"
-              style={{ zIndex: 9999 }}
-              onClick={(e) => {
-                // Close if clicking the backdrop
-                if (e.target === e.currentTarget) {
-                  setShowReportDialog(false);
-                  setReportReason("");
-                  setReportDetails("");
-                }
-              }}
-            >
-              <div
-                className="bg-background border border-border rounded-lg p-6 max-w-md w-full space-y-4"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div>
-                  <h3 className="text-lg font-semibold">Reportar Comentario</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Selecciona una razón para reportar este comentario
-                  </p>
-                </div>
+        {/* Report Dialog - With Animations */}
+        <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
+          <DialogPortal>
+            <DialogOverlay className="bg-black/50" />
+            <DialogContent className="bg-background border border-border rounded-lg p-6 max-w-md w-full space-y-4">
+              <DialogHeader>
+                <DialogTitle className="text-lg font-semibold">
+                  Reportar Comentario
+                </DialogTitle>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Selecciona una razón para reportar este comentario
+                </p>
+              </DialogHeader>
 
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Razón</label>
                   <select
@@ -247,29 +244,29 @@ export function CommentItem({
                 </div>
 
                 <div className="flex gap-2 justify-end">
-                  <button
+                  <Button
+                    variant="ghost"
                     onClick={() => {
                       setShowReportDialog(false);
                       setReportReason("");
                       setReportDetails("");
                     }}
-                    className="px-4 py-2 text-sm hover:bg-muted rounded-lg"
                     disabled={isReporting}
                   >
                     Cancelar
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={handleReport}
                     disabled={!reportReason || isReporting}
-                    className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
                   >
                     {isReporting ? "Reportando..." : "Reportar"}
-                  </button>
+                  </Button>
                 </div>
               </div>
-            </div>,
-            document.body,
-          )}
+            </DialogContent>
+          </DialogPortal>
+        </Dialog>
 
         {/* Nested Replies */}
         {hasReplies && (
