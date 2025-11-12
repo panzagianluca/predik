@@ -488,7 +488,7 @@ export default function ProfilePage() {
                       {Number(
                         formatUnits(
                           stats.totalInvested + stats.totalWithdrawn,
-                          18,
+                          6,
                         ),
                       ).toFixed(2)}
                     </p>
@@ -563,7 +563,7 @@ export default function ProfilePage() {
                             <p className="text-2xl font-bold mt-1">
                               $
                               {Number(
-                                formatUnits(stats.totalInvested, 18),
+                                formatUnits(stats.totalInvested, 6),
                               ).toFixed(2)}
                             </p>
                           )}
@@ -584,7 +584,7 @@ export default function ProfilePage() {
                             >
                               {stats.netPosition >= BigInt(0) ? "+" : ""}$
                               {Number(
-                                formatUnits(stats.netPosition, 18),
+                                formatUnits(stats.netPosition, 6),
                               ).toFixed(2)}
                             </p>
                           )}
