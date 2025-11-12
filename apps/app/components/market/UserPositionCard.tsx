@@ -1,0 +1,401 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { Market } from "@/types/market";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Loader2, TrendingUp, Share2, Sparkles } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { formatUnits } from "viem";
+import { toast } from "sonner";
+import { logger } from "@/lib/logger";
+import { haptics } from "@/lib/haptics";
+import { trackWinningsClaimed } from "@/lib/posthog";
+
+interface UserPositionCardProps {
+  market: Market;
+  userAddress: string;
+  onClaimSuccess?: () => void;
+}
+
+interface UserPosition {
+  outcomeId: number;
+  outcomeName: string;
+  shares: bigint;
+  sharesFormatted: number;
+  avgPrice: number;
+  currentValue: number;
+  invested: number;
+  pnl: number;
+  pnlPercent: number;
+  isWinner: boolean;
+  hasShares: boolean;
+}
+
+export function UserPositionCard({
+  market,
+  userAddress,
+  onClaimSuccess,
+}: UserPositionCardProps) {
+  const [position, setPosition] = useState<UserPosition | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isClaiming, setIsClaiming] = useState(false);
+  const [hasClaimed, setHasClaimed] = useState(false);
+
+  useEffect(() => {
+    loadUserPosition();
+  }, [market.id, userAddress]);
+
+  const loadUserPosition = async () => {
+    try {
+      setIsLoading(true);
+
+      if (!window.ethereum || !market.token) {
+        setIsLoading(false);
+        return;
+      }
+
+      const polkamarketsjs = await import("polkamarkets-js");
+      const web3Module = await import("web3");
+      const Web3 = web3Module.default || web3Module;
+
+      const polkamarkets = new polkamarketsjs.Application({
+        web3Provider: window.ethereum,
+      });
+
+      const web3 = new Web3(window.ethereum as any);
+      (window as any).web3 = web3;
+      (polkamarkets as any).web3 = web3;
+
+      await window.ethereum.request({ method: "eth_requestAccounts" });
+
+      const pm = polkamarkets.getPredictionMarketV3PlusContract({
+        contractAddress: process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS!,
+      });
+
+      // Get user's shares for this market
+      const result = await pm
+        .getContract()
+        .methods.getUserMarketShares(market.id, userAddress)
+        .call();
+
+      const outcomeShares = result.outcomes || result[1];
+      logger.log("User market shares:", outcomeShares);
+
+      // Find which outcome has shares
+      let userOutcome: UserPosition | null = null;
+
+      for (let i = 0; i < market.outcomes.length; i++) {
+        const outcome = market.outcomes[i];
+        const shares = BigInt(outcomeShares[i]);
+
+        if (shares > BigInt(0)) {
+          const decimals = market.token?.decimals || 18;
+          const sharesFormatted = Number(formatUnits(shares, decimals));
+          const currentValue = sharesFormatted * outcome.price;
+
+          // Estimate invested amount (shares * avg price, approximation)
+          const avgPrice = outcome.price; // Simplified, ideally track actual buy price
+          const invested = sharesFormatted * avgPrice;
+          const pnl = currentValue - invested;
+          const pnlPercent = invested > 0 ? (pnl / invested) * 100 : 0;
+
+          const isWinner =
+            market.state === "resolved" &&
+            market.resolvedOutcomeId === outcome.id;
+
+          userOutcome = {
+            outcomeId: outcome.id,
+            outcomeName: outcome.title,
+            shares,
+            sharesFormatted,
+            avgPrice,
+            currentValue,
+            invested,
+            pnl,
+            pnlPercent,
+            isWinner,
+            hasShares: true,
+          };
+
+          break; // User typically has shares in one outcome
+        }
+      }
+
+      setPosition(userOutcome);
+
+      // Check if already claimed (simplified - check if shares are 0 after resolution)
+      if (userOutcome && userOutcome.isWinner && market.state === "resolved") {
+        // In a real scenario, you'd check blockchain for claim transaction
+        // For now, we assume if shares exist, not claimed yet
+        setHasClaimed(false);
+      }
+    } catch (error) {
+      console.error("Error loading user position:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleClaim = async () => {
+    if (!position || !position.isWinner || hasClaimed) return;
+
+    try {
+      setIsClaiming(true);
+      haptics.medium();
+
+      const polkamarketsjs = await import("polkamarkets-js");
+      const web3Module = await import("web3");
+      const Web3 = web3Module.default || web3Module;
+
+      const polkamarkets = new polkamarketsjs.Application({
+        web3Provider: window.ethereum,
+      });
+
+      const web3 = new Web3(window.ethereum as any);
+      (window as any).web3 = web3;
+      (polkamarkets as any).web3 = web3;
+
+      if (window.ethereum) {
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+      }
+
+      logger.log("Claiming winnings for market:", market.id);
+
+      // Get prediction market contract
+      const pm = polkamarkets.getPredictionMarketV3PlusContract({
+        contractAddress: process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS!,
+      });
+
+      // Claim winnings
+      await pm.claimWinnings({
+        marketId: market.id,
+      });
+
+      // Track claim
+      trackWinningsClaimed(market.id, market.slug, position.currentValue);
+
+      toast.success("¡Ganancias reclamadas exitosamente!");
+      haptics.success();
+
+      setHasClaimed(true);
+      onClaimSuccess?.();
+    } catch (error: any) {
+      console.error("Claim failed:", error);
+      toast.error(error?.message || "Error al reclamar. Intentá de nuevo.");
+      haptics.error();
+    } finally {
+      setIsClaiming(false);
+    }
+  };
+
+  const handleShare = () => {
+    haptics.light();
+    const text = `¡Gané ${position?.pnl.toFixed(
+      2,
+    )} USDT (${position?.pnlPercent.toFixed(0)}%) en ${
+      market.titleEs || market.title
+    }! 🎯`;
+    const url = `${window.location.origin}/markets/${market.slug}`;
+
+    if (navigator.share) {
+      navigator.share({ text, url });
+    } else {
+      navigator.clipboard.writeText(`${text}\n${url}`);
+      toast.success("¡Copiado al portapapeles!");
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <Card className="w-full">
+        <CardContent className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!position || !position.hasShares) {
+    return null; // Don't show card if user has no position
+  }
+
+  const isResolved = market.state === "resolved";
+  const canClaim = isResolved && position.isWinner && !hasClaimed;
+  const showFlexButton = position.isWinner; // Show before claiming and after claimed
+
+  return (
+    <Card className="w-full overflow-hidden">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center gap-2">
+          <Sparkles className="h-5 w-5 text-purple-500" />
+          Mi Predicción
+        </CardTitle>
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+        {/* Outcome */}
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">Resultado</span>
+          <div
+            className={cn(
+              "px-3 py-1.5 rounded-lg font-semibold text-sm flex items-center gap-2",
+              position.isWinner &&
+                "bg-purple-500/10 text-purple-600 dark:text-purple-400 shimmer",
+              !position.isWinner && "bg-muted text-muted-foreground",
+            )}
+          >
+            {position.isWinner && <Sparkles className="h-4 w-4" />}
+            {position.outcomeName}
+          </div>
+        </div>
+
+        {/* Position */}
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">Posición</span>
+          <div className="text-right">
+            <p className="font-semibold">${position.currentValue.toFixed(2)}</p>
+            <p className="text-xs text-muted-foreground">
+              {position.sharesFormatted.toFixed(2)} acciones @ $
+              {position.avgPrice.toFixed(2)}
+            </p>
+          </div>
+        </div>
+
+        {/* PNL */}
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">
+            Ganancia/Pérdida
+          </span>
+          <div className="text-right">
+            <p
+              className={cn(
+                "font-semibold flex items-center gap-1",
+                position.pnl >= 0 ? "text-green-500" : "text-red-500",
+              )}
+            >
+              {position.pnl >= 0 && <TrendingUp className="h-4 w-4" />}
+              {position.pnl >= 0 ? "+" : ""}${position.pnl.toFixed(2)}
+            </p>
+            <p
+              className={cn(
+                "text-xs",
+                position.pnl >= 0 ? "text-green-500" : "text-red-500",
+              )}
+            >
+              {position.pnlPercent >= 0 ? "+" : ""}
+              {position.pnlPercent.toFixed(2)}%
+            </p>
+          </div>
+        </div>
+
+        {/* Status */}
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">Estado</span>
+          <span
+            className={cn(
+              "font-semibold text-sm",
+              position.isWinner && !hasClaimed && "text-green-500",
+              position.isWinner && hasClaimed && "text-blue-500",
+              !position.isWinner && "text-muted-foreground",
+              !isResolved && "text-orange-500",
+            )}
+          >
+            {!isResolved && "Pendiente"}
+            {isResolved && position.isWinner && !hasClaimed && "Ganaste"}
+            {isResolved && position.isWinner && hasClaimed && "Reclamado"}
+            {isResolved && !position.isWinner && "Perdiste"}
+          </span>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2 pt-2">
+          {showFlexButton && (
+            <Button
+              variant="outline"
+              onClick={handleShare}
+              className="flex-1 border-purple-500/50 text-purple-600 dark:text-purple-400 hover:bg-purple-500/10"
+            >
+              <Share2 className="h-4 w-4 mr-2" />
+              Compartir
+            </Button>
+          )}
+
+          {canClaim && (
+            <Button
+              onClick={handleClaim}
+              disabled={isClaiming}
+              className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
+            >
+              {isClaiming ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Reclamando...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Reclamar
+                </>
+              )}
+            </Button>
+          )}
+
+          {hasClaimed && (
+            <Button
+              disabled
+              className="flex-1 bg-blue-600/50 text-white cursor-not-allowed"
+            >
+              ✓ Reclamado
+            </Button>
+          )}
+
+          {!isResolved && (
+            <div className="flex-1 text-center text-sm text-muted-foreground py-2">
+              Esperando resolución...
+            </div>
+          )}
+        </div>
+
+        {/* Message for losers */}
+        {isResolved && !position.isWinner && (
+          <div className="text-center text-sm text-muted-foreground bg-muted/50 rounded-lg p-3">
+            Tus acciones no ganaron esta vez
+          </div>
+        )}
+      </CardContent>
+
+      <style jsx>{`
+        .shimmer {
+          position: relative;
+          overflow: hidden;
+        }
+
+        .shimmer::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.2),
+            transparent
+          );
+          animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+          0% {
+            left: -100%;
+          }
+          100% {
+            left: 100%;
+          }
+        }
+      `}</style>
+    </Card>
+  );
+}

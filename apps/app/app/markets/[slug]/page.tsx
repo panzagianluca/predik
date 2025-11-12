@@ -9,6 +9,7 @@ import { fetchMarket } from "@/lib/myriad/api";
 import { Market } from "@/types/market";
 import { ProbabilityChart } from "@/components/market/ProbabilityChart";
 import { TradingPanel } from "@/components/market/TradingPanel";
+import { UserPositionCard } from "@/components/market/UserPositionCard";
 import { MobileTradingModal } from "@/components/market/MobileTradingModal";
 import { RelatedMarketCard } from "@/components/market/RelatedMarketCard";
 import { ShareButton } from "@/components/market/ShareButton";
@@ -837,15 +838,25 @@ export default function MarketDetailPage() {
 
           {/* RIGHT COLUMN */}
           <div className="space-y-6">
-            {/* Trading Panel - Desktop Only */}
+            {/* Trading Panel / User Position - Desktop Only */}
             <div className="hidden lg:block">
               <TooltipProvider>
-                <TradingPanel
-                  market={market}
-                  userAddress={address}
-                  isConnected={isConnected}
-                  onTradeComplete={handleTradeComplete}
-                />
+                {(market.state === "closed" || market.state === "resolved") &&
+                isConnected &&
+                address ? (
+                  <UserPositionCard
+                    market={market}
+                    userAddress={address}
+                    onClaimSuccess={handleTradeComplete}
+                  />
+                ) : (
+                  <TradingPanel
+                    market={market}
+                    userAddress={address}
+                    isConnected={isConnected}
+                    onTradeComplete={handleTradeComplete}
+                  />
+                )}
               </TooltipProvider>
             </div>
 
@@ -965,39 +976,58 @@ export default function MarketDetailPage() {
         </div>
       </div>
 
-      {/* Mobile Trading Modal */}
-      <MobileTradingModal
-        isOpen={showMobileTrade}
-        onClose={() => setShowMobileTrade(false)}
-        market={market}
-        preselectedOutcomeId={selectedOutcomeId || undefined}
-        userAddress={address}
-        isConnected={isConnected}
-        onTradeComplete={handleTradeComplete}
-      />
+      {/* Mobile Trading Modal - Only for open markets */}
+      {market.state !== "closed" && market.state !== "resolved" && (
+        <MobileTradingModal
+          isOpen={showMobileTrade}
+          onClose={() => setShowMobileTrade(false)}
+          market={market}
+          preselectedOutcomeId={selectedOutcomeId || undefined}
+          userAddress={address}
+          isConnected={isConnected}
+          onTradeComplete={handleTradeComplete}
+        />
+      )}
 
-      {/* Mobile Fixed Bottom Action Bar */}
-      <div className="lg:hidden fixed bottom-16 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border z-40">
-        <div className="flex gap-2 max-w-7xl mx-auto">
-          {market.outcomes.map((outcome, index) => (
-            <button
-              key={outcome.id}
-              onClick={() => handleMobileTradeOpen(String(outcome.id))}
-              className={cn(
-                "flex-1 h-12 rounded-lg font-semibold text-sm transition-all duration-200 flex flex-col items-center justify-center",
-                index === 0
-                  ? "bg-green-600/75 hover:bg-green-700/75 text-white"
-                  : "bg-red-600/75 hover:bg-red-700/75 text-white",
-              )}
-            >
-              <span>{translateOutcomeTitle(outcome.title)}</span>
-              <span className="text-xs opacity-90">
-                {(outcome.price * 100).toFixed(1)}%
-              </span>
-            </button>
-          ))}
+      {/* Mobile Fixed Bottom Action Bar - Only for open markets */}
+      {market.state !== "closed" && market.state !== "resolved" && (
+        <div className="lg:hidden fixed bottom-16 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border z-40">
+          <div className="flex gap-2 max-w-7xl mx-auto">
+            {market.outcomes.map((outcome, index) => (
+              <button
+                key={outcome.id}
+                onClick={() => handleMobileTradeOpen(String(outcome.id))}
+                className={cn(
+                  "flex-1 h-12 rounded-lg font-semibold text-sm transition-all duration-200 flex flex-col items-center justify-center",
+                  index === 0
+                    ? "bg-green-600/75 hover:bg-green-700/75 text-white"
+                    : "bg-red-600/75 hover:bg-red-700/75 text-white",
+                )}
+              >
+                <span>{translateOutcomeTitle(outcome.title)}</span>
+                <span className="text-xs opacity-90">
+                  {(outcome.price * 100).toFixed(1)}%
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Mobile User Position Card - Only for closed/resolved markets */}
+      {(market.state === "closed" || market.state === "resolved") &&
+        isConnected &&
+        address && (
+          <div className="lg:hidden fixed bottom-16 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border z-40">
+            <div className="max-w-7xl mx-auto">
+              <UserPositionCard
+                market={market}
+                userAddress={address}
+                onClaimSuccess={handleTradeComplete}
+              />
+            </div>
+          </div>
+        )}
 
       {/* Hidden Shareable Market Card for Image Generation */}
       <ShareableMarketCard
