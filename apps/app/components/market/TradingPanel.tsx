@@ -26,7 +26,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/animate-ui/components/animate/tooltip";
+} from "@/components/animate-ui/primitives/radix/tooltip";
 import { LogoSpinner } from "@/components/ui/logo-spinner";
 import { haptics } from "@/lib/haptics";
 import { logger } from "@/lib/logger";
@@ -128,6 +128,22 @@ export function TradingPanel({
         return;
       }
 
+      // Check wallet network FIRST
+      if (window.ethereum) {
+        const chainId = String(
+          await window.ethereum.request({
+            method: "eth_chainId",
+          }),
+        );
+        const expectedChainId = "0x38"; // BNB Chain = 56 = 0x38
+
+        if (chainId !== expectedChainId) {
+          logger.warn("⚠️ Wrong network for balance check:", chainId);
+          setBalance(0);
+          return;
+        }
+      }
+
       const polkamarketsjs = await import("polkamarkets-js");
       const web3Module = await import("web3");
       const Web3 = web3Module.default || web3Module;
@@ -204,6 +220,22 @@ export function TradingPanel({
         return;
       }
 
+      // Check wallet network FIRST
+      if (window.ethereum) {
+        const chainId = String(
+          await window.ethereum.request({
+            method: "eth_chainId",
+          }),
+        );
+        const expectedChainId = "0x38"; // BNB Chain = 56 = 0x38
+
+        if (chainId !== expectedChainId) {
+          logger.warn("⚠️ Wrong network for position check:", chainId);
+          setUserPosition(null);
+          return;
+        }
+      }
+
       const polkamarketsjs = await import("polkamarkets-js");
       const web3Module = await import("web3");
       const Web3 = web3Module.default || web3Module;
@@ -270,6 +302,25 @@ export function TradingPanel({
     setError(null);
 
     try {
+      // Check wallet network FIRST
+      if (window.ethereum) {
+        const chainId = String(
+          await window.ethereum.request({
+            method: "eth_chainId",
+          }),
+        );
+        const expectedChainId = "0x38"; // BNB Chain = 56 = 0x38
+
+        if (chainId !== expectedChainId) {
+          setError(
+            "Por favor conectá tu wallet a BNB Smart Chain (Chain ID 56)",
+          );
+          setCalculation(null);
+          setIsCalculating(false);
+          return;
+        }
+      }
+
       const polkamarketsjs = await import("polkamarkets-js");
       const web3Module = await import("web3");
       const Web3 = web3Module.default || web3Module;

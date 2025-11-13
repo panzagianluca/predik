@@ -113,6 +113,22 @@ export function MobileTradingModal({
 
   const loadBalance = async () => {
     try {
+      // Check wallet network FIRST
+      if (window.ethereum) {
+        const chainId = String(
+          await window.ethereum.request({
+            method: "eth_chainId",
+          }),
+        );
+        const expectedChainId = "0x38"; // BNB Chain = 56 = 0x38
+
+        if (chainId !== expectedChainId) {
+          logger.warn("⚠️ Wrong network for balance check:", chainId);
+          setBalance(0);
+          return;
+        }
+      }
+
       const polkamarketsjs = await import("polkamarkets-js");
       const web3Module = await import("web3");
       const Web3 = web3Module.default || web3Module;
@@ -178,6 +194,25 @@ export function MobileTradingModal({
     setError(null);
 
     try {
+      // Check wallet network FIRST
+      if (window.ethereum) {
+        const chainId = String(
+          await window.ethereum.request({
+            method: "eth_chainId",
+          }),
+        );
+        const expectedChainId = "0x38"; // BNB Chain = 56 = 0x38
+
+        if (chainId !== expectedChainId) {
+          setError(
+            "Por favor conectá tu wallet a BNB Smart Chain (Chain ID 56)",
+          );
+          setCalculation(null);
+          setIsCalculating(false);
+          return;
+        }
+      }
+
       const polkamarketsjs = await import("polkamarkets-js");
       const web3Module = await import("web3");
       const Web3 = web3Module.default || web3Module;
