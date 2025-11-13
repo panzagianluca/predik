@@ -282,9 +282,9 @@ export default function MarketDetailPage() {
                         </span>
                       )}
 
-                      {/* BNB Chain Badge */}
+                      {/* BNB Chain Badge - Links to Prediction Market contract */}
                       <a
-                        href={`https://bscscan.com/address/${market.tokenAddress}`}
+                        href={`https://bscscan.com/address/${process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS}#readContract`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center hover:opacity-80 transition-opacity"
@@ -292,6 +292,7 @@ export default function MarketDetailPage() {
                           e.stopPropagation();
                           haptics.light();
                         }}
+                        title={`Ver mercado #${market.id} en BscScan`}
                       >
                         <div className="relative w-4 h-4 flex items-center justify-center">
                           <Image
@@ -350,9 +351,9 @@ export default function MarketDetailPage() {
                     </span>
                   )}
 
-                  {/* BNB Chain Badge */}
+                  {/* BNB Chain Badge - Links to Prediction Market contract */}
                   <a
-                    href={`https://bscscan.com/address/${market.tokenAddress}`}
+                    href={`https://bscscan.com/address/${process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS}#readContract`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center hover:opacity-80 transition-opacity"
@@ -360,6 +361,7 @@ export default function MarketDetailPage() {
                       e.stopPropagation();
                       haptics.light();
                     }}
+                    title={`Ver mercado #${market.id} en BscScan`}
                   >
                     <div className="relative w-3.5 h-3.5 flex items-center justify-center">
                       <Image

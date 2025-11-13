@@ -465,7 +465,7 @@ export function MarketCard({ market }: MarketCardProps) {
             <Tooltip>
               <TooltipTrigger asChild>
                 <a
-                  href={`https://bscscan.com/address/${market.tokenAddress}`}
+                  href={`https://bscscan.com/address/${process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS}#readContract`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center hover:opacity-80 transition-opacity underline decoration-dotted"
@@ -473,6 +473,7 @@ export function MarketCard({ market }: MarketCardProps) {
                     e.stopPropagation();
                     haptics.light();
                   }}
+                  title={`Ver mercado #${market.id} en BscScan`}
                 >
                   <div className="relative w-3.5 h-3.5 flex items-center justify-center">
                     <Image
