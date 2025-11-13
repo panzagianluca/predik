@@ -1,13 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import {
-  Bold,
-  Italic,
-  Underline,
-  Image as ImageIcon,
-  Send,
-} from "lucide-react";
+import { Bold, Italic, Underline, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { logger } from "@/lib/logger";
 import { getProfilePicture } from "@/lib/profileUtils";
@@ -32,7 +26,6 @@ export function CommentForm({
   placeholder = "Escribe un comentario...",
 }: CommentFormProps) {
   const [content, setContent] = useState("");
-  const [gifUrl, setGifUrl] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -77,7 +70,7 @@ export function CommentForm({
 
     try {
       if (onSubmit) {
-        await onSubmit(content, gifUrl || undefined);
+        await onSubmit(content, undefined);
       } else {
         // Default API call
         const response = await fetch("/api/comments", {
@@ -87,7 +80,6 @@ export function CommentForm({
             marketId,
             userAddress,
             content,
-            gifUrl: gifUrl || undefined,
             parentId,
           }),
         });
@@ -97,7 +89,6 @@ export function CommentForm({
 
       // Reset form
       setContent("");
-      setGifUrl("");
       if (onCancel) onCancel();
     } catch (error) {
       logger.error("Error posting comment:", error);
@@ -139,23 +130,6 @@ export function CommentForm({
             maxLength={maxChars}
           />
 
-          {/* GIF Preview */}
-          {gifUrl && (
-            <div className="mt-2 relative max-w-xs">
-              <img
-                src={gifUrl}
-                alt="Selected GIF"
-                className="rounded-lg w-full"
-              />
-              <button
-                onClick={() => setGifUrl("")}
-                className="absolute top-2 right-2 bg-black/50 text-white rounded-full p-1 hover:bg-black/70"
-              >
-                ✕
-              </button>
-            </div>
-          )}
-
           {/* Toolbar */}
           <div className="flex items-center justify-between mt-2">
             <div className="flex items-center gap-1">
@@ -187,18 +161,6 @@ export function CommentForm({
                 disabled={!userAddress}
               >
                 <Underline className="h-4 w-4" />
-              </button>
-
-              <div className="w-px h-4 bg-border mx-1" />
-
-              {/* GIF Picker - Placeholder for now */}
-              <button
-                onClick={() => alert("GIF picker coming soon!")}
-                className="p-1.5 rounded hover:bg-muted transition-colors"
-                title="GIF"
-                disabled={!userAddress}
-              >
-                <ImageIcon className="h-4 w-4" />
               </button>
             </div>
 

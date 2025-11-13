@@ -74,7 +74,7 @@ export function MarketTimeline({ market }: MarketTimelineProps) {
     <Card className="w-full">
       <CardContent className="p-4 space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-[14px] font-semibold">Timeline</h3>
+          <h3 className="text-[14px] font-semibold">Línea de Tiempo</h3>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
             className="p-1 hover:bg-muted rounded transition-colors"
@@ -87,7 +87,14 @@ export function MarketTimeline({ market }: MarketTimelineProps) {
           </button>
         </div>
 
-        {isExpanded && (
+        <div
+          className={cn(
+            "overflow-hidden transition-all duration-500 ease-in-out",
+            isExpanded
+              ? "max-h-[2000px] opacity-100 mt-4"
+              : "max-h-0 opacity-0",
+          )}
+        >
           <div className="space-y-0">
             {timelineEvents.map((event, index) => {
               const Icon = event.icon;
@@ -138,7 +145,7 @@ export function MarketTimeline({ market }: MarketTimelineProps) {
               );
             })}
           </div>
-        )}
+        </div>
       </CardContent>
     </Card>
   );

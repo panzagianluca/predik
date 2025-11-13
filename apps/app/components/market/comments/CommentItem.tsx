@@ -206,114 +206,118 @@ export function CommentItem({
         {/* Report Dialog - With Animations */}
         <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
           <DialogPortal>
-            <DialogOverlay className="bg-black/50" />
-            <DialogContent className="bg-background border border-border rounded-lg p-6 max-w-md w-full space-y-4">
-              <DialogHeader>
-                <DialogTitle className="text-lg font-semibold">
-                  Reportar Comentario
-                </DialogTitle>
-                <DialogDescription className="text-sm text-muted-foreground mt-1">
-                  Selecciona una razón para reportar este comentario
-                </DialogDescription>
-              </DialogHeader>
+            <DialogOverlay className="fixed inset-0 bg-black/50 z-50" />
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <DialogContent className="bg-background border border-border rounded-lg shadow-lg p-6 max-w-md w-full space-y-4">
+                <DialogHeader>
+                  <DialogTitle className="text-lg font-semibold">
+                    Reportar Comentario
+                  </DialogTitle>
+                  <DialogDescription className="text-sm text-muted-foreground mt-1">
+                    Selecciona una razón para reportar este comentario
+                  </DialogDescription>
+                </DialogHeader>
 
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Razón</label>
-                  <select
-                    value={reportReason}
-                    onChange={(e) => setReportReason(e.target.value)}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm"
-                  >
-                    <option value="">Seleccionar...</option>
-                    <option value="spam">Spam</option>
-                    <option value="offensive">Ofensivo</option>
-                    <option value="abuse">Abuso</option>
-                    <option value="other">Otro</option>
-                  </select>
-                </div>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Razón</label>
+                    <select
+                      value={reportReason}
+                      onChange={(e) => setReportReason(e.target.value)}
+                      className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm"
+                    >
+                      <option value="">Seleccionar...</option>
+                      <option value="spam">Spam</option>
+                      <option value="offensive">Ofensivo</option>
+                      <option value="abuse">Abuso</option>
+                      <option value="other">Otro</option>
+                    </select>
+                  </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    Detalles (opcional)
-                  </label>
-                  <textarea
-                    value={reportDetails}
-                    onChange={(e) => setReportDetails(e.target.value)}
-                    placeholder="Proporciona más información..."
-                    className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm min-h-[80px]"
-                    maxLength={500}
-                  />
-                </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Detalles (opcional)
+                    </label>
+                    <textarea
+                      value={reportDetails}
+                      onChange={(e) => setReportDetails(e.target.value)}
+                      placeholder="Proporciona más información..."
+                      className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm min-h-[80px]"
+                      maxLength={500}
+                    />
+                  </div>
 
-                <div className="flex gap-2 justify-end">
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      setShowReportDialog(false);
-                      setReportReason("");
-                      setReportDetails("");
-                    }}
-                    disabled={isReporting}
-                  >
-                    Cancelar
-                  </Button>
-                  <Button
-                    onClick={handleReport}
-                    disabled={!reportReason || isReporting}
-                    className="bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
-                  >
-                    {isReporting ? "Reportando..." : "Reportar"}
-                  </Button>
+                  <div className="flex gap-2 justify-end">
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        setShowReportDialog(false);
+                        setReportReason("");
+                        setReportDetails("");
+                      }}
+                      disabled={isReporting}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      onClick={handleReport}
+                      disabled={!reportReason || isReporting}
+                      className="bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
+                    >
+                      {isReporting ? "Reportando..." : "Reportar"}
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </DialogContent>
+              </DialogContent>
+            </div>
           </DialogPortal>
         </Dialog>
 
         {/* Delete Confirmation Dialog */}
         <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
           <DialogPortal>
-            <DialogOverlay className="bg-black/50" />
-            <DialogContent className="bg-background border border-border rounded-lg p-6 max-w-md w-full space-y-4">
-              <DialogHeader>
-                <DialogTitle className="text-lg font-semibold">
-                  Eliminar Comentario
-                </DialogTitle>
-                <DialogDescription className="text-sm text-muted-foreground mt-1">
-                  ¿Estás seguro de eliminar este comentario? Esta acción no se
-                  puede deshacer.
-                </DialogDescription>
-              </DialogHeader>
+            <DialogOverlay className="fixed inset-0 bg-black/50 z-50" />
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <DialogContent className="bg-background border border-border rounded-lg shadow-lg p-6 max-w-md w-full space-y-4">
+                <DialogHeader>
+                  <DialogTitle className="text-lg font-semibold">
+                    Eliminar Comentario
+                  </DialogTitle>
+                  <DialogDescription className="text-sm text-muted-foreground mt-1">
+                    ¿Estás seguro de eliminar este comentario? Esta acción no se
+                    puede deshacer.
+                  </DialogDescription>
+                </DialogHeader>
 
-              <div className="flex gap-2 justify-end">
-                <Button
-                  variant="ghost"
-                  onClick={() => setShowDeleteDialog(false)}
-                  disabled={isDeleting}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  onClick={async () => {
-                    if (!onDelete) return;
-                    setIsDeleting(true);
-                    try {
-                      await onDelete(comment.id);
-                      setShowDeleteDialog(false);
-                    } catch (error) {
-                      // Error already handled in parent
-                    } finally {
-                      setIsDeleting(false);
-                    }
-                  }}
-                  disabled={isDeleting}
-                  className="bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
-                >
-                  {isDeleting ? "Eliminando..." : "Eliminar"}
-                </Button>
-              </div>
-            </DialogContent>
+                <div className="flex gap-2 justify-end">
+                  <Button
+                    variant="ghost"
+                    onClick={() => setShowDeleteDialog(false)}
+                    disabled={isDeleting}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={async () => {
+                      if (!onDelete) return;
+                      setIsDeleting(true);
+                      try {
+                        await onDelete(comment.id);
+                        setShowDeleteDialog(false);
+                      } catch (error) {
+                        // Error already handled in parent
+                      } finally {
+                        setIsDeleting(false);
+                      }
+                    }}
+                    disabled={isDeleting}
+                    className="bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
+                  >
+                    {isDeleting ? "Eliminando..." : "Eliminar"}
+                  </Button>
+                </div>
+              </DialogContent>
+            </div>
           </DialogPortal>
         </Dialog>
 

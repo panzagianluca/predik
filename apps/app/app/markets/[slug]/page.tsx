@@ -12,6 +12,7 @@ import { TradingPanel } from "@/components/market/TradingPanel";
 import { UserPositionCard } from "@/components/market/UserPositionCard";
 import { MarketTimeline } from "@/components/market/MarketTimeline";
 import { MobileTradingModal } from "@/components/market/MobileTradingModal";
+import { MobilePositionModal } from "@/components/market/MobilePositionModal";
 import { RelatedMarketCard } from "@/components/market/RelatedMarketCard";
 import { ShareButton } from "@/components/market/ShareButton";
 import { CopyLinkButton } from "@/components/market/CopyLinkButton";
@@ -45,12 +46,12 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { TooltipProvider } from "@/components/animate-ui/primitives/animate/tooltip";
 import {
   Tooltip,
+  TooltipProvider,
   TooltipTrigger,
   TooltipContent,
-} from "@/components/animate-ui/primitives/animate/tooltip";
+} from "@/components/animate-ui/components/animate/tooltip";
 import CountUp from "react-countup";
 import { haptics } from "@/lib/haptics";
 import {
@@ -93,6 +94,8 @@ export default function MarketDetailPage() {
     null,
   );
   const [countdown, setCountdown] = useState<string>("");
+  const [isMobileStatsExpanded, setIsMobileStatsExpanded] = useState(true);
+  const [showMobilePosition, setShowMobilePosition] = useState(false);
 
   useEffect(() => {
     const loadMarket = async () => {
@@ -724,102 +727,132 @@ export default function MarketDetailPage() {
               {/* Market Stats - Mobile Only (shown before tabs) */}
               <Card className="lg:hidden">
                 <CardContent className="p-4 space-y-4">
-                  <h3 className="text-[14px] font-semibold">Estadísticas</h3>
-
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">
-                        Liquidez
-                      </span>
-                      <span className="font-semibold">
-                        $
-                        <CountUp
-                          end={market.liquidity}
-                          duration={1}
-                          separator=","
-                          preserveValue
-                        />
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">
-                        Volumen
-                      </span>
-                      <span className="font-semibold">
-                        $
-                        <CountUp
-                          end={market.volume || 0}
-                          duration={1}
-                          separator=","
-                          preserveValue
-                        />
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">
-                        Operadores
-                      </span>
-                      <span className="font-semibold">
-                        <CountUp
-                          end={market.users || 0}
-                          duration={0.8}
-                          preserveValue
-                        />
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Fee</span>
-                      <span className="font-semibold">
-                        {((market.fees?.buy?.fee || 0) * 100).toFixed(2)}%
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">
-                        Treasury Fee
-                      </span>
-                      <span className="font-semibold">
-                        {((market.fees?.buy?.treasury_fee || 0) * 100).toFixed(
-                          2,
-                        )}
-                        %
-                      </span>
-                    </div>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-[14px] font-semibold">Estadísticas</h3>
+                    <button
+                      onClick={() =>
+                        setIsMobileStatsExpanded(!isMobileStatsExpanded)
+                      }
+                      className="p-1 hover:bg-muted rounded transition-colors"
+                    >
+                      {isMobileStatsExpanded ? (
+                        <ChevronUp className="h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4" />
+                      )}
+                    </button>
                   </div>
 
-                  {/* Current Outcomes */}
-                  <div className="border-t pt-4 mt-4">
-                    <h4 className="font-semibold text-sm mb-3">
-                      Probabilidades Actuales
-                    </h4>
-                    <div className="space-y-2">
-                      {market.outcomes.map((outcome, index) => (
-                        <div
-                          key={outcome.id}
-                          className="flex items-center justify-between"
-                        >
-                          <span className="text-sm">
-                            {translateOutcomeTitle(outcome.title)}
-                          </span>
-                          <span
-                            className="font-bold"
-                            style={{
-                              color: index === 0 ? "#22c55e" : "#ef4444",
-                            }}
+                  <div
+                    className={cn(
+                      "overflow-hidden transition-all duration-500 ease-in-out",
+                      isMobileStatsExpanded
+                        ? "max-h-[2000px] opacity-100 mt-4"
+                        : "max-h-0 opacity-0",
+                    )}
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">
+                          Liquidez
+                        </span>
+                        <span className="font-semibold">
+                          $
+                          <CountUp
+                            end={market.liquidity}
+                            duration={1}
+                            separator=","
+                            preserveValue
+                          />
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">
+                          Volumen
+                        </span>
+                        <span className="font-semibold">
+                          $
+                          <CountUp
+                            end={market.volume || 0}
+                            duration={1}
+                            separator=","
+                            preserveValue
+                          />
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">
+                          Operadores
+                        </span>
+                        <span className="font-semibold">
+                          <CountUp
+                            end={market.users || 0}
+                            duration={0.8}
+                            preserveValue
+                          />
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">
+                          Fee
+                        </span>
+                        <span className="font-semibold">
+                          {((market.fees?.buy?.fee || 0) * 100).toFixed(2)}%
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">
+                          Treasury Fee
+                        </span>
+                        <span className="font-semibold">
+                          {(
+                            (market.fees?.buy?.treasury_fee || 0) * 100
+                          ).toFixed(2)}
+                          %
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Current Outcomes */}
+                    <div className="border-t pt-4 mt-4">
+                      <h4 className="font-semibold text-sm mb-3">
+                        Probabilidades Actuales
+                      </h4>
+                      <div className="space-y-2">
+                        {market.outcomes.map((outcome, index) => (
+                          <div
+                            key={outcome.id}
+                            className="flex items-center justify-between"
                           >
-                            <CountUp
-                              end={outcome.price * 100}
-                              duration={0.8}
-                              decimals={2}
-                              suffix="%"
-                              preserveValue
-                            />
-                          </span>
-                        </div>
-                      ))}
+                            <span className="text-sm">
+                              {translateOutcomeTitle(outcome.title)}
+                            </span>
+                            <span
+                              className="font-bold"
+                              style={{
+                                color: index === 0 ? "#22c55e" : "#ef4444",
+                              }}
+                            >
+                              <CountUp
+                                end={outcome.price * 100}
+                                duration={0.8}
+                                decimals={2}
+                                suffix="%"
+                                preserveValue
+                              />
+                            </span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Timeline - Mobile Only (shown after stats) */}
+              <div className="lg:hidden">
+                <MarketTimeline market={market} />
+              </div>
 
               {/* Tabs: Comments | Holders | Activity */}
               <Tabs defaultValue="comments" className="w-full">
@@ -1057,19 +1090,36 @@ export default function MarketDetailPage() {
           </div>
         )}
 
-        {/* Mobile User Position Card - Only for closed/resolved markets */}
+        {/* Mobile Position Modal - Only for closed/resolved markets */}
         {(market.state === "closed" || market.state === "resolved") &&
           isConnected &&
           address && (
-            <div className="lg:hidden fixed bottom-16 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border z-40">
-              <div className="max-w-7xl mx-auto">
-                <UserPositionCard
-                  market={market}
-                  userAddress={address}
-                  onClaimSuccess={handleTradeComplete}
-                />
-              </div>
-            </div>
+            <>
+              {/* Collapsed Sticky Bar */}
+              <button
+                onClick={() => {
+                  setShowMobilePosition(true);
+                  haptics.light();
+                }}
+                className="lg:hidden fixed bottom-16 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border z-40 hover:bg-muted/50 transition-colors"
+              >
+                <div className="max-w-7xl mx-auto flex items-center justify-between">
+                  <span className="font-semibold text-purple-600 dark:text-purple-400">
+                    Mi Predicción
+                  </span>
+                  <ChevronUp className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                </div>
+              </button>
+
+              {/* Position Modal */}
+              <MobilePositionModal
+                isOpen={showMobilePosition}
+                onClose={() => setShowMobilePosition(false)}
+                market={market}
+                userAddress={address}
+                onClaimSuccess={handleTradeComplete}
+              />
+            </>
           )}
 
         {/* Hidden Shareable Market Card for Image Generation */}
