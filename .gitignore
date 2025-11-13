@@ -1,44 +1,193 @@
+# ========================================
+# PREDIK .GITIGNORE
+# ========================================
+# Clean repo - no secrets, no docs, no test files
+# Last updated: 2025-11-13
 
+# ========================================
+# BUILD & DEPENDENCIES
+# ========================================
+.next/
+.turbo/
+node_modules/
+dist/
+build/
+out/
+.cache/
 
-#Ignore vscode AI rules
-.github/instructions/codacy.instructions.md
-.next
-node_modules
-
-# Environment variables - NEVER COMMIT THESE
+# ========================================
+# ENVIRONMENT & SECRETS - NEVER COMMIT
+# ========================================
+# All .env files contain sensitive data
 .env
+.env.*
 .env.local
-.env*.local
+.env.*.local
 .env.development.local
 .env.test.local
 .env.production.local
+.env.backup
 
-# Database migrations - keep in repo for deployment
-# But ignore any local SQL dumps or backups
-*.sql.backup
-*.sql.dump
+# Specific app .env files
+apps/**/.env
+apps/**/.env.*
+apps/**/.env.local
+packages/**/.env
+packages/**/.env.local
 
-scripts/seed-proposals.mjs
+# API keys, tokens, credentials
+**/secrets.json
+**/credentials.json
+**/*secret*
+**/*credential*
+**/*password*
+**/MANTECA_CREDENTIALS.md
 
-# Subgraph documentation - generated files
-SUBGRAPH_DEPLOYMENT.md
-SUBGRAPH_IMPLEMENTATION_SUMMARY.md
-subgraph/QUICK_START.md
-subgraph/ARCHITECTURE.md
-subgraph/QUERIES.md
-subgraph/TROUBLESHOOTING.md
-subgraph/DEPLOYMENT_CHECKLIST.md
-Docs/SUBGRAPH_INTEGRATION.md
-
-# Documentation files - ignore all markdown docs
+# ========================================
+# DOCUMENTATION - KEEP LOCAL ONLY
+# ========================================
+# All documentation stays local, not in repo
+Docs/
+docs/
 *.md
 !README.md
+!LICENSE.md
+!CONTRIBUTING.md
+!CHANGELOG.md
+
+# Subgraph docs (all markdown except main README)
+subgraph/**/*.md
 !subgraph/README.md
 
-# Manteca.dev credentials - NEVER COMMIT
-MANTECA_CREDENTIALS.md
+# Archive and backup docs
+**/Archive/
+**/archive/
+**/*.backup.md
+**/*.old.md
 
-# Backup files
-hooks/use-user-transactions-rpc.ts.bak
-subgraph/PRODUCTION.md
+# ========================================
+# MIGRATIONS & SQL FILES
+# ========================================
+# SQL migrations are generated, keep local
+migrations/
+migrations/**/*.sql
+drizzle/**/*.sql
+*.sql
+*.sql.backup
+*.sql.dump
+*.db
+*.sqlite
+*.sqlite3
+
+# Keep only the drizzle meta folder for schema tracking
+!drizzle/meta/
+
+# ========================================
+# TEST FILES & DEBUG
+# ========================================
+# Testing pages and debug scripts
+**/uitest/
+**/test-page/
+**/debug-*/
+debug-*.js
+debug-*.ts
+**/playground/
+**/__tests__/
+**/__mocks__/
+*.test.ts
+*.test.tsx
+*.test.js
+*.test.jsx
+*.spec.ts
+*.spec.tsx
+*.spec.js
+*.spec.jsx
+
+# Test coverage
+coverage/
+.nyc_output/
+*.lcov
+
+# ========================================
+# SCRIPTS & SEEDS
+# ========================================
+# Seed scripts contain test data
+scripts/seed-*.mjs
+scripts/seed-*.js
+scripts/test-*.mjs
+scripts/test-*.js
+
+# ========================================
+# VERCEL & DEPLOYMENT
+# ========================================
+.vercel/
 .vercel
+.vercelignore
+
+# ========================================
+# IDE & EDITOR
+# ========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# AI instructions (keep local)
+.github/instructions/codacy.instructions.md
+
+# ========================================
+# LOGS & TEMP FILES
+# ========================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+
+# ========================================
+# SUBGRAPH GENERATED FILES
+# ========================================
+subgraph/build/
+subgraph/generated/
+subgraph/.bin/
+
+# ========================================
+# PACKAGE MANAGER
+# ========================================
+# Lock files (keep package-lock.json for npm)
+# yarn.lock
+# pnpm-lock.yaml
+
+# ========================================
+# OS SPECIFIC
+# ========================================
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ========================================
+# SECRETS DETECTION
+# ========================================
+.secrets.baseline
+.gitleaks.toml
+
+# ========================================
+# MISC
+# ========================================
+.npmrc
+*.tsbuildinfo
+.eslintcache
