@@ -72,12 +72,19 @@ function PositionRow({
     outcome?.title || (position.outcomeId === "1" ? "YES" : "NO");
 
   // For resolved markets, use resolved price (1.0 for winner, 0.0 for loser)
+  // CRITICAL FIX: resolvedOutcomeId can be null, fallback to outcome.price === 1
   let currentPrice = outcome?.price || 0;
-  if (market?.state === "resolved" && (market as any).resolvedOutcomeId) {
-    currentPrice =
-      (market as any).resolvedOutcomeId.toString() === position.outcomeId
-        ? 1.0
-        : 0.0;
+  if (market?.state === "resolved") {
+    if ((market as any).resolvedOutcomeId) {
+      // If resolvedOutcomeId is set, use it
+      currentPrice =
+        (market as any).resolvedOutcomeId.toString() === position.outcomeId
+          ? 1.0
+          : 0.0;
+    } else if (outcome?.price !== undefined) {
+      // Fallback: if outcome.price is 1, this outcome won
+      currentPrice = outcome.price;
+    }
   }
 
   const { shares, avgPrice, currentValue, unrealizedPnL, pnlPercentage } =

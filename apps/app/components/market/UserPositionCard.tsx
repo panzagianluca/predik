@@ -91,9 +91,13 @@ export function UserPositionCard({
         const pnl = currentValue - invested;
         const pnlPercent = invested > 0 ? (pnl / invested) * 100 : 0;
 
+        // Determine if this outcome won
+        // CRITICAL FIX: resolvedOutcomeId can be null even for resolved markets
+        // Fallback to checking if outcome.price === 1 (winning outcome always has price 1)
         const isWinner =
           market.state === "resolved" &&
-          market.resolvedOutcomeId === outcome.id;
+          (market.resolvedOutcomeId === outcome.id ||
+            (market.resolvedOutcomeId === null && outcome.price === 1));
 
         userOutcome = {
           outcomeId: outcome.id,
