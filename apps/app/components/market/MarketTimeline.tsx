@@ -133,14 +133,6 @@ export function MarketTimeline({ market }: MarketTimelineProps) {
                     <p className="text-xs text-muted-foreground mt-0.5">
                       {formatDate(event.date)}
                     </p>
-                    {isResolvedEvent && winningOutcome && (
-                      <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">
-                        <Trophy className="h-3.5 w-3.5" />
-                        <span className="text-xs font-semibold">
-                          {translateOutcomeTitle(winningOutcome.title)}
-                        </span>
-                      </div>
-                    )}
                   </div>
                 </div>
               );
