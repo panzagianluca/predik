@@ -92,7 +92,7 @@ export function MarketTimeline({ market }: MarketTimelineProps) {
             "overflow-hidden transition-all duration-500 ease-in-out",
             isExpanded
               ? "max-h-[2000px] opacity-100 mt-4"
-              : "max-h-0 opacity-0",
+              : "max-h-0 opacity-0 mt-0",
           )}
         >
           <div className="space-y-0">

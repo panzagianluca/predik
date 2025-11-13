@@ -191,7 +191,7 @@ export function SharePreviewModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        className="max-w-[1240px] w-full p-0 gap-0 overflow-hidden"
+        className="!max-w-[min(1240px,calc(100vw-2rem))] w-full p-0 gap-0 overflow-hidden"
         from="bottom"
       >
         <DialogTitle className="sr-only">
@@ -203,23 +203,52 @@ export function SharePreviewModal({
           <h3 className="text-lg font-semibold">Vista previa</h3>
         </div>
 
-        {/* Image Preview - Exact size: 1200x800 (3:2) */}
-        <div className="relative w-full bg-muted flex items-center justify-center">
-          <Image
-            src={imageUrl}
-            alt="Share preview"
-            width={1200}
-            height={800}
-            className="object-contain max-w-full h-auto"
-            unoptimized
-          />
+        {/* Image Preview - Responsive 1200x800 (3:2 aspect ratio) */}
+        <div className="relative w-full bg-muted flex items-center justify-center overflow-hidden">
+          <div className="w-full max-w-[1200px] aspect-[3/2]">
+            <Image
+              src={imageUrl}
+              alt="Share preview"
+              width={1200}
+              height={800}
+              className="w-full h-full object-contain"
+              unoptimized
+            />
+          </div>
         </div>
 
         {/* Quick platform share buttons and Download */}
         <div className="p-4 border-t bg-muted/30">
           <TooltipProvider>
-            <div className="flex items-center justify-between gap-4">
-              {/* Left side: Download + Copy Image (desktop) / Share (mobile) */}
+            {/* Mobile: Simple Download + Compartir */}
+            <div className="flex md:hidden items-center gap-2 w-full">
+              <Button
+                onClick={handleDownload}
+                variant="outline"
+                className="gap-2 flex-1"
+              >
+                <Download className="h-4 w-4" />
+                Descargar
+              </Button>
+
+              <Button
+                onClick={handleShare}
+                disabled={isSharing}
+                variant="outline"
+                className="gap-2 flex-1"
+              >
+                {isSharing ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Share2 className="h-4 w-4" />
+                )}
+                Compartir
+              </Button>
+            </div>
+
+            {/* Desktop: Download + Copy + Social Buttons */}
+            <div className="hidden md:flex items-center justify-between gap-4">
+              {/* Left side: Download + Copy Image */}
               <div className="flex items-center gap-2">
                 <Button
                   onClick={handleDownload}
@@ -230,29 +259,13 @@ export function SharePreviewModal({
                   Descargar
                 </Button>
 
-                {/* Copy Image - Desktop only */}
                 <Button
                   onClick={handleCopyImage}
                   variant="outline"
-                  className="gap-2 flex-shrink-0 hidden md:flex"
+                  className="gap-2 flex-shrink-0"
                 >
                   <Copy className="h-4 w-4" />
                   Copiar Imagen
-                </Button>
-
-                {/* Share - Mobile only */}
-                <Button
-                  onClick={handleShare}
-                  disabled={isSharing}
-                  variant="outline"
-                  className="gap-2 flex-shrink-0 md:hidden"
-                >
-                  {isSharing ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Share2 className="h-4 w-4" />
-                  )}
-                  Compartir
                 </Button>
               </div>
 

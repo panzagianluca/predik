@@ -44,6 +44,7 @@ import {
   Clock,
   ChevronDown,
   ChevronUp,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -748,7 +749,7 @@ export default function MarketDetailPage() {
                       "overflow-hidden transition-all duration-500 ease-in-out",
                       isMobileStatsExpanded
                         ? "max-h-[2000px] opacity-100 mt-4"
-                        : "max-h-0 opacity-0",
+                        : "max-h-0 opacity-0 mt-0",
                     )}
                   >
                     <div className="space-y-3">
@@ -850,7 +851,7 @@ export default function MarketDetailPage() {
               </Card>
 
               {/* Timeline - Mobile Only (shown after stats) */}
-              <div className="lg:hidden">
+              <div className="lg:hidden mt-8">
                 <MarketTimeline market={market} />
               </div>
 
@@ -1104,9 +1105,12 @@ export default function MarketDetailPage() {
                 className="lg:hidden fixed bottom-16 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border z-40 hover:bg-muted/50 transition-colors"
               >
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
-                  <span className="font-semibold text-purple-600 dark:text-purple-400">
-                    Mi Predicción
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                    <span className="font-semibold text-purple-600 dark:text-purple-400">
+                      Mi Predicción
+                    </span>
+                  </div>
                   <ChevronUp className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                 </div>
               </button>
