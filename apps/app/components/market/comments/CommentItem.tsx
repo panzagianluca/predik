@@ -55,9 +55,11 @@ export function CommentItem({
   isReply = false,
 }: CommentItemProps) {
   const [showReportDialog, setShowReportDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [reportReason, setReportReason] = useState<string>("");
   const [reportDetails, setReportDetails] = useState<string>("");
   const [isReporting, setIsReporting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Case-insensitive comparison for ownership check
   const isOwner =
@@ -189,7 +191,7 @@ export function CommentItem({
 
               {isOwner && onDelete && (
                 <button
-                  onClick={() => onDelete(comment.id)}
+                  onClick={() => setShowDeleteDialog(true)}
                   className="flex items-center gap-1 text-xs text-red-500 hover:underline"
                 >
                   <Trash2 className="h-3 w-3" />
@@ -263,6 +265,52 @@ export function CommentItem({
                     {isReporting ? "Reportando..." : "Reportar"}
                   </Button>
                 </div>
+              </div>
+            </DialogContent>
+          </DialogPortal>
+        </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+          <DialogPortal>
+            <DialogOverlay className="bg-black/50" />
+            <DialogContent className="bg-background border border-border rounded-lg p-6 max-w-md w-full space-y-4">
+              <DialogHeader>
+                <DialogTitle className="text-lg font-semibold">
+                  Eliminar Comentario
+                </DialogTitle>
+                <p className="text-sm text-muted-foreground mt-1">
+                  ¿Estás seguro de eliminar este comentario? Esta acción no se
+                  puede deshacer.
+                </p>
+              </DialogHeader>
+
+              <div className="flex gap-2 justify-end">
+                <Button
+                  variant="ghost"
+                  onClick={() => setShowDeleteDialog(false)}
+                  disabled={isDeleting}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={async () => {
+                    if (!onDelete) return;
+                    setIsDeleting(true);
+                    try {
+                      await onDelete(comment.id);
+                      setShowDeleteDialog(false);
+                    } catch (error) {
+                      // Error already handled in parent
+                    } finally {
+                      setIsDeleting(false);
+                    }
+                  }}
+                  disabled={isDeleting}
+                  className="bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
+                >
+                  {isDeleting ? "Eliminando..." : "Eliminar"}
+                </Button>
               </div>
             </DialogContent>
           </DialogPortal>

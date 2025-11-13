@@ -2,6 +2,9 @@ import { MarketCard } from "@/components/market/MarketCard";
 import { Market } from "@/types/market";
 import { GlowingButton } from "@/components/ui/glowing-button";
 
+// Force dynamic rendering to avoid build-time API calls that can timeout
+export const dynamic = "force-dynamic";
+
 async function getFeaturedMarkets(): Promise<Market[]> {
   try {
     const response = await fetch(

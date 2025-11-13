@@ -60,7 +60,7 @@ export function MarketTimeline({ market }: MarketTimelineProps) {
     },
   ];
 
-  if (market.state === "resolved" && winningOutcome) {
+  if (market.state === "resolved") {
     timelineEvents.push({
       icon: Trophy,
       label: "Resuelto",
