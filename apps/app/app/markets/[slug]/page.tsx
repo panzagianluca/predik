@@ -46,6 +46,11 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/animate-ui/primitives/animate/tooltip";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/animate-ui/primitives/animate/tooltip";
 import CountUp from "react-countup";
 import { haptics } from "@/lib/haptics";
 import {
@@ -283,27 +288,33 @@ export default function MarketDetailPage() {
                       )}
 
                       {/* BNB Chain Badge - Links to Prediction Market contract */}
-                      <a
-                        href={`https://bscscan.com/address/${process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS}#readContract`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center hover:opacity-80 transition-opacity"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          haptics.light();
-                        }}
-                        title={`Ver mercado #${market.id} en BscScan`}
-                      >
-                        <div className="relative w-4 h-4 flex items-center justify-center">
-                          <Image
-                            src="/bnb-seeklogo.svg"
-                            alt="BNB Chain"
-                            fill
-                            sizes="16px"
-                            className="object-contain"
-                          />
-                        </div>
-                      </a>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <a
+                            href={`https://bscscan.com/address/${process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS}#readContract`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center hover:opacity-80 transition-opacity"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              haptics.light();
+                            }}
+                          >
+                            <div className="relative w-4 h-4 flex items-center justify-center">
+                              <Image
+                                src="/bnb-seeklogo.svg"
+                                alt="BNB Chain"
+                                fill
+                                sizes="16px"
+                                className="object-contain"
+                              />
+                            </div>
+                          </a>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Mercado #{market.id} en BNB Chain
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
                   </div>
 
@@ -352,27 +363,33 @@ export default function MarketDetailPage() {
                   )}
 
                   {/* BNB Chain Badge - Links to Prediction Market contract */}
-                  <a
-                    href={`https://bscscan.com/address/${process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS}#readContract`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center hover:opacity-80 transition-opacity"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      haptics.light();
-                    }}
-                    title={`Ver mercado #${market.id} en BscScan`}
-                  >
-                    <div className="relative w-3.5 h-3.5 flex items-center justify-center">
-                      <Image
-                        src="/bnb-seeklogo.svg"
-                        alt="BNB Chain"
-                        fill
-                        sizes="14px"
-                        className="object-contain"
-                      />
-                    </div>
-                  </a>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <a
+                        href={`https://bscscan.com/address/${process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS}#readContract`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center hover:opacity-80 transition-opacity"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          haptics.light();
+                        }}
+                      >
+                        <div className="relative w-3.5 h-3.5 flex items-center justify-center">
+                          <Image
+                            src="/bnb-seeklogo.svg"
+                            alt="BNB Chain"
+                            fill
+                            sizes="14px"
+                            className="object-contain"
+                          />
+                        </div>
+                      </a>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      Mercado #{market.id} en BNB Chain
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
 
                 {/* Share Button - Mobile only */}
