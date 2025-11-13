@@ -8,6 +8,7 @@ import { MessageSquare } from "lucide-react";
 import { fetchUserProfile } from "@/lib/userUtils";
 import { logger } from "@/lib/logger";
 import { getProfilePicture } from "@/lib/profileUtils";
+import { toast } from "sonner";
 
 interface CommentSectionProps {
   marketId: string;
@@ -120,8 +121,10 @@ export function CommentSection({ marketId, userAddress }: CommentSectionProps) {
   };
 
   const handleDeleteComment = async (commentId: string) => {
-    if (!userAddress) return;
-    if (!confirm("¿Estás seguro de eliminar este comentario?")) return;
+    if (!userAddress) {
+      toast.error("Debes conectar tu wallet para eliminar comentarios");
+      throw new Error("Wallet not connected");
+    }
 
     try {
       const response = await fetch(
@@ -144,7 +147,10 @@ export function CommentSection({ marketId, userAddress }: CommentSectionProps) {
       });
     } catch (error) {
       logger.error("Error deleting comment:", error);
-      alert("Error al eliminar comentario");
+      toast.error("Error al eliminar comentario");
+      throw error instanceof Error
+        ? error
+        : new Error("Error al eliminar comentario");
     }
   };
 

@@ -14,6 +14,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogPortal,
   DialogOverlay,
 } from "@/components/animate-ui/primitives/radix/dialog";
@@ -211,9 +212,9 @@ export function CommentItem({
                 <DialogTitle className="text-lg font-semibold">
                   Reportar Comentario
                 </DialogTitle>
-                <p className="text-sm text-muted-foreground mt-1">
+                <DialogDescription className="text-sm text-muted-foreground mt-1">
                   Selecciona una razón para reportar este comentario
-                </p>
+                </DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4">
@@ -279,10 +280,10 @@ export function CommentItem({
                 <DialogTitle className="text-lg font-semibold">
                   Eliminar Comentario
                 </DialogTitle>
-                <p className="text-sm text-muted-foreground mt-1">
+                <DialogDescription className="text-sm text-muted-foreground mt-1">
                   ¿Estás seguro de eliminar este comentario? Esta acción no se
                   puede deshacer.
-                </p>
+                </DialogDescription>
               </DialogHeader>
 
               <div className="flex gap-2 justify-end">
