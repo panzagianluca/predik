@@ -34,7 +34,7 @@ export function MarketTimeline({ market }: MarketTimelineProps) {
   };
 
   const winningOutcome = market.outcomes.find(
-    (o) => o.id === market.resolvedOutcomeId,
+    (o) => o.id === market.resolvedOutcomeId || o.price === 1,
   );
 
   const timelineEvents = [
@@ -119,7 +119,7 @@ export function MarketTimeline({ market }: MarketTimelineProps) {
                   </div>
 
                   {/* Content */}
-                  <div className="flex-1 pb-6">
+                  <div className={cn("flex-1", !isLast && "pb-6")}>
                     <p
                       className={cn(
                         "text-sm font-medium",
