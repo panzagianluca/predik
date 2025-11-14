@@ -191,19 +191,43 @@ async function translateMarketToSpanish(market: any): Promise<any> {
     });
 
     // Store in database for future use
-    const [newTranslation] = await db
-      .insert(marketTranslations)
-      .values({
-        marketId: market.id,
-        marketSlug: market.slug,
-        titleEs,
-        descriptionEs,
-        titleEn: market.title,
-        descriptionEn: market.description,
-      })
-      .returning();
+    try {
+      const [newTranslation] = await db
+        .insert(marketTranslations)
+        .values({
+          marketId: market.id,
+          marketSlug: market.slug,
+          titleEs,
+          descriptionEs,
+          titleEn: market.title,
+          descriptionEn: market.description,
+        })
+        .returning();
 
-    translation = newTranslation;
+      translation = newTranslation;
+    } catch (error: any) {
+      // Handle race condition: another request already created the translation
+      if (error.code === "23505" || error.message?.includes("duplicate key")) {
+        logger.log(
+          `⚡ Race condition detected for ${market.slug}, fetching existing translation...`,
+        );
+        // Fetch the translation that was created by the other request
+        translation = await db
+          .select()
+          .from(marketTranslations)
+          .where(eq(marketTranslations.marketSlug, market.slug))
+          .limit(1)
+          .then((rows) => rows[0]);
+
+        if (!translation) {
+          // If still not found, throw the original error
+          throw error;
+        }
+      } else {
+        // Re-throw any other errors
+        throw error;
+      }
+    }
   }
 
   // Return market with Spanish translations

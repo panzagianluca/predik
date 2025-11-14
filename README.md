@@ -208,7 +208,7 @@ Create `apps/app/.env.local`:
 
 ```bash
 # Database (Neon PostgreSQL)
-DATABASE_URL=postgresql://user:password@host:port/database
+DATABASE_URL=postgresql://user:password@host:port/database  # pragma: allowlist secret
 
 # Blockchain (BNB Smart Chain)
 NEXT_PUBLIC_CHAIN_ID=56
@@ -671,10 +671,8 @@ echo $NEXT_PUBLIC_PREDICTION_MARKET_QUERIER
 ### 🚧 In Progress
 
 - [ ] Admin panel UI completion
-- [ ] Cloudflare Zero Trust setup
-- [ ] Custom domain configuration
+- [ ] Cloudflare Zero Trust configuration
 - [ ] Notification system (backend)
-- [ ] Market resolution tracking
 
 ### 📋 Planned Features
 
@@ -693,15 +691,12 @@ echo $NEXT_PUBLIC_PREDICTION_MARKET_QUERIER
 
 - **Website**: [predik.io](https://predik.io)
 - **App**: [app.predik.io](https://app.predik.io)
-- **Twitter**: [@predik_io](https://twitter.com/predik_io)
-- **Telegram**: [t.me/predik_official](https://t.me/predik_official)
-- **Documentation**: [docs.predik.io](https://docs.predik.io)
+- **Twitter**: [@predikapp](https://twitter.com/predikapp)
 
 ### Contact
 
-- **Email**: hello@predik.io
 - **Support**: support@predik.io
-- **Admin**: admin@predik.io
+- **Admin**: gianluca@predik.io
 
 ---
 
