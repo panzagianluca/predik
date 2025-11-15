@@ -918,10 +918,7 @@ export function TradingPanel({
                       </span>
                       <TooltipProvider>
                         <Tooltip>
-                          <TooltipTrigger
-                            asChild={false}
-                            className="inline-flex cursor-help"
-                          >
+                          <TooltipTrigger className="inline-flex cursor-help">
                             <Info className="h-3 w-3 text-muted-foreground" />
                           </TooltipTrigger>
                           <TooltipContent>

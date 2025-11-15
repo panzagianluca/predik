@@ -47,8 +47,14 @@ type TooltipTriggerProps = React.ComponentProps<
   typeof TooltipPrimitive.Trigger
 >;
 
-function TooltipTrigger(props: TooltipTriggerProps) {
-  return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />;
+function TooltipTrigger({ asChild = false, ...props }: TooltipTriggerProps) {
+  return (
+    <TooltipPrimitive.Trigger
+      asChild={asChild}
+      data-slot="tooltip-trigger"
+      {...props}
+    />
+  );
 }
 
 type TooltipPortalProps = Omit<
