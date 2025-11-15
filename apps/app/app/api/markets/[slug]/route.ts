@@ -26,8 +26,17 @@ export async function GET(
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      logger.error(`❌ Myriad API error for ${slug}:`, {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText,
+      });
       return NextResponse.json(
-        { error: `Failed to fetch market: ${response.statusText}` },
+        {
+          error: `Failed to fetch market: ${response.statusText}`,
+          details: errorText,
+        },
         { status: response.status },
       );
     }
@@ -159,7 +168,10 @@ export async function GET(
   } catch (error) {
     logger.error("Error fetching market:", error);
     return NextResponse.json(
-      { error: "Failed to fetch market" },
+      {
+        error: "Failed to fetch market",
+        message: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 },
     );
   }

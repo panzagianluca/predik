@@ -272,7 +272,7 @@ export function SharePreviewModal({
               {/* Social Share Buttons */}
               <div className="flex items-center gap-2">
                 <Tooltip>
-                  <TooltipTrigger asChild>
+                  <TooltipTrigger>
                     <Button
                       onClick={handleShareToTelegram}
                       variant="outline"
@@ -293,7 +293,7 @@ export function SharePreviewModal({
                 </Tooltip>
 
                 <Tooltip>
-                  <TooltipTrigger asChild>
+                  <TooltipTrigger>
                     <Button
                       onClick={handleShareToX}
                       variant="outline"
@@ -314,7 +314,7 @@ export function SharePreviewModal({
                 </Tooltip>
 
                 <Tooltip>
-                  <TooltipTrigger asChild>
+                  <TooltipTrigger>
                     <Button
                       onClick={handleShareToInstagram}
                       variant="outline"
@@ -335,7 +335,7 @@ export function SharePreviewModal({
                 </Tooltip>
 
                 <Tooltip>
-                  <TooltipTrigger asChild>
+                  <TooltipTrigger>
                     <Button
                       onClick={handleShareToWhatsApp}
                       variant="outline"
@@ -356,7 +356,7 @@ export function SharePreviewModal({
                 </Tooltip>
 
                 <Tooltip>
-                  <TooltipTrigger asChild>
+                  <TooltipTrigger>
                     <Button
                       onClick={handleShareToFacebook}
                       variant="outline"

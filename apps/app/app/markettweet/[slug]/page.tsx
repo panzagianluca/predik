@@ -613,15 +613,13 @@ export default function MarketTweetPage() {
 
                         return (
                           <Tooltip key={`${day}-${count}`}>
-                            <TooltipTrigger asChild>
-                              <div
-                                className="w-3 bg-muted-foreground/30 rounded-t-sm transition-all hover:bg-foreground/40 cursor-pointer"
-                                style={{
-                                  height: `${height}%`,
-                                  opacity: opacity,
-                                }}
-                              />
-                            </TooltipTrigger>
+                            <TooltipTrigger
+                              className="w-3 bg-muted-foreground/30 rounded-t-sm transition-all hover:bg-foreground/40 cursor-pointer"
+                              style={{
+                                height: `${height}%`,
+                                opacity: opacity,
+                              }}
+                            />
                             <TooltipContent>
                               <div className="text-xs">
                                 <div className="font-semibold">{day} Nov</div>
