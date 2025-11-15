@@ -665,6 +665,12 @@ export function MobileTradingModal({
                   placeholder="0.00"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleExecuteTrade();
+                    }
+                  }}
                   min="0"
                   step="0.01"
                   disabled={isExecuting}
