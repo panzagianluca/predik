@@ -435,7 +435,10 @@ export function MarketCard({ market }: MarketCardProps) {
           {/* Close Date */}
           {/* Left: Date */}
           <Tooltip>
-            <TooltipTrigger className="flex items-center gap-1 hover:text-foreground transition-colors duration-200 cursor-help">
+            <TooltipTrigger
+              asChild={false}
+              className="flex items-center gap-1 hover:text-foreground transition-colors duration-200 cursor-help"
+            >
               <Calendar className="w-3 h-3" />
               <span>{formatRelativeDate(market.expiresAt)}</span>
             </TooltipTrigger>
@@ -446,7 +449,10 @@ export function MarketCard({ market }: MarketCardProps) {
 
           {/* Center: Volume */}
           <Tooltip>
-            <TooltipTrigger className="flex items-center justify-center gap-1 flex-1 hover:text-foreground transition-colors duration-200 cursor-help">
+            <TooltipTrigger
+              asChild={false}
+              className="flex items-center justify-center gap-1 flex-1 hover:text-foreground transition-colors duration-200 cursor-help"
+            >
               <TrendingUp className="w-3 h-3" />
               <span>{formatVolume(market.volume)}</span>
             </TooltipTrigger>
@@ -459,49 +465,55 @@ export function MarketCard({ market }: MarketCardProps) {
           <div className="flex items-center gap-2">
             {/* BNB Network Badge */}
             <Tooltip>
-              <TooltipTrigger
-                onClick={(e) => {
-                  e.stopPropagation();
-                  haptics.light();
-                  window.open(
-                    `https://bscscan.com/address/${process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS}#readContract`,
-                    "_blank",
-                    "noopener,noreferrer",
-                  );
-                }}
-                className="flex items-center hover:opacity-80 transition-opacity cursor-pointer underline decoration-dotted"
-                title={`Ver mercado #${market.id} en BscScan`}
-              >
-                <div className="relative w-3.5 h-3.5 flex items-center justify-center">
-                  <Image
-                    src="/bnb-seeklogo.svg"
-                    alt="BNB"
-                    fill
-                    sizes="14px"
-                    className="object-contain"
-                  />
-                </div>
+              <TooltipTrigger asChild={false}>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    haptics.light();
+                    window.open(
+                      `https://bscscan.com/address/${process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS}#readContract`,
+                      "_blank",
+                      "noopener,noreferrer",
+                    );
+                  }}
+                  className="flex items-center hover:opacity-80 transition-opacity cursor-pointer underline decoration-dotted"
+                  title={`Ver mercado #${market.id} en BscScan`}
+                  type="button"
+                >
+                  <div className="relative w-3.5 h-3.5 flex items-center justify-center">
+                    <Image
+                      src="/bnb-seeklogo.svg"
+                      alt="BNB"
+                      fill
+                      sizes="14px"
+                      className="object-contain"
+                    />
+                  </div>
+                </button>
               </TooltipTrigger>
               <TooltipContent>Mercado en la red de BNB</TooltipContent>
             </Tooltip>
 
             {/* Save/Bookmark Button */}
             <Tooltip>
-              <TooltipTrigger
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  toggleSave(market.id);
-                  haptics.selection();
-                }}
-                className="flex items-center hover:text-foreground transition-colors cursor-pointer"
-              >
-                <Bookmark
-                  className={cn(
-                    "w-3.5 h-3.5",
-                    isSaved && "fill-electric-purple text-electric-purple",
-                  )}
-                />
+              <TooltipTrigger asChild={false}>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleSave(market.id);
+                    haptics.selection();
+                  }}
+                  className="flex items-center hover:text-foreground transition-colors cursor-pointer"
+                  type="button"
+                >
+                  <Bookmark
+                    className={cn(
+                      "w-3.5 h-3.5",
+                      isSaved && "fill-electric-purple text-electric-purple",
+                    )}
+                  />
+                </button>
               </TooltipTrigger>
               <TooltipContent>
                 {isSaved ? "Guardado" : "Guardar mercado"}
