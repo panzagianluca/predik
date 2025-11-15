@@ -910,24 +910,22 @@ export default function MarketDetailPage() {
             <div className="space-y-6">
               {/* Trading Panel / User Position - Desktop Only */}
               <div className="hidden lg:block">
-                <TooltipProvider>
-                  {(market.state === "closed" || market.state === "resolved") &&
-                  isConnected &&
-                  address ? (
-                    <UserPositionCard
-                      market={market}
-                      userAddress={address}
-                      onClaimSuccess={handleTradeComplete}
-                    />
-                  ) : (
-                    <TradingPanel
-                      market={market}
-                      userAddress={address}
-                      isConnected={isConnected}
-                      onTradeComplete={handleTradeComplete}
-                    />
-                  )}
-                </TooltipProvider>
+                {(market.state === "closed" || market.state === "resolved") &&
+                isConnected &&
+                address ? (
+                  <UserPositionCard
+                    market={market}
+                    userAddress={address}
+                    onClaimSuccess={handleTradeComplete}
+                  />
+                ) : (
+                  <TradingPanel
+                    market={market}
+                    userAddress={address}
+                    isConnected={isConnected}
+                    onTradeComplete={handleTradeComplete}
+                  />
+                )}
               </div>
 
               {/* Market Stats - Desktop Only */}
