@@ -759,10 +759,7 @@ export function MobileTradingModal({
                           </span>
                           <TooltipProvider>
                             <Tooltip>
-                              <TooltipTrigger
-                                className="inline-flex cursor-help"
-                                type="button"
-                              >
+                              <TooltipTrigger className="inline-flex cursor-help">
                                 <Info className="h-3 w-3 text-muted-foreground" />
                               </TooltipTrigger>
                               <TooltipContent>
