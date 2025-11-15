@@ -308,16 +308,14 @@ export default function ProfilePage() {
                         <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
                         <span className="text-sm">Vinculado</span>
                         <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div className="cursor-help">
-                              <Image
-                                src="/SocialMedia/google-icon-logo-svgrepo-com.svg"
-                                alt="Google"
-                                width={20}
-                                height={20}
-                                className="flex-shrink-0"
-                              />
-                            </div>
+                          <TooltipTrigger className="cursor-help inline-flex">
+                            <Image
+                              src="/SocialMedia/google-icon-logo-svgrepo-com.svg"
+                              alt="Google"
+                              width={20}
+                              height={20}
+                              className="flex-shrink-0"
+                            />
                           </TooltipTrigger>
                           <TooltipContent>
                             {(linkedGoogle as any).email ||
@@ -330,16 +328,14 @@ export default function ProfilePage() {
                         <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
                         <span className="text-sm">Vinculado</span>
                         <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div className="cursor-help">
-                              <Image
-                                src="/SocialMedia/PhXLogo.svg"
-                                alt="X"
-                                width={20}
-                                height={20}
-                                className="flex-shrink-0 dark:invert"
-                              />
-                            </div>
+                          <TooltipTrigger className="cursor-help inline-flex">
+                            <Image
+                              src="/SocialMedia/PhXLogo.svg"
+                              alt="X"
+                              width={20}
+                              height={20}
+                              className="flex-shrink-0 dark:invert"
+                            />
                           </TooltipTrigger>
                           <TooltipContent>
                             {(linkedTwitter as any).username ||
@@ -356,16 +352,14 @@ export default function ProfilePage() {
                         <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
                         <span className="text-sm">Vinculado</span>
                         <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div className="cursor-help">
-                              <Image
-                                src="/SocialMedia/google-icon-logo-svgrepo-com.svg"
-                                alt="Google"
-                                width={20}
-                                height={20}
-                                className="flex-shrink-0"
-                              />
-                            </div>
+                          <TooltipTrigger className="cursor-help inline-flex">
+                            <Image
+                              src="/SocialMedia/google-icon-logo-svgrepo-com.svg"
+                              alt="Google"
+                              width={20}
+                              height={20}
+                              className="flex-shrink-0"
+                            />
                           </TooltipTrigger>
                           <TooltipContent>
                             {(linkedGoogle as any).email ||
@@ -411,16 +405,14 @@ export default function ProfilePage() {
                         <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
                         <span className="text-sm">Vinculado</span>
                         <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div className="cursor-help">
-                              <Image
-                                src="/SocialMedia/PhXLogo.svg"
-                                alt="X"
-                                width={20}
-                                height={20}
-                                className="flex-shrink-0 dark:invert"
-                              />
-                            </div>
+                          <TooltipTrigger className="cursor-help inline-flex">
+                            <Image
+                              src="/SocialMedia/PhXLogo.svg"
+                              alt="X"
+                              width={20}
+                              height={20}
+                              className="flex-shrink-0 dark:invert"
+                            />
                           </TooltipTrigger>
                           <TooltipContent>
                             {(linkedTwitter as any).username ||
