@@ -760,7 +760,9 @@ export function MobileTradingModal({
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Info className="h-3 w-3 text-muted-foreground" />
+                                <button type="button" className="inline-flex">
+                                  <Info className="h-3 w-3 text-muted-foreground" />
+                                </button>
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p className="text-xs">

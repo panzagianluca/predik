@@ -919,7 +919,9 @@ export function TradingPanel({
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                            <button type="button" className="inline-flex">
+                              <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                            </button>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p className="text-xs">
