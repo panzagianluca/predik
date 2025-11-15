@@ -109,7 +109,18 @@ export async function GET(
     };
 
     // 🌐 TRANSLATION: Get Spanish translation from DB or create it
-    const translatedData = await translateMarketToSpanish(responseData);
+    let translatedData;
+    try {
+      translatedData = await translateMarketToSpanish(responseData);
+    } catch (translationError) {
+      logger.error(`Translation failed for ${slug}:`, translationError);
+      // Fall back to original data without translation
+      translatedData = {
+        ...responseData,
+        titleEs: responseData.title,
+        descriptionEs: responseData.description,
+      };
+    }
 
     // Fire-and-forget: pre-warm holders cache so the Holders tab can show results instantly
     try {
@@ -219,7 +230,14 @@ async function translateMarketToSpanish(market: any): Promise<any> {
       translation = newTranslation;
     } catch (error: any) {
       // Handle race condition: another request already created the translation
-      if (error.code === "23505" || error.message?.includes("duplicate key")) {
+      const errorCode = error.code || error.cause?.code;
+      const errorMessage = error.message || error.cause?.message || "";
+
+      if (
+        errorCode === "23505" ||
+        errorMessage.includes("duplicate key") ||
+        errorMessage.includes("market_translations_market_id_unique")
+      ) {
         logger.log(
           `⚡ Race condition detected for ${market.slug}, fetching existing translation...`,
         );
