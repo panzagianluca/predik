@@ -435,12 +435,11 @@ export function MarketCard({ market }: MarketCardProps) {
           {/* Close Date */}
           {/* Left: Date */}
           <Tooltip>
-            <TooltipTrigger
-              asChild={false}
-              className="flex items-center gap-1 hover:text-foreground transition-colors duration-200 cursor-help"
-            >
-              <Calendar className="w-3 h-3" />
-              <span>{formatRelativeDate(market.expiresAt)}</span>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1 hover:text-foreground transition-colors duration-200 cursor-help">
+                <Calendar className="w-3 h-3" />
+                <span>{formatRelativeDate(market.expiresAt)}</span>
+              </div>
             </TooltipTrigger>
             <TooltipContent>
               Cierra: {formatAbsoluteDate(market.expiresAt)}
@@ -449,12 +448,11 @@ export function MarketCard({ market }: MarketCardProps) {
 
           {/* Center: Volume */}
           <Tooltip>
-            <TooltipTrigger
-              asChild={false}
-              className="flex items-center justify-center gap-1 flex-1 hover:text-foreground transition-colors duration-200 cursor-help"
-            >
-              <TrendingUp className="w-3 h-3" />
-              <span>{formatVolume(market.volume)}</span>
+            <TooltipTrigger asChild>
+              <div className="flex items-center justify-center gap-1 flex-1 hover:text-foreground transition-colors duration-200 cursor-help">
+                <TrendingUp className="w-3 h-3" />
+                <span>{formatVolume(market.volume)}</span>
+              </div>
             </TooltipTrigger>
             <TooltipContent>
               Volumen: {formatFullVolume(market.volume)}
@@ -465,7 +463,7 @@ export function MarketCard({ market }: MarketCardProps) {
           <div className="flex items-center gap-2">
             {/* BNB Network Badge */}
             <Tooltip>
-              <TooltipTrigger asChild={false}>
+              <TooltipTrigger asChild>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -496,7 +494,7 @@ export function MarketCard({ market }: MarketCardProps) {
 
             {/* Save/Bookmark Button */}
             <Tooltip>
-              <TooltipTrigger asChild={false}>
+              <TooltipTrigger asChild>
                 <button
                   onClick={(e) => {
                     e.preventDefault();

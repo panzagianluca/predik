@@ -47,7 +47,7 @@ type TooltipTriggerProps = React.ComponentProps<
   typeof TooltipPrimitive.Trigger
 >;
 
-function TooltipTrigger({ asChild = false, ...props }: TooltipTriggerProps) {
+function TooltipTrigger({ asChild = true, ...props }: TooltipTriggerProps) {
   return (
     <TooltipPrimitive.Trigger
       asChild={asChild}
