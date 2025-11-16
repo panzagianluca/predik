@@ -2,6 +2,7 @@
 
 import { useReadContract, useAccount } from "wagmi";
 import { formatUnits } from "viem";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 // TODO: Update this address when migrating to CELO Mainnet
 // Current: Celo Sepolia Testnet USDT
@@ -29,6 +30,13 @@ const ERC20_ABI = [
 /**
  * Hook to get USDT token balance for the connected wallet
  *
+ * When user has multiple linked wallets (e.g., MetaMask + Google embedded wallet),
+ * this will check the balance of whichever wallet is currently active.
+ *
+ * Priority:
+ * 1. External wallet (MetaMask, etc.) if connected via wagmi
+ * 2. Primary wallet from Dynamic (embedded or linked wallet)
+ *
  * @returns {Object} balance information
  * @returns {string} formatted - Formatted balance as string (e.g., "100.50")
  * @returns {bigint | undefined} raw - Raw balance in smallest unit
@@ -41,6 +49,10 @@ const ERC20_ABI = [
  */
 export function useUSDTBalance() {
   const { address } = useAccount();
+  const { primaryWallet } = useDynamicContext();
+
+  // Use external wallet if connected, otherwise use primary wallet from Dynamic
+  const walletAddress = address || primaryWallet?.address;
 
   const {
     data: balance,
@@ -50,9 +62,9 @@ export function useUSDTBalance() {
     address: USDT_TOKEN_ADDRESS,
     abi: ERC20_ABI,
     functionName: "balanceOf",
-    args: address ? [address] : undefined,
+    args: walletAddress ? [walletAddress as `0x${string}`] : undefined,
     query: {
-      enabled: !!address, // Only fetch when address is available
+      enabled: !!walletAddress, // Only fetch when address is available
       refetchInterval: 10000, // Refetch every 10 seconds
     },
   });

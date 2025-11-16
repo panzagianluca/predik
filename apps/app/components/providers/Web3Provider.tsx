@@ -43,10 +43,15 @@ export function Web3Provider({ children }: { children: ReactNode }) {
         environmentId: process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID!,
         walletConnectors: [EthereumWalletConnectors],
         // Multi-wallet configuration
-        // Allows users to connect with any wallet (Google, MetaMask, X, etc.) from any device
-        // and link multiple wallets to one account
-        // Note: Social logins (Google, Twitter, etc.) are configured in the Dynamic Dashboard
+        // NEW users with Google/social login → auto-create embedded wallet
+        // EXISTING users with linked wallet → use their existing wallet (DON'T create new one)
+        // Social logins (Google, Twitter, etc.) are configured in the Dynamic Dashboard
         // at https://app.dynamic.xyz/dashboard/configurations
+        recommendedWallets: [
+          {
+            walletKey: "metamask",
+          },
+        ],
         events: {
           // Handle authentication cancellation
           onAuthFlowCancel: () => {

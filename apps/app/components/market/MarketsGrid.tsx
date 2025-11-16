@@ -338,7 +338,8 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
               <div
                 className="grid gap-4"
                 style={{
-                  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+                  maxWidth: "100%",
                 }}
               >
                 {sortedMarkets.map((market, index) => (
