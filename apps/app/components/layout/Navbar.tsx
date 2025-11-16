@@ -544,11 +544,6 @@ export function Navbar() {
 
             {/* Right Side: Wallet + Menu */}
             <div className="flex items-center gap-3 ml-auto">
-              {/* Temporary simplified Dynamic widget - preserves all existing UI elements below */}
-              <div style={{ display: "none" }}>
-                <DynamicWidget />
-              </div>
-
               <div className="flex items-center gap-3">
                 {!address ? (
                   <>

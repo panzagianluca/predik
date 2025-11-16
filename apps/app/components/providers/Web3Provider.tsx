@@ -41,10 +41,11 @@ export function Web3Provider({ children }: { children: ReactNode }) {
       settings={{
         environmentId: process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID!,
         walletConnectors: [EthereumWalletConnectors],
-        // Multi-wallet is enabled via Dynamic Dashboard:
-        // https://app.dynamic.xyz/dashboard/log-in-user-profile
-        // Toggle "Multi-Wallet" in the "Branded Wallets" section
-        // This allows users to link multiple wallets (MetaMask, Google, X, etc.) to one account
+        // Multi-wallet configuration
+        // Allows users to connect with any wallet (Google, MetaMask, X, etc.) from any device
+        // and link multiple wallets to one account
+        // Note: Social logins (Google, Twitter, etc.) are configured in the Dynamic Dashboard
+        // at https://app.dynamic.xyz/dashboard/configurations
       }}
     >
       <WagmiProvider config={config}>
