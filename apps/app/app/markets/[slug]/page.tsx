@@ -1105,3 +1105,4 @@ export default function MarketDetailPage() {
     </div>
   );
 }
+// Build: 1763296232 - to trigger just a new vercel build
