@@ -71,7 +71,10 @@ export function Navbar() {
   const { formatted: usdtBalance, isLoading: isLoadingBalance } =
     useUSDTBalance();
   const { address } = useAccount();
-  const { setShowAuthFlow, handleLogOut } = useDynamicContext();
+  const { setShowAuthFlow, handleLogOut, user } = useDynamicContext();
+
+  // Check if user is authenticated (via wallet OR social login)
+  const isAuthenticated = !!address || !!user;
 
   // Avoid hydration mismatch
   useEffect(() => {
@@ -526,7 +529,7 @@ export function Navbar() {
                         onClick={() => {
                           setShowTutorial(false);
                           // If user is logged in, open deposit modal, otherwise open connect wallet
-                          if (address) {
+                          if (isAuthenticated) {
                             setShowDepositModal(true);
                           } else {
                             setShowAuthFlow(true);
@@ -545,7 +548,7 @@ export function Navbar() {
             {/* Right Side: Wallet + Menu */}
             <div className="flex items-center gap-3 ml-auto">
               <div className="flex items-center gap-3">
-                {!address ? (
+                {!isAuthenticated ? (
                   <>
                     <button
                       className="group/button relative inline-flex items-center justify-center overflow-hidden rounded-md bg-electric-purple backdrop-blur-lg px-6 h-9 text-[14px] sm:text-sm font-semibold text-white transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl hover:shadow-electric-purple/50"
@@ -667,27 +670,35 @@ export function Navbar() {
                 ) : (
                   // LOGGED IN STATE
                   <div className="flex items-center gap-3">
-                    {/* USDT Balance - Shows loading skeleton while fetching */}
-                    <div className="flex flex-col items-center justify-center h-9 px-2 sm:px-4 min-w-[60px] sm:min-w-[80px]">
-                      <span className="text-[10px] sm:text-[12px] leading-tight text-muted-foreground">
-                        Balance
-                      </span>
-                      {isLoadingBalance ? (
-                        <div className="h-5 w-12 sm:w-16 bg-muted animate-pulse rounded mt-0.5" />
-                      ) : (
-                        <span className="text-[14px] sm:text-[16px] font-bold leading-tight">
-                          ${parseFloat(usdtBalance).toFixed(2)}
+                    {/* USDT Balance - Only show if wallet is linked */}
+                    {address && (
+                      <div className="flex flex-col items-center justify-center h-9 px-2 sm:px-4 min-w-[60px] sm:min-w-[80px]">
+                        <span className="text-[10px] sm:text-[12px] leading-tight text-muted-foreground">
+                          Balance
                         </span>
-                      )}
-                    </div>
+                        {isLoadingBalance ? (
+                          <div className="h-5 w-12 sm:w-16 bg-muted animate-pulse rounded mt-0.5" />
+                        ) : (
+                          <span className="text-[14px] sm:text-[16px] font-bold leading-tight">
+                            ${parseFloat(usdtBalance).toFixed(2)}
+                          </span>
+                        )}
+                      </div>
+                    )}
 
-                    {/* Depositar Button - Always visible instantly when connected */}
+                    {/* Depositar Button OR Link Wallet Button */}
                     <button
                       className="group/button relative inline-flex items-center justify-center overflow-hidden rounded-md bg-electric-purple backdrop-blur-lg px-4 sm:px-6 h-9 text-[14px] sm:text-sm font-semibold text-white transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl hover:shadow-electric-purple/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                      onClick={() => setShowDepositModal(true)}
+                      onClick={() =>
+                        address
+                          ? setShowDepositModal(true)
+                          : setShowAuthFlow(true)
+                      }
                       type="button"
                     >
-                      <span className="relative z-10">Depositar</span>
+                      <span className="relative z-10">
+                        {address ? "Depositar" : "Vincular Wallet"}
+                      </span>
                       <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-13deg)_translateX(-100%)] group-hover/button:duration-1000 group-hover/button:[transform:skew(-13deg)_translateX(100%)]">
                         <div className="relative h-full w-10 bg-white/30"></div>
                       </div>
@@ -712,7 +723,12 @@ export function Navbar() {
                                 <div className="h-9 w-9 bg-muted animate-pulse rounded-xl" />
                               ) : (
                                 <Image
-                                  src={userAvatar || getProfilePicture(address)}
+                                  src={
+                                    userAvatar ||
+                                    getProfilePicture(
+                                      address || user?.email || "default",
+                                    )
+                                  }
                                   alt="Profile"
                                   fill
                                   sizes="36px"
@@ -731,18 +747,32 @@ export function Navbar() {
                             ease: "easeInOut",
                           }}
                         >
-                          {/* Wallet Address */}
+                          {/* Wallet Address or Email */}
                           <div className="px-2 py-2 text-sm font-satoshi text-muted-foreground flex items-center gap-2">
-                            <div className="relative w-4 h-4 flex items-center justify-center">
-                              <Image
-                                src="/bnb-seeklogo.svg"
-                                alt="BNB Chain"
-                                fill
-                                sizes="16px"
-                                className="object-contain"
-                              />
-                            </div>
-                            {`${address.slice(0, 6)}...${address.slice(-6)}`}
+                            {address ? (
+                              <>
+                                <div className="relative w-4 h-4 flex items-center justify-center">
+                                  <Image
+                                    src="/bnb-seeklogo.svg"
+                                    alt="BNB Chain"
+                                    fill
+                                    sizes="16px"
+                                    className="object-contain"
+                                  />
+                                </div>
+                                {`${address.slice(0, 6)}...${address.slice(
+                                  -6,
+                                )}`}
+                              </>
+                            ) : user?.email ? (
+                              <>
+                                <User className="h-4 w-4" />
+                                {user.email.slice(0, 20)}
+                                {user.email.length > 20 && "..."}
+                              </>
+                            ) : (
+                              <span>No wallet linked</span>
+                            )}
                           </div>
 
                           <DropdownMenuSeparator />
