@@ -180,7 +180,7 @@ export function MobileTradingModal({
       (polkamarkets as any).web3 = web3;
 
       if (provider.request) {
-        await window.ethereum.request({ method: "eth_requestAccounts" });
+        await provider.request({ method: "eth_requestAccounts" });
       }
 
       if (!market.token) {
