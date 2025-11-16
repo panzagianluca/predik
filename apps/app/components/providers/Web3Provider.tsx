@@ -9,6 +9,7 @@ import { config } from "@/lib/wagmi";
 import { ReactNode, useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { trackWalletConnected, trackWalletDisconnected } from "@/lib/posthog";
+import { toast } from "sonner";
 
 // Inner component to track wallet connections
 function WalletTracker() {
@@ -46,6 +47,23 @@ export function Web3Provider({ children }: { children: ReactNode }) {
         // and link multiple wallets to one account
         // Note: Social logins (Google, Twitter, etc.) are configured in the Dynamic Dashboard
         // at https://app.dynamic.xyz/dashboard/configurations
+        events: {
+          // Handle authentication cancellation
+          onAuthFlowCancel: () => {
+            toast.error("Autenticación cancelada", {
+              description:
+                "Podés intentar conectarte nuevamente cuando quieras",
+              duration: 4000,
+            });
+          },
+          // Handle successful authentication
+          onAuthSuccess: (args) => {
+            toast.success("¡Conectado con éxito!", {
+              description: "Tu wallet está lista para operar",
+              duration: 3000,
+            });
+          },
+        },
       }}
     >
       <WagmiProvider config={config}>
