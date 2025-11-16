@@ -71,10 +71,14 @@ export function Navbar() {
   const { formatted: usdtBalance, isLoading: isLoadingBalance } =
     useUSDTBalance();
   const { address } = useAccount();
-  const { setShowAuthFlow, handleLogOut, user } = useDynamicContext();
+  const { setShowAuthFlow, handleLogOut, user, primaryWallet } =
+    useDynamicContext();
 
-  // Check if user is authenticated (via wallet OR social login)
-  const isAuthenticated = !!address || !!user;
+  // Get wallet address from wagmi or Dynamic's primaryWallet (embedded wallet)
+  const walletAddress = address || primaryWallet?.address;
+
+  // Check if user is authenticated
+  const isAuthenticated = !!walletAddress || !!user;
 
   // Avoid hydration mismatch
   useEffect(() => {
@@ -84,7 +88,7 @@ export function Navbar() {
   // Load user avatar from database
   useEffect(() => {
     const loadUserAvatar = async () => {
-      if (!address) {
+      if (!walletAddress) {
         setUserAvatar("");
         setIsLoadingProfile(false);
         return;
@@ -95,26 +99,28 @@ export function Navbar() {
         // Add cache-busting timestamp to force fresh data
         const timestamp = Date.now();
         const response = await fetch(
-          `/api/profile/update?walletAddress=${address}&_t=${timestamp}`,
+          `/api/profile/update?walletAddress=${walletAddress}&_t=${timestamp}`,
           {
             cache: "no-store", // Prevent caching
           },
         );
         if (response.ok) {
           const userData = await response.json();
-          setUserAvatar(userData.customAvatar || getProfilePicture(address));
+          setUserAvatar(
+            userData.customAvatar || getProfilePicture(walletAddress),
+          );
         } else {
-          setUserAvatar(getProfilePicture(address));
+          setUserAvatar(getProfilePicture(walletAddress));
         }
       } catch (error) {
-        setUserAvatar(getProfilePicture(address));
+        setUserAvatar(getProfilePicture(walletAddress));
       } finally {
         setIsLoadingProfile(false);
       }
     };
 
     loadUserAvatar();
-  }, [address]);
+  }, [walletAddress]);
 
   // Handle logout - uses Dynamic's handleLogOut for proper cleanup
   const handleLogout = async () => {
@@ -670,35 +676,27 @@ export function Navbar() {
                 ) : (
                   // LOGGED IN STATE
                   <div className="flex items-center gap-3">
-                    {/* USDT Balance - Only show if wallet is linked */}
-                    {address && (
-                      <div className="flex flex-col items-center justify-center h-9 px-2 sm:px-4 min-w-[60px] sm:min-w-[80px]">
-                        <span className="text-[10px] sm:text-[12px] leading-tight text-muted-foreground">
-                          Balance
+                    {/* USDT Balance */}
+                    <div className="flex flex-col items-center justify-center h-9 px-2 sm:px-4 min-w-[60px] sm:min-w-[80px]">
+                      <span className="text-[10px] sm:text-[12px] leading-tight text-muted-foreground">
+                        Balance
+                      </span>
+                      {isLoadingBalance ? (
+                        <div className="h-5 w-12 sm:w-16 bg-muted animate-pulse rounded mt-0.5" />
+                      ) : (
+                        <span className="text-[14px] sm:text-[16px] font-bold leading-tight">
+                          ${parseFloat(usdtBalance).toFixed(2)}
                         </span>
-                        {isLoadingBalance ? (
-                          <div className="h-5 w-12 sm:w-16 bg-muted animate-pulse rounded mt-0.5" />
-                        ) : (
-                          <span className="text-[14px] sm:text-[16px] font-bold leading-tight">
-                            ${parseFloat(usdtBalance).toFixed(2)}
-                          </span>
-                        )}
-                      </div>
-                    )}
+                      )}
+                    </div>
 
-                    {/* Depositar Button OR Link Wallet Button */}
+                    {/* Depositar Button */}
                     <button
                       className="group/button relative inline-flex items-center justify-center overflow-hidden rounded-md bg-electric-purple backdrop-blur-lg px-4 sm:px-6 h-9 text-[14px] sm:text-sm font-semibold text-white transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl hover:shadow-electric-purple/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                      onClick={() =>
-                        address
-                          ? setShowDepositModal(true)
-                          : setShowAuthFlow(true)
-                      }
+                      onClick={() => setShowDepositModal(true)}
                       type="button"
                     >
-                      <span className="relative z-10">
-                        {address ? "Depositar" : "Vincular Wallet"}
-                      </span>
+                      <span className="relative z-10">Depositar</span>
                       <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-13deg)_translateX(-100%)] group-hover/button:duration-1000 group-hover/button:[transform:skew(-13deg)_translateX(100%)]">
                         <div className="relative h-full w-10 bg-white/30"></div>
                       </div>
@@ -726,7 +724,7 @@ export function Navbar() {
                                   src={
                                     userAvatar ||
                                     getProfilePicture(
-                                      address || user?.email || "default",
+                                      walletAddress || "default",
                                     )
                                   }
                                   alt="Profile"
