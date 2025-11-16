@@ -37,6 +37,8 @@ import {
   trackTradeCompleted,
   trackTradeFailed,
 } from "@/lib/posthog";
+import { useWalletClient } from "wagmi";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 interface TradingPanelProps {
   market: Market;
@@ -83,23 +85,51 @@ export function TradingPanel({
   const [userPosition, setUserPosition] = useState<UserPosition | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Get wallet client from wagmi (works for both MetaMask and embedded wallets)
+  const { data: walletClient } = useWalletClient();
+  const { primaryWallet } = useDynamicContext();
+
   const quickAmounts = [1, 5, 25, 100];
+
+  // Get provider - supports both external wallets and embedded wallets
+  const getProvider = () => {
+    // Try wagmi wallet client first (best for embedded wallets)
+    if (walletClient?.transport) {
+      return walletClient.transport;
+    }
+    // Fallback to window.ethereum for MetaMask
+    if (typeof window !== "undefined" && window.ethereum) {
+      return window.ethereum;
+    }
+    // Fallback to primaryWallet connector for embedded wallets
+    if (primaryWallet?.connector) {
+      return (primaryWallet.connector as any).getWalletClient?.();
+    }
+    return null;
+  };
 
   // Load user balance
   useEffect(() => {
-    if (
-      !isConnected ||
-      !userAddress ||
-      typeof window === "undefined" ||
-      !window.ethereum ||
-      !market.token
-    ) {
+    if (!isConnected || !userAddress || !market.token) {
+      setBalance(0);
+      return;
+    }
+
+    const provider = getProvider();
+    if (!provider) {
+      logger.warn("⚠️ No provider available for balance check");
       setBalance(0);
       return;
     }
 
     loadBalance();
-  }, [isConnected, userAddress, market.token?.address]);
+  }, [
+    isConnected,
+    userAddress,
+    market.token?.address,
+    walletClient,
+    primaryWallet,
+  ]);
 
   // Load user position for this market
   useEffect(() => {
@@ -128,10 +158,17 @@ export function TradingPanel({
         return;
       }
 
+      const provider = getProvider();
+      if (!provider) {
+        logger.warn("⚠️ No provider available");
+        setBalance(0);
+        return;
+      }
+
       // Check wallet network FIRST
-      if (window.ethereum) {
+      if (provider.request) {
         const chainId = String(
-          await window.ethereum.request({
+          await provider.request({
             method: "eth_chainId",
           }),
         );
@@ -149,16 +186,16 @@ export function TradingPanel({
       const Web3 = web3Module.default || web3Module;
 
       const polkamarkets = new polkamarketsjs.Application({
-        web3Provider: window.ethereum,
+        web3Provider: provider,
       });
 
-      const web3 = new Web3(window.ethereum as any);
+      const web3 = new Web3(provider as any);
       (window as any).web3 = web3;
       (polkamarkets as any).web3 = web3;
 
       // Request account access
-      if (window.ethereum) {
-        await window.ethereum.request({ method: "eth_requestAccounts" });
+      if (provider.request) {
+        await provider.request({ method: "eth_requestAccounts" });
       }
 
       const erc20 = polkamarkets.getERC20Contract({
@@ -220,10 +257,17 @@ export function TradingPanel({
         return;
       }
 
+      const provider = getProvider();
+      if (!provider) {
+        logger.warn("⚠️ No provider available");
+        setUserPosition(null);
+        return;
+      }
+
       // Check wallet network FIRST
-      if (window.ethereum) {
+      if (provider.request) {
         const chainId = String(
-          await window.ethereum.request({
+          await provider.request({
             method: "eth_chainId",
           }),
         );
@@ -241,14 +285,14 @@ export function TradingPanel({
       const Web3 = web3Module.default || web3Module;
 
       const polkamarkets = new polkamarketsjs.Application({
-        web3Provider: window.ethereum,
+        web3Provider: provider,
       });
 
-      const web3 = new Web3(window.ethereum as any);
+      const web3 = new Web3(provider as any);
       (window as any).web3 = web3;
       (polkamarkets as any).web3 = web3;
-      if (window.ethereum) {
-        await window.ethereum.request({ method: "eth_requestAccounts" });
+      if (provider.request) {
+        await provider.request({ method: "eth_requestAccounts" });
       }
 
       const pm = polkamarkets.getPredictionMarketV3PlusContract({
@@ -302,10 +346,18 @@ export function TradingPanel({
     setError(null);
 
     try {
+      const provider = getProvider();
+      if (!provider) {
+        setError("No wallet provider available");
+        setCalculation(null);
+        setIsCalculating(false);
+        return;
+      }
+
       // Check wallet network FIRST
-      if (window.ethereum) {
+      if (provider.request) {
         const chainId = String(
-          await window.ethereum.request({
+          await provider.request({
             method: "eth_chainId",
           }),
         );
@@ -326,16 +378,16 @@ export function TradingPanel({
       const Web3 = web3Module.default || web3Module;
 
       const polkamarkets = new polkamarketsjs.Application({
-        web3Provider: window.ethereum,
+        web3Provider: provider,
       });
 
-      const web3 = new Web3(window.ethereum as any);
+      const web3 = new Web3(provider as any);
       (window as any).web3 = web3;
       (polkamarkets as any).web3 = web3;
 
       // Request account access
-      if (window.ethereum) {
-        await window.ethereum.request({ method: "eth_requestAccounts" });
+      if (provider.request) {
+        await provider.request({ method: "eth_requestAccounts" });
       }
 
       const pm = polkamarkets.getPredictionMarketV3PlusContract({
@@ -455,8 +507,9 @@ export function TradingPanel({
       return;
     }
 
-    if (typeof window === "undefined" || !window.ethereum) {
-      setError("Please install MetaMask or another Web3 wallet!");
+    const provider = getProvider();
+    if (!provider) {
+      setError("No wallet provider available. Please connect your wallet.");
       return;
     }
 
@@ -518,14 +571,14 @@ export function TradingPanel({
       const Web3 = web3Module.default || web3Module;
 
       const polkamarkets = new polkamarketsjs.Application({
-        web3Provider: window.ethereum,
+        web3Provider: provider,
       });
 
-      const web3 = new Web3(window.ethereum as any);
+      const web3 = new Web3(provider as any);
       (window as any).web3 = web3;
       (polkamarkets as any).web3 = web3;
-      if (window.ethereum) {
-        await window.ethereum.request({ method: "eth_requestAccounts" });
+      if (provider.request) {
+        await provider.request({ method: "eth_requestAccounts" });
       }
 
       const pm = polkamarkets.getPredictionMarketV3PlusContract({

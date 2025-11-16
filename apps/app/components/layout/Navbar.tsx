@@ -747,7 +747,7 @@ export function Navbar() {
                         >
                           {/* Wallet Address or Email */}
                           <div className="px-2 py-2 text-sm font-satoshi text-muted-foreground flex items-center gap-2">
-                            {address ? (
+                            {walletAddress ? (
                               <>
                                 <div className="relative w-4 h-4 flex items-center justify-center">
                                   <Image
@@ -758,9 +758,10 @@ export function Navbar() {
                                     className="object-contain"
                                   />
                                 </div>
-                                {`${address.slice(0, 6)}...${address.slice(
-                                  -6,
-                                )}`}
+                                {`${walletAddress.slice(
+                                  0,
+                                  6,
+                                )}...${walletAddress.slice(-6)}`}
                               </>
                             ) : user?.email ? (
                               <>
