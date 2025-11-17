@@ -30,7 +30,7 @@ import {
   trackTradeCompleted,
   trackTradeFailed,
 } from "@/lib/posthog";
-import { useWalletClient } from "wagmi";
+import { useAccount, useWalletClient } from "wagmi";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 interface MobileTradingModalProps {
@@ -72,42 +72,41 @@ export function MobileTradingModal({
   const [balance, setBalance] = useState<any>(0);
   const [error, setError] = useState<string | null>(null);
 
-  // Get wallet client from wagmi (works for both MetaMask and embedded wallets)
+  // Get wallet client and connector from wagmi (works for both MetaMask and embedded wallets)
   const { data: walletClient } = useWalletClient();
+  const { connector } = useAccount();
   const { primaryWallet } = useDynamicContext();
 
   const quickAmounts = [1, 5, 25, 100];
 
-  // Get provider - supports both external wallets and embedded wallets
+  // Get provider - supports both external wallets (MetaMask) and embedded wallets (Dynamic)
   const getProvider = async () => {
-    // For MetaMask or other browser wallets
+    // For MetaMask or other browser extension wallets
     if (typeof window !== "undefined" && window.ethereum) {
-      logger.log("🔌 Using window.ethereum provider");
+      logger.log("🔌 Using window.ethereum provider (MetaMask/Browser wallet)");
       return window.ethereum;
     }
 
-    // For embedded wallets via Dynamic - get the EIP-1193 provider
-    if (primaryWallet?.connector) {
-      logger.log("🔌 Checking Dynamic connector for provider");
-      const connector = primaryWallet.connector as any;
+    // For embedded wallets and other connectors via wagmi
+    // This uses wagmi's connector which properly wraps Dynamic's embedded wallets
+    if (connector) {
+      logger.log("🔌 Getting provider from wagmi connector:", {
+        connectorName: connector.name,
+        connectorType: connector.type,
+      });
 
-      // Dynamic's connector should expose the provider via getProvider()
-      if (connector.getProvider) {
+      try {
         const provider = await connector.getProvider();
-        logger.log("🔌 Got provider from connector.getProvider():", provider);
-        return provider;
-      }
-
-      // Fallback: some connectors expose provider directly
-      if (connector.provider) {
-        logger.log("🔌 Got provider from connector.provider");
-        return connector.provider;
+        if (provider) {
+          logger.log("✅ Got EIP-1193 provider from wagmi connector");
+          return provider;
+        }
+      } catch (error) {
+        logger.error("❌ Error getting provider from connector:", error);
       }
     }
 
-    logger.warn(
-      "⚠️ No provider found - neither window.ethereum nor connector.provider",
-    );
+    logger.warn("⚠️ No provider available - user not connected");
     return null;
   };
 
