@@ -15,70 +15,81 @@ const MYRIAD_API_KEY = process.env.MYRIAD_API_KEY!;
 
 async function getMarkets() {
   try {
-    const baseParams = {
-      network_id: "56", // BNB Smart Chain
-      token_address:
-        process.env.NEXT_PUBLIC_USDT_TOKEN_ADDRESS ||
-        "0x55d398326f99059fF775485246999027B3197955",
-      sort: "volume",
-      order: "desc",
-      limit: "50",
-    };
+    /**
+     * Helper function to fetch ALL markets for a given state with pagination
+     */
+    async function fetchAllMarketsForState(state: string): Promise<any[]> {
+      let allMarkets: any[] = [];
+      let currentPage = 1;
+      let hasMorePages = true;
+      const pageLimit = "100"; // Fetch 100 per page for efficiency
 
-    // Fetch open, closed, and resolved markets in parallel from Myriad
-    const [openRes, closedRes, resolvedRes] = await Promise.all([
-      fetch(
-        `${MYRIAD_API_URL}/markets?${new URLSearchParams({
-          ...baseParams,
-          state: "open",
-        })}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": MYRIAD_API_KEY,
-          },
-          next: { revalidate: 30 },
-        },
-      ),
-      fetch(
-        `${MYRIAD_API_URL}/markets?${new URLSearchParams({
-          ...baseParams,
-          state: "closed",
-        })}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": MYRIAD_API_KEY,
-          },
-          next: { revalidate: 30 },
-        },
-      ),
-      fetch(
-        `${MYRIAD_API_URL}/markets?${new URLSearchParams({
-          ...baseParams,
-          state: "resolved",
-        })}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": MYRIAD_API_KEY,
-          },
-          next: { revalidate: 30 },
-        },
-      ),
-    ]);
+      const baseParams = {
+        network_id: "56", // BNB Smart Chain
+        token_address:
+          process.env.NEXT_PUBLIC_USDT_TOKEN_ADDRESS ||
+          "0x55d398326f99059fF775485246999027B3197955",
+        sort: "volume",
+        order: "desc",
+        state,
+        limit: pageLimit,
+      };
 
-    const [openData, closedData, resolvedData] = await Promise.all([
-      openRes.ok ? openRes.json() : { data: [] },
-      closedRes.ok ? closedRes.json() : { data: [] },
-      resolvedRes.ok ? resolvedRes.json() : { data: [] },
+      while (hasMorePages) {
+        const params = new URLSearchParams({
+          ...baseParams,
+          page: String(currentPage),
+        });
+
+        const response = await fetch(`${MYRIAD_API_URL}/markets?${params}`, {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": MYRIAD_API_KEY,
+          },
+          next: { revalidate: 30 },
+        });
+
+        if (!response.ok) {
+          logger.error(
+            `❌ Failed to fetch ${state} markets page ${currentPage}:`,
+            response.statusText,
+          );
+          break;
+        }
+
+        const responseData = await response.json();
+        const markets = responseData.data || [];
+        const pagination = responseData.pagination;
+
+        allMarkets = allMarkets.concat(markets);
+
+        logger.log(
+          `📄 Fetched ${state} page ${currentPage}: ${markets.length} markets (total ${state}: ${allMarkets.length})`,
+        );
+
+        // Check if there are more pages
+        if (pagination && pagination.page < pagination.totalPages) {
+          currentPage++;
+        } else {
+          hasMorePages = false;
+        }
+      }
+
+      return allMarkets;
+    }
+
+    // Fetch ALL markets from all states in parallel
+    const [openMarkets, closedMarkets, resolvedMarkets] = await Promise.all([
+      fetchAllMarketsForState("open"),
+      fetchAllMarketsForState("closed"),
+      fetchAllMarketsForState("resolved"),
     ]);
 
     // Combine all markets
     const allMarkets = [
-      ...(openData.data || []),
-      ...(closedData.data || []),
-      ...(resolvedData.data || []),
+      ...openMarkets,
+      ...closedMarkets,
+      ...resolvedMarkets,
     ].filter(
       (market) =>
         // Exclude test markets
@@ -96,11 +107,11 @@ async function getMarkets() {
       "✅ Home page loaded",
       translatedMarkets.length,
       "markets (open:",
-      openData.data?.length || 0,
+      openMarkets.length,
       ", closed:",
-      closedData.data?.length || 0,
+      closedMarkets.length,
       ", resolved:",
-      resolvedData.data?.length || 0,
+      resolvedMarkets.length,
       ")",
     );
     return translatedMarkets;

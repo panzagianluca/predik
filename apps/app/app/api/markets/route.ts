@@ -30,16 +30,83 @@ export async function GET(request: NextRequest) {
     const topics = searchParams.get("topics");
     const sort = searchParams.get("sort");
     const order = searchParams.get("order");
-    const page = searchParams.get("page");
-    const limit = searchParams.get("limit");
+    const requestedPage = searchParams.get("page");
+    const requestedLimit = searchParams.get("limit");
+    const fetchAll = searchParams.get("fetch_all") === "true";
 
     if (state) params.set("state", state);
     if (keyword) params.set("keyword", keyword);
     if (topics) params.set("topics", topics);
     if (sort) params.set("sort", sort);
     if (order) params.set("order", order);
-    if (page) params.set("page", page);
-    if (limit) params.set("limit", limit);
+
+    // If fetch_all is true, paginate through all results
+    if (fetchAll) {
+      logger.log("📡 Fetching ALL markets with pagination...");
+
+      let allMarkets: any[] = [];
+      let currentPage = 1;
+      let hasMorePages = true;
+      const pageLimit = "100"; // Fetch 100 per page for efficiency
+
+      while (hasMorePages) {
+        const pageParams = new URLSearchParams(params);
+        pageParams.set("page", String(currentPage));
+        pageParams.set("limit", pageLimit);
+
+        const response = await fetch(
+          `${MYRIAD_API_URL}/markets?${pageParams}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": MYRIAD_API_KEY,
+            },
+            next: { revalidate: 30 },
+          },
+        );
+
+        if (!response.ok) {
+          logger.error(
+            "❌ Myriad V2 API error:",
+            response.status,
+            response.statusText,
+          );
+          break;
+        }
+
+        const responseData = await response.json();
+        const markets = responseData.data || responseData;
+        const pagination = responseData.pagination;
+
+        allMarkets = allMarkets.concat(markets);
+
+        logger.log(
+          `📄 Fetched page ${currentPage}: ${markets.length} markets (total so far: ${allMarkets.length})`,
+        );
+
+        // Check if there are more pages
+        if (pagination && pagination.page < pagination.totalPages) {
+          currentPage++;
+        } else {
+          hasMorePages = false;
+        }
+      }
+
+      logger.log(`✅ Fetched ALL ${allMarkets.length} markets from Myriad`);
+
+      // 🌐 TRANSLATION: Get Spanish translations from DB or create them
+      const translatedMarkets = await translateMarketsToSpanish(allMarkets);
+
+      return NextResponse.json(translatedMarkets, {
+        headers: {
+          "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60",
+        },
+      });
+    }
+
+    // Single page request (backward compatible)
+    if (requestedPage) params.set("page", requestedPage);
+    if (requestedLimit) params.set("limit", requestedLimit);
 
     const response = await fetch(`${MYRIAD_API_URL}/markets?${params}`, {
       headers: {
