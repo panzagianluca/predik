@@ -92,19 +92,38 @@ export function TradingPanel({
   const quickAmounts = [1, 5, 25, 100];
 
   // Get provider - supports both external wallets and embedded wallets
-  const getProvider = () => {
-    // Try wagmi wallet client first (best for embedded wallets)
-    if (walletClient?.transport) {
-      return walletClient.transport;
-    }
-    // Fallback to window.ethereum for MetaMask
+  const getProvider = async () => {
+    // For MetaMask or other browser wallets
     if (typeof window !== "undefined" && window.ethereum) {
+      logger.log("🔌 Using window.ethereum provider");
       return window.ethereum;
     }
-    // Fallback to primaryWallet connector for embedded wallets
+
+    // For embedded wallets via Dynamic
     if (primaryWallet?.connector) {
-      return (primaryWallet.connector as any).getWalletClient?.();
+      const connector = primaryWallet.connector as any;
+
+      logger.log("🔌 Checking Dynamic connector for provider:", {
+        hasGetProvider: !!connector.getProvider,
+        hasProvider: !!connector.provider,
+        connectorKeys: Object.keys(connector),
+      });
+
+      // Try to get the provider from the connector
+      if (connector.getProvider) {
+        const provider = await connector.getProvider();
+        logger.log("🔌 Got provider from connector.getProvider()");
+        return provider;
+      }
+
+      // Fallback: some connectors expose provider directly
+      if (connector.provider) {
+        logger.log("🔌 Using connector.provider directly");
+        return connector.provider;
+      }
     }
+
+    logger.warn("⚠️ No provider found");
     return null;
   };
 
@@ -115,14 +134,17 @@ export function TradingPanel({
       return;
     }
 
-    const provider = getProvider();
-    if (!provider) {
-      logger.warn("⚠️ No provider available for balance check");
-      setBalance(0);
-      return;
-    }
+    const checkAndLoad = async () => {
+      const provider = await getProvider();
+      if (!provider) {
+        logger.warn("⚠️ No provider available for balance check");
+        setBalance(0);
+        return;
+      }
+      loadBalance();
+    };
 
-    loadBalance();
+    checkAndLoad();
   }, [
     isConnected,
     userAddress,
@@ -158,7 +180,7 @@ export function TradingPanel({
         return;
       }
 
-      const provider = getProvider();
+      const provider = await getProvider();
       if (!provider) {
         logger.warn("⚠️ No provider available");
         setBalance(0);
@@ -257,7 +279,7 @@ export function TradingPanel({
         return;
       }
 
-      const provider = getProvider();
+      const provider = await getProvider();
       if (!provider) {
         logger.warn("⚠️ No provider available");
         setUserPosition(null);
@@ -346,7 +368,7 @@ export function TradingPanel({
     setError(null);
 
     try {
-      const provider = getProvider();
+      const provider = await getProvider();
       if (!provider) {
         setError("No wallet provider available");
         setCalculation(null);
@@ -507,7 +529,7 @@ export function TradingPanel({
       return;
     }
 
-    const provider = getProvider();
+    const provider = await getProvider();
     if (!provider) {
       setError("No wallet provider available. Please connect your wallet.");
       return;
