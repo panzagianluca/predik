@@ -143,14 +143,7 @@ export function MobileTradingModal({
     };
 
     checkAndLoad();
-  }, [
-    isConnected,
-    userAddress,
-    isOpen,
-    market.token?.address,
-    walletClient,
-    primaryWallet,
-  ]);
+  }, [isConnected, userAddress, isOpen, market.token?.address]);
 
   // Calculate trade
   useEffect(() => {

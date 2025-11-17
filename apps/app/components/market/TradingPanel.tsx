@@ -145,13 +145,7 @@ export function TradingPanel({
     };
 
     checkAndLoad();
-  }, [
-    isConnected,
-    userAddress,
-    market.token?.address,
-    walletClient,
-    primaryWallet,
-  ]);
+  }, [isConnected, userAddress, market.token?.address]);
 
   // Load user position for this market
   useEffect(() => {
