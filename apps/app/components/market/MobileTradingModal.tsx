@@ -155,7 +155,7 @@ export function MobileTradingModal({
 
   const loadBalance = async () => {
     try {
-      const provider = await getProvider();
+      const provider = (await getProvider()) as any;
       if (!provider) {
         logger.warn("⚠️ No provider available");
         setBalance(0);
@@ -243,7 +243,7 @@ export function MobileTradingModal({
     setError(null);
 
     try {
-      const provider = await getProvider();
+      const provider = (await getProvider()) as any;
       if (!provider) {
         setError("No wallet provider available");
         setCalculation(null);
@@ -428,7 +428,7 @@ export function MobileTradingModal({
     haptics.medium();
 
     try {
-      const provider = await getProvider();
+      const provider = (await getProvider()) as any;
       if (!provider) {
         setError("No wallet provider available");
         setIsExecuting(false);

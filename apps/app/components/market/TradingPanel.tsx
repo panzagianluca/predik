@@ -170,7 +170,7 @@ export function TradingPanel({
         return;
       }
 
-      const provider = await getProvider();
+      const provider = (await getProvider()) as any;
       if (!provider) {
         logger.warn("⚠️ No provider available");
         setBalance(0);
@@ -269,7 +269,7 @@ export function TradingPanel({
         return;
       }
 
-      const provider = await getProvider();
+      const provider = (await getProvider()) as any;
       if (!provider) {
         logger.warn("⚠️ No provider available");
         setUserPosition(null);
@@ -358,7 +358,7 @@ export function TradingPanel({
     setError(null);
 
     try {
-      const provider = await getProvider();
+      const provider = (await getProvider()) as any;
       if (!provider) {
         setError("No wallet provider available");
         setCalculation(null);
@@ -519,7 +519,7 @@ export function TradingPanel({
       return;
     }
 
-    const provider = await getProvider();
+    const provider = (await getProvider()) as any;
     if (!provider) {
       setError("No wallet provider available. Please connect your wallet.");
       return;
