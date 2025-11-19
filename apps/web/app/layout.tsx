@@ -72,8 +72,11 @@ export default function RootLayout({
           defaultTheme="dark"
           enableSystem={false}
           disableTransitionOnChange
+          storageKey="theme"
+          enableColorScheme={false}
         >
           {/* Animated Gradient Background - BOTTOM LAYER - THEME AWARE */}
+          {/* Note: Animation controlled per-page via page-level wrapper */}
           <BackgroundWrapper />
 
           {/* Content - ON TOP OF GRADIENT */}

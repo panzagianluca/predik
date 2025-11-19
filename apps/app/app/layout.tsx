@@ -70,9 +70,11 @@ export default function RootLayout({
       >
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="dark"
+          enableSystem={false}
           disableTransitionOnChange
+          storageKey="theme"
+          enableColorScheme={false}
         >
           <Web3Provider>
             <Toaster position="top-right" richColors />

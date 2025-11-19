@@ -164,6 +164,16 @@ export function Navbar() {
                       <li>
                         <NavigationMenuLink asChild>
                           <a
+                            href="/roadmap"
+                            className="block text-sm font-medium p-2 rounded-md hover:bg-[hsl(var(--electric-purple))]/10 transition-colors"
+                          >
+                            Roadmap
+                          </a>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <a
                             href="/blog"
                             className="block text-sm font-medium p-2 rounded-md hover:bg-[hsl(var(--electric-purple))]/10 transition-colors"
                           >

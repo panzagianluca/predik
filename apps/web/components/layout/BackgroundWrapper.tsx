@@ -4,7 +4,13 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { BackgroundGradientAnimation } from "@/components/ui/background-gradient-animation";
 
-export function BackgroundWrapper() {
+interface BackgroundWrapperProps {
+  isAnimated?: boolean;
+}
+
+export function BackgroundWrapper({
+  isAnimated = false,
+}: BackgroundWrapperProps) {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -18,6 +24,23 @@ export function BackgroundWrapper() {
 
   const isDark = resolvedTheme === "dark";
 
+  // Static background for non-homepage
+  if (!isAnimated) {
+    return (
+      <div className="fixed inset-0 z-0">
+        <div
+          className="absolute inset-0"
+          style={{
+            background: isDark
+              ? "radial-gradient(ellipse 80% 80% at 50% -20%, rgba(168, 85, 247, 0.15), transparent 50%), radial-gradient(ellipse 60% 60% at 80% 50%, rgba(139, 92, 246, 0.1), transparent 50%), radial-gradient(ellipse 60% 60% at 20% 80%, rgba(192, 132, 252, 0.1), transparent 50%), linear-gradient(to bottom, rgb(20, 14, 41), rgb(10, 7, 20))"
+              : "radial-gradient(ellipse 80% 80% at 50% -20%, rgba(168, 85, 247, 0.1), transparent 50%), radial-gradient(ellipse 60% 60% at 80% 50%, rgba(139, 92, 246, 0.08), transparent 50%), radial-gradient(ellipse 60% 60% at 20% 80%, rgba(192, 132, 252, 0.08), transparent 50%), linear-gradient(to bottom, rgb(249, 250, 251), rgb(243, 244, 246))",
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Animated background for homepage
   return (
     <div className="fixed inset-0 z-0">
       <BackgroundGradientAnimation

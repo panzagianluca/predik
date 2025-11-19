@@ -4,14 +4,21 @@ import * as React from "react";
 import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
 import { flushSync } from "react-dom";
+import { setThemeCookie, getThemeCookie } from "@/lib/theme-cookie";
 
 export function ThemeToggle() {
   const { theme, resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
 
-  // Prevent hydration mismatch
+  // Prevent hydration mismatch and sync from cookie on mount
   React.useEffect(() => {
     setMounted(true);
+
+    // Read theme from cookie on mount
+    const cookieTheme = getThemeCookie();
+    if (cookieTheme && cookieTheme !== theme) {
+      setTheme(cookieTheme);
+    }
   }, []);
 
   if (!mounted) {
@@ -22,6 +29,9 @@ export function ThemeToggle() {
 
   const toggleTheme = async () => {
     const newTheme = isDark ? "light" : "dark";
+
+    // Save to cookie for cross-domain sync
+    setThemeCookie(newTheme);
 
     // If View Transitions API is not supported, just toggle
     if (!document.startViewTransition) {
