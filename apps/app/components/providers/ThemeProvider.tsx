@@ -18,7 +18,7 @@ export function ThemeProvider({ children, ...props }: any) {
   return (
     <NextThemesProvider
       {...props}
-      onValueChange={(theme) => {
+      onValueChange={(theme: string) => {
         // Sync to cookie whenever theme changes
         setThemeCookie(theme);
       }}
