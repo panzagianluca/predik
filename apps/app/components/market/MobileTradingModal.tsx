@@ -243,16 +243,11 @@ export function MobileTradingModal({
     setError(null);
 
     try {
+      // Try to get provider, but allow calculations without it (for logged-out preview)
       const provider = (await getProvider()) as any;
-      if (!provider) {
-        setError("No wallet provider available");
-        setCalculation(null);
-        setIsCalculating(false);
-        return;
-      }
 
-      // Check wallet network FIRST
-      if (provider.request) {
+      // If user is connected, validate network
+      if (provider && provider.request && isConnected) {
         const chainId = String(
           await provider.request({
             method: "eth_chainId",
@@ -274,11 +269,14 @@ export function MobileTradingModal({
       const web3Module = await import("web3");
       const Web3 = web3Module.default || web3Module;
 
+      // Use provider if available, otherwise use public RPC for read-only calculations
+      const web3Provider = provider || "https://bsc-dataseed.binance.org/";
+
       const polkamarkets = new polkamarketsjs.Application({
-        web3Provider: provider,
+        web3Provider: web3Provider,
       });
 
-      const web3 = new Web3(provider as any);
+      const web3 = new Web3(web3Provider as any);
       (window as any).web3 = web3;
       (polkamarkets as any).web3 = web3;
 
