@@ -56,7 +56,7 @@ export function BackgroundWrapper({
         pointerColor="168, 85, 247"
         size="80%"
         blendingValue={isDark ? "hard-light" : "soft-light"}
-        interactive={true}
+        interactive={false}
       />
     </div>
   );

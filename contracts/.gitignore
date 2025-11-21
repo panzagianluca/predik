@@ -1,0 +1,12 @@
+# Foundry files
+lib/
+out/
+cache/
+broadcast/
+
+# Environment
+.env
+.env.foundry
+
+# OS
+.DS_Store

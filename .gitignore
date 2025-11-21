@@ -16,6 +16,16 @@ out/
 .cache/
 
 # ========================================
+# FOUNDRY / SMART CONTRACTS
+# ========================================
+# Foundry build artifacts
+contracts/lib/
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+contracts/.env
+
+# ========================================
 # ENVIRONMENT & SECRETS - NEVER COMMIT
 # ========================================
 # All .env files contain sensitive data
