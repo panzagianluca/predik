@@ -9,6 +9,8 @@ import { TooltipProvider } from "@/components/animate-ui/primitives/animate/tool
 import { motion, AnimatePresence } from "framer-motion";
 import { haptics } from "@/lib/haptics";
 import { useAccount } from "wagmi";
+import { LogoSpinner } from "@/components/ui/logo-spinner";
+import { logger } from "@/lib/logger";
 
 type TimeFilter = "trending" | "recent" | "closing-soon" | "closed" | "saved";
 type CategoryFilter =
@@ -20,15 +22,174 @@ type CategoryFilter =
   | "culture"
   | "gaming";
 
-interface MarketsGridProps {
-  markets: Market[];
-}
+interface MarketsGridProps {}
 
-export function MarketsGrid({ markets }: MarketsGridProps) {
+export function MarketsGrid() {
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("trending");
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
   const [savedMarketIds, setSavedMarketIds] = useState<number[]>([]);
+  const [openMarkets, setOpenMarkets] = useState<Market[]>([]);
+  const [closedMarkets, setClosedMarkets] = useState<Market[]>([]);
+  const [isLoadingOpen, setIsLoadingOpen] = useState(true);
+  const [isLoadingClosed, setIsLoadingClosed] = useState(false);
+  const [hasLoadedClosed, setHasLoadedClosed] = useState(false);
+  const [closedPage, setClosedPage] = useState(1);
+  const [resolvedPage, setResolvedPage] = useState(1);
+  const [hasMoreClosed, setHasMoreClosed] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const { address } = useAccount();
+
+  // Fetch open markets on mount
+  useEffect(() => {
+    const fetchOpenMarkets = async () => {
+      setIsLoadingOpen(true);
+      try {
+        const response = await fetch(
+          `/api/markets?state=open&sort=volume&order=desc&limit=100&page=1`,
+        );
+        if (response.ok) {
+          const markets = await response.json();
+          // Filter out test markets
+          const filteredMarkets = markets.filter(
+            (market: Market) =>
+              !market.title.toLowerCase().includes("test usd") &&
+              !market.slug.includes("test-usd") &&
+              !market.title.toLowerCase().includes("bnb candles") &&
+              !market.slug.includes("bnb-candles"),
+          );
+          setOpenMarkets(filteredMarkets);
+          logger.log("✅ Loaded", filteredMarkets.length, "open markets");
+        }
+      } catch (error) {
+        logger.error("Error loading open markets:", error);
+      } finally {
+        setIsLoadingOpen(false);
+      }
+    };
+
+    fetchOpenMarkets();
+  }, []);
+
+  // Fetch closed/resolved markets only when user clicks "Cerrados" tab
+  useEffect(() => {
+    if (timeFilter === "closed" && !hasLoadedClosed) {
+      const fetchClosedMarkets = async () => {
+        setIsLoadingClosed(true);
+        try {
+          // Only fetch first 50 closed and 50 resolved (most recent/popular)
+          const [closedResponse, resolvedResponse] = await Promise.all([
+            fetch(
+              `/api/markets?state=closed&sort=volume&order=desc&limit=50&page=1`,
+            ),
+            fetch(
+              `/api/markets?state=resolved&sort=volume&order=desc&limit=50&page=1`,
+            ),
+          ]);
+
+          const closed = closedResponse.ok ? await closedResponse.json() : [];
+          const resolved = resolvedResponse.ok
+            ? await resolvedResponse.json()
+            : [];
+
+          const allClosed = [...closed, ...resolved].filter(
+            (market: Market) =>
+              !market.title.toLowerCase().includes("test usd") &&
+              !market.slug.includes("test-usd") &&
+              !market.title.toLowerCase().includes("bnb candles") &&
+              !market.slug.includes("bnb-candles"),
+          );
+
+          setClosedMarkets(allClosed);
+          setHasLoadedClosed(true);
+          setClosedPage(1);
+          setResolvedPage(1);
+          setHasMoreClosed(closed.length === 50 || resolved.length === 50);
+          logger.log("✅ Loaded", allClosed.length, "closed markets");
+        } catch (error) {
+          logger.error("Error loading closed markets:", error);
+        } finally {
+          setIsLoadingClosed(false);
+        }
+      };
+
+      fetchClosedMarkets();
+    }
+  }, [timeFilter, hasLoadedClosed]);
+
+  // Load more closed markets on scroll
+  const loadMoreClosedMarkets = async () => {
+    if (isLoadingMore || !hasMoreClosed) return;
+
+    setIsLoadingMore(true);
+    try {
+      const nextClosedPage = closedPage + 1;
+      const nextResolvedPage = resolvedPage + 1;
+
+      const [closedResponse, resolvedResponse] = await Promise.all([
+        fetch(
+          `/api/markets?state=closed&sort=volume&order=desc&limit=50&page=${nextClosedPage}`,
+        ),
+        fetch(
+          `/api/markets?state=resolved&sort=volume&order=desc&limit=50&page=${nextResolvedPage}`,
+        ),
+      ]);
+
+      const closed = closedResponse.ok ? await closedResponse.json() : [];
+      const resolved = resolvedResponse.ok ? await resolvedResponse.json() : [];
+
+      const newMarkets = [...closed, ...resolved].filter(
+        (market: Market) =>
+          !market.title.toLowerCase().includes("test usd") &&
+          !market.slug.includes("test-usd") &&
+          !market.title.toLowerCase().includes("bnb candles") &&
+          !market.slug.includes("bnb-candles"),
+      );
+
+      if (newMarkets.length > 0) {
+        setClosedMarkets((prev) => [...prev, ...newMarkets]);
+        setClosedPage(nextClosedPage);
+        setResolvedPage(nextResolvedPage);
+        setHasMoreClosed(closed.length === 50 || resolved.length === 50);
+        logger.log("✅ Loaded", newMarkets.length, "more closed markets");
+      } else {
+        setHasMoreClosed(false);
+      }
+    } catch (error) {
+      logger.error("Error loading more closed markets:", error);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
+  // Infinite scroll detection
+  useEffect(() => {
+    if (timeFilter !== "closed" || !hasLoadedClosed) return;
+
+    const handleScroll = () => {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const clientHeight = window.innerHeight;
+
+      // Load more when user is 500px from bottom
+      if (
+        scrollHeight - scrollTop - clientHeight < 500 &&
+        hasMoreClosed &&
+        !isLoadingMore
+      ) {
+        loadMoreClosedMarkets();
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [
+    timeFilter,
+    hasLoadedClosed,
+    hasMoreClosed,
+    isLoadingMore,
+    closedPage,
+    resolvedPage,
+  ]);
 
   // Fetch saved markets from API when user logs in or filter changes to "saved"
   useEffect(() => {
@@ -66,8 +227,12 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
     }
   }, [address, timeFilter]);
 
+  // Combine markets based on current filter
+  const allMarkets =
+    timeFilter === "closed" ? [...openMarkets, ...closedMarkets] : openMarkets;
+
   // Filter markets based on selected filters
-  const filteredMarkets = markets.filter((market) => {
+  const filteredMarkets = allMarkets.filter((market) => {
     // Time filter logic
     if (timeFilter === "saved") {
       // Show only saved markets
@@ -333,7 +498,11 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.3, ease: "easeInOut" }}
         >
-          {sortedMarkets.length > 0 ? (
+          {isLoadingOpen || (timeFilter === "closed" && isLoadingClosed) ? (
+            <div className="flex items-center justify-center py-12">
+              <LogoSpinner size={32} />
+            </div>
+          ) : sortedMarkets.length > 0 ? (
             <TooltipProvider>
               <div
                 className="grid gap-4"
@@ -365,6 +534,25 @@ export function MarketsGrid({ markets }: MarketsGridProps) {
               </p>
             </div>
           )}
+
+          {/* Loading more indicator for closed markets */}
+          {timeFilter === "closed" && isLoadingMore && (
+            <div className="flex items-center justify-center py-8">
+              <LogoSpinner size={32} />
+            </div>
+          )}
+
+          {/* End of results message */}
+          {timeFilter === "closed" &&
+            hasLoadedClosed &&
+            !hasMoreClosed &&
+            sortedMarkets.length > 0 && (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground text-sm">
+                  Has llegado al final de los mercados cerrados
+                </p>
+              </div>
+            )}
         </motion.div>
       </AnimatePresence>
     </div>
