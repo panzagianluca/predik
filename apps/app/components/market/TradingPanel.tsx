@@ -26,7 +26,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/animate-ui/primitives/radix/tooltip";
+} from "@/components/animate-ui/components/animate/tooltip";
 import { LogoSpinner } from "@/components/ui/logo-spinner";
 import { haptics } from "@/lib/haptics";
 import { logger } from "@/lib/logger";
@@ -981,12 +981,13 @@ export function TradingPanel({
                       </span>
                       <TooltipProvider>
                         <Tooltip>
-                          <TooltipTrigger
-                            asChild={false}
-                            className="inline-flex cursor-help"
-                            type="button"
-                          >
-                            <Info className="h-3 w-3 text-muted-foreground" />
+                          <TooltipTrigger asChild>
+                            <button
+                              className="inline-flex cursor-help"
+                              type="button"
+                            >
+                              <Info className="h-3 w-3 text-muted-foreground" />
+                            </button>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p className="text-xs">
