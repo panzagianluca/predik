@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
 import { BackgroundWrapper } from "@/components/layout/BackgroundWrapper";
 import "./globals.css";
 
@@ -83,6 +84,7 @@ export default function RootLayout({
           <div className="relative z-10">
             <Navbar />
             {children}
+            <Footer />
           </div>
         </ThemeProvider>
       </body>
