@@ -29,7 +29,6 @@ interface MarketCardProps {
 }
 
 export function MarketCard({ market }: MarketCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
   // Show fade by default for markets with 3+ outcomes (hide when scrolled to bottom)
@@ -289,15 +288,7 @@ export function MarketCard({ market }: MarketCardProps) {
 
   return (
     <Card
-      className="w-full rounded-xl overflow-hidden transition-all duration-200 ease-in-out"
-      style={{
-        transform: isHovered ? "translateY(-2px)" : "translateY(0)",
-        boxShadow: isHovered
-          ? "0 10px 25px rgba(0, 0, 0, 0.1)"
-          : "0 0 0 rgba(0, 0, 0, 0)",
-      }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className="w-full rounded-xl overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-[2px] hover:shadow-[0_10px_25px_rgba(0,0,0,0.1)]"
       onClick={() => haptics.light()}
     >
       {/* Header Section */}
@@ -320,7 +311,7 @@ export function MarketCard({ market }: MarketCardProps) {
           {/* Market Title - Clickable */}
           <Link
             href={`/markets/${market.slug}`}
-            className="flex-1 min-w-0"
+            className="flex-1 min-w-0 rounded-sm transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             prefetch={true}
             onClick={() => {
               trackMarketClick(
@@ -331,7 +322,7 @@ export function MarketCard({ market }: MarketCardProps) {
               );
             }}
           >
-            <h3 className="text-base font-semibold leading-tight line-clamp-2 hover:text-primary transition-colors duration-200">
+            <h3 className="text-base font-semibold leading-tight line-clamp-2 hover:text-primary transition-colors duration-300 ease-in-out">
               {market.titleEs || market.title}
             </h3>
           </Link>
@@ -367,7 +358,7 @@ export function MarketCard({ market }: MarketCardProps) {
                 <Link
                   key={outcome.id}
                   href={`/markets/${market.slug}?outcome=${outcome.id}`}
-                  className="block group"
+                  className="block group rounded-sm transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   prefetch={true}
                   onClick={() => {
                     trackOutcomeClick(
@@ -379,7 +370,7 @@ export function MarketCard({ market }: MarketCardProps) {
                     );
                   }}
                 >
-                  <div className="space-y-1 hover:opacity-80 transition-opacity duration-200">
+                  <div className="space-y-1 hover:opacity-80 transition-opacity duration-300 ease-in-out">
                     <div className="flex items-center justify-between text-sm">
                       <span className="font-medium">
                         {translateOutcomeTitle(outcome.title)}
@@ -436,7 +427,7 @@ export function MarketCard({ market }: MarketCardProps) {
           {/* Left: Date */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center gap-1 hover:text-foreground transition-colors duration-200 cursor-help">
+              <div className="flex items-center gap-1 hover:text-foreground transition-colors duration-300 ease-in-out cursor-help">
                 <Calendar className="w-3 h-3" />
                 <span>{formatRelativeDate(market.expiresAt)}</span>
               </div>
@@ -449,7 +440,7 @@ export function MarketCard({ market }: MarketCardProps) {
           {/* Center: Volume */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center justify-center gap-1 flex-1 hover:text-foreground transition-colors duration-200 cursor-help">
+              <div className="flex items-center justify-center gap-1 flex-1 hover:text-foreground transition-colors duration-300 ease-in-out cursor-help">
                 <TrendingUp className="w-3 h-3" />
                 <span>{formatVolume(market.volume)}</span>
               </div>
@@ -474,7 +465,7 @@ export function MarketCard({ market }: MarketCardProps) {
                       "noopener,noreferrer",
                     );
                   }}
-                  className="flex items-center hover:opacity-80 transition-opacity cursor-pointer underline decoration-dotted"
+                  className="flex items-center hover:opacity-80 transition-all duration-300 ease-in-out cursor-pointer underline decoration-dotted rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   title={`Ver mercado #${market.id} en BscScan`}
                   type="button"
                 >
@@ -502,7 +493,7 @@ export function MarketCard({ market }: MarketCardProps) {
                     toggleSave(market.id);
                     haptics.selection();
                   }}
-                  className="flex items-center hover:text-foreground transition-colors cursor-pointer"
+                  className="flex items-center hover:text-foreground transition-all duration-300 ease-in-out cursor-pointer rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   type="button"
                 >
                   <Bookmark

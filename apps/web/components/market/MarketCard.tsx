@@ -78,7 +78,7 @@ export function MarketCard({ market }: MarketCardProps) {
       href={`https://app.predik.io/markets/${market.slug}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="block w-full rounded-xl overflow-hidden transition-all duration-200 ease-in-out bg-card/90 backdrop-blur-md border border-border hover:shadow-lg hover:-translate-y-1"
+      className="block w-full rounded-xl overflow-hidden transition-all duration-300 ease-in-out bg-card/90 backdrop-blur-md border border-border hover:shadow-lg hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
       {/* Header Section */}
       <div className="p-4 pb-3">

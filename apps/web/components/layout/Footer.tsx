@@ -26,7 +26,10 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-12 mb-12">
           {/* Brand Column */}
           <div className="space-y-4">
-            <Link href="/" className="flex items-center gap-2">
+            <Link
+              href="/"
+              className="flex items-center gap-2 rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
               {mounted && (
                 <Image
                   src={logoSrc}
@@ -47,7 +50,7 @@ export function Footer() {
                 href="https://x.com/predikapp"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-electric-purple transition-colors"
+                className="text-muted-foreground hover:text-electric-purple rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 aria-label="X (Twitter)"
               >
                 <Twitter className="h-5 w-5" />
@@ -56,7 +59,7 @@ export function Footer() {
                 href="https://instagram.com/predikapp"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-electric-purple transition-colors"
+                className="text-muted-foreground hover:text-electric-purple rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 aria-label="Instagram"
               >
                 <Instagram className="h-5 w-5" />
@@ -65,7 +68,7 @@ export function Footer() {
                 href="https://tiktok.com/@predikapp"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-electric-purple transition-colors"
+                className="text-muted-foreground hover:text-electric-purple rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 aria-label="TikTok"
               >
                 {/* TikTok Icon (Custom SVG since Lucide might not have it or it's new) */}
@@ -88,7 +91,7 @@ export function Footer() {
                 href="https://t.me/predikapp"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-electric-purple transition-colors"
+                className="text-muted-foreground hover:text-electric-purple rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 aria-label="Telegram"
               >
                 <Send className="h-5 w-5" />
@@ -103,7 +106,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground hover:text-foreground rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   Inicio
                 </Link>
@@ -111,7 +114,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/como-funciona"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground hover:text-foreground rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   Cómo Funciona
                 </Link>
@@ -119,7 +122,7 @@ export function Footer() {
               <li>
                 <Link
                   href="https://app.predik.io?filter=politica"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground hover:text-foreground rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   Política
                 </Link>
@@ -127,7 +130,7 @@ export function Footer() {
               <li>
                 <Link
                   href="https://app.predik.io?filter=economia"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground hover:text-foreground rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   Economía
                 </Link>
@@ -135,7 +138,7 @@ export function Footer() {
               <li>
                 <Link
                   href="https://app.predik.io?filter=deportes"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground hover:text-foreground rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   Deportes
                 </Link>
@@ -149,7 +152,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/about"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground hover:text-foreground rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   Acerca de
                 </Link>
@@ -157,7 +160,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/roadmap"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground hover:text-foreground rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   Roadmap
                 </Link>
@@ -165,7 +168,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/blog"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground hover:text-foreground rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   Blog
                 </Link>
@@ -173,7 +176,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/carreras"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground hover:text-foreground rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   Carreras
                 </Link>
@@ -187,7 +190,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/faq"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground hover:text-foreground rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   FAQ
                 </Link>
@@ -195,7 +198,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/contacto"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground hover:text-foreground rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   Contacto
                 </Link>
@@ -209,7 +212,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/terminos"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground hover:text-foreground rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   Términos de Uso
                 </Link>
@@ -217,7 +220,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/privacidad"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground hover:text-foreground rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   Política de Privacidad
                 </Link>

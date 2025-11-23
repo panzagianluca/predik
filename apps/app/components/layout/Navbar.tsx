@@ -150,7 +150,10 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 flex-shrink-0">
+            <Link
+              href="/"
+              className="flex items-center gap-2 flex-shrink-0 rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
               {mounted && (
                 <Image
                   src={logoSrc}
@@ -180,7 +183,7 @@ export function Navbar() {
                 }}
               >
                 <DialogTrigger asChild>
-                  <button className="flex items-center gap-2 text-sm font-medium text-foreground/70 hover:text-electric-purple transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+                  <button className="flex items-center gap-2 text-sm font-medium text-foreground/70 hover:text-electric-purple shrink-0 rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
                     <AlertCircle className="h-5 w-5" />
                     <span>Como Funciona?</span>
                   </button>
@@ -363,7 +366,7 @@ export function Navbar() {
 
                           <button
                             onClick={() => setSelectedOutcome("si")}
-                            className={`h-auto py-3 rounded-md border-2 flex items-center justify-between px-4 transition-colors relative z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                            className={`h-auto py-3 rounded-md border-2 flex items-center justify-between px-4 transition-all duration-300 ease-in-out relative z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                               selectedOutcome === "si"
                                 ? "border-transparent bg-transparent"
                                 : "border-border bg-muted/30"
@@ -378,7 +381,7 @@ export function Navbar() {
                           </button>
                           <button
                             onClick={() => setSelectedOutcome("no")}
-                            className={`h-auto py-3 rounded-md border-2 flex items-center justify-between px-4 transition-colors relative z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                            className={`h-auto py-3 rounded-md border-2 flex items-center justify-between px-4 transition-all duration-300 ease-in-out relative z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                               selectedOutcome === "no"
                                 ? "border-transparent bg-transparent"
                                 : "border-border bg-muted/30"
@@ -557,7 +560,7 @@ export function Navbar() {
                 {!isAuthenticated ? (
                   <>
                     <button
-                      className="group/button relative inline-flex items-center justify-center overflow-hidden rounded-md bg-electric-purple backdrop-blur-lg px-6 h-9 text-[14px] sm:text-sm font-semibold text-white transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl hover:shadow-electric-purple/50"
+                      className="group/button relative inline-flex items-center justify-center overflow-hidden rounded-md bg-electric-purple backdrop-blur-lg px-6 h-9 text-[14px] sm:text-sm font-semibold text-white transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl hover:shadow-electric-purple/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       onClick={() => setShowAuthFlow(true)}
                       type="button"
                     >
@@ -573,7 +576,7 @@ export function Navbar() {
                         <Button
                           size="default"
                           variant="ghost"
-                          className="hidden md:flex h-10 w-10 p-0 hover:bg-transparent hover:text-electric-purple transition-colors"
+                          className="hidden md:flex h-10 w-10 p-0 hover:bg-transparent hover:text-electric-purple transition-all duration-300 ease-in-out"
                         >
                           <Menu className="h-7 w-7" />
                         </Button>
@@ -650,7 +653,7 @@ export function Navbar() {
 
                             <button
                               onClick={() => setTheme("light")}
-                              className={`p-1.5 rounded transition-colors duration-200 flex-1 flex items-center justify-center relative z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                              className={`p-1.5 rounded transition-all duration-300 ease-in-out flex-1 flex items-center justify-center relative z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                                 resolvedTheme === "light"
                                   ? "text-foreground"
                                   : "text-muted-foreground hover:text-foreground"
@@ -660,7 +663,7 @@ export function Navbar() {
                             </button>
                             <button
                               onClick={() => setTheme("dark")}
-                              className={`p-1.5 rounded transition-colors duration-200 flex-1 flex items-center justify-center relative z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                              className={`p-1.5 rounded transition-all duration-300 ease-in-out flex-1 flex items-center justify-center relative z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                                 resolvedTheme === "dark"
                                   ? "text-foreground"
                                   : "text-muted-foreground hover:text-foreground"
@@ -715,7 +718,7 @@ export function Navbar() {
                     <div className="hidden md:block">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button className="flex items-center gap-2 hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+                          <button className="flex items-center gap-2 hover:opacity-80 rounded-xl transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
                             <div className="relative h-9 w-9 rounded-xl overflow-hidden">
                               {isLoadingProfile ? (
                                 <div className="h-9 w-9 bg-muted animate-pulse rounded-xl" />
@@ -860,7 +863,7 @@ export function Navbar() {
 
                               <button
                                 onClick={() => setTheme("light")}
-                                className={`p-1.5 rounded transition-colors duration-200 flex-1 flex items-center justify-center relative z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                                className={`p-1.5 rounded transition-all duration-300 ease-in-out flex-1 flex items-center justify-center relative z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                                   resolvedTheme === "light"
                                     ? "text-foreground"
                                     : "text-muted-foreground hover:text-foreground"
@@ -870,7 +873,7 @@ export function Navbar() {
                               </button>
                               <button
                                 onClick={() => setTheme("dark")}
-                                className={`p-1.5 rounded transition-colors duration-200 flex-1 flex items-center justify-center relative z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                                className={`p-1.5 rounded transition-all duration-300 ease-in-out flex-1 flex items-center justify-center relative z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                                   resolvedTheme === "dark"
                                     ? "text-foreground"
                                     : "text-muted-foreground hover:text-foreground"

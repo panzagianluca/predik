@@ -47,7 +47,7 @@ export function GlowingButton({
       ref={buttonRef}
       href={href}
       className={cn(
-        "group relative inline-flex h-9 items-center justify-center overflow-visible rounded-md px-6",
+        "group relative inline-flex h-9 items-center justify-center overflow-visible rounded-md px-6 transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         className,
       )}
       onMouseMove={handleMouseMove}

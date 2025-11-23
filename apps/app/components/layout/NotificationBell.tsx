@@ -167,7 +167,7 @@ export function NotificationBell() {
                   setIsOpen(false);
                 }}
                 className={cn(
-                  "block px-4 py-3 hover:bg-muted border-b transition-colors",
+                  "block px-4 py-3 hover:bg-muted border-b transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                   !notification.isRead && "bg-electric-purple/5",
                 )}
               >

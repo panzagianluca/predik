@@ -351,7 +351,7 @@ export function MarketsGrid() {
                     setTimeFilter(filter.id);
                   }}
                   className={cn(
-                    "flex items-center gap-2 px-4 h-[36px] rounded-md border-2 transition-all duration-200 text-[14px] relative overflow-hidden flex-shrink-0",
+                    "flex items-center gap-2 px-4 h-[36px] rounded-md border-2 transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background text-[14px] relative overflow-hidden flex-shrink-0",
                     isActive
                       ? "bg-electric-purple text-white border-electric-purple font-semibold"
                       : "bg-background border-border hover:border-electric-purple/50 text-foreground font-medium",
@@ -390,7 +390,7 @@ export function MarketsGrid() {
                     setCategoryFilter(filter.id);
                   }}
                   className={cn(
-                    "px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] relative overflow-hidden flex-shrink-0",
+                    "px-4 h-[36px] rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background font-medium text-[14px] relative overflow-hidden flex-shrink-0",
                     isActive
                       ? "text-electric-purple bg-electric-purple/5"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted",
@@ -427,7 +427,7 @@ export function MarketsGrid() {
                     setTimeFilter(filter.id);
                   }}
                   className={cn(
-                    "flex items-center gap-2 px-4 h-[36px] rounded-md border-2 transition-all duration-200 text-[14px] relative overflow-hidden",
+                    "flex items-center gap-2 px-4 h-[36px] rounded-md border-2 transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background text-[14px] relative overflow-hidden",
                     isActive
                       ? "bg-electric-purple text-white border-electric-purple font-semibold"
                       : "bg-background border-border hover:border-electric-purple/50 text-foreground font-medium",
@@ -465,7 +465,7 @@ export function MarketsGrid() {
                     setCategoryFilter(filter.id);
                   }}
                   className={cn(
-                    "px-4 h-[36px] rounded-md transition-all duration-200 font-medium text-[14px] relative overflow-hidden",
+                    "px-4 h-[36px] rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background font-medium text-[14px] relative overflow-hidden",
                     isActive
                       ? "text-electric-purple bg-electric-purple/5"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted",

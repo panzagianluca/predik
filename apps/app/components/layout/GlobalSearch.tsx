@@ -87,7 +87,7 @@ export function GlobalSearch() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="flex w-full max-w-[360px] items-center gap-2 rounded-md border border-transparent bg-muted/70 px-4 h-9 text-sm text-muted-foreground transition-colors duration-200 hover:bg-muted/90 hover:text-foreground dark:bg-muted/40 dark:hover:bg-muted/60 mr-4 md:mr-6">
+        <button className="flex w-full max-w-[360px] items-center gap-2 rounded-md border border-transparent bg-muted/70 px-4 h-9 text-sm text-muted-foreground transition-all duration-300 ease-in-out hover:bg-muted/90 hover:text-foreground dark:bg-muted/40 dark:hover:bg-muted/60 mr-4 md:mr-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
           <Search className="w-4 h-4 text-muted-foreground" />
           <span className="hidden md:inline whitespace-nowrap">
             Buscar Mercados

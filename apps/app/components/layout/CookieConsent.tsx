@@ -127,13 +127,13 @@ export function CookieConsentBanner() {
             <div className="flex gap-2">
               <button
                 onClick={acceptAll}
-                className="flex-1 h-9 bg-electric-purple hover:bg-electric-purple/90 text-white font-medium text-[14px] rounded-md transition-all duration-200"
+                className="flex-1 h-9 bg-electric-purple hover:bg-electric-purple/90 text-white font-medium text-[14px] rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 Aceptar todo
               </button>
               <button
                 onClick={acceptNecessary}
-                className="flex-1 h-9 bg-muted hover:bg-muted/80 text-foreground font-medium text-[14px] rounded-md transition-all duration-200"
+                className="flex-1 h-9 bg-muted hover:bg-muted/80 text-foreground font-medium text-[14px] rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 Solo necesarias
               </button>
@@ -160,7 +160,7 @@ export function CookieConsentBanner() {
               </h2>
               <button
                 onClick={() => setShowPreferences(false)}
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-foreground transition-all duration-300 ease-in-out rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -213,7 +213,7 @@ export function CookieConsentBanner() {
                       checked={behavioralEnabled}
                       onChange={(e) => setBehavioralEnabled(e.target.checked)}
                     />
-                    <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-electric-purple/50 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-electric-purple"></div>
+                    <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-background rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-electric-purple"></div>
                   </label>
                 </div>
                 <p className="text-[14px] text-muted-foreground mb-2">
@@ -252,7 +252,7 @@ export function CookieConsentBanner() {
                       checked={analyticsEnabled}
                       onChange={(e) => setAnalyticsEnabled(e.target.checked)}
                     />
-                    <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-electric-purple/50 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-electric-purple"></div>
+                    <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-background rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-electric-purple"></div>
                   </label>
                 </div>
                 <p className="text-[14px] text-muted-foreground mb-2">
@@ -291,7 +291,7 @@ export function CookieConsentBanner() {
                   );
                   saveConsent(true, behavioralEnabled, analyticsEnabled);
                 }}
-                className="flex-1 h-9 bg-electric-purple hover:bg-electric-purple/90 text-white font-medium text-[14px] rounded-md transition-all duration-200"
+                className="flex-1 h-9 bg-electric-purple hover:bg-electric-purple/90 text-white font-medium text-[14px] rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 Guardar mis preferencias
               </button>
@@ -304,7 +304,7 @@ export function CookieConsentBanner() {
                   setAnalyticsEnabled(true);
                   saveConsent(true, true, true);
                 }}
-                className="flex-1 h-9 bg-muted hover:bg-muted/80 text-foreground font-medium text-[14px] rounded-md transition-all duration-200"
+                className="flex-1 h-9 bg-muted hover:bg-muted/80 text-foreground font-medium text-[14px] rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 Aceptar todo
               </button>
@@ -317,7 +317,7 @@ export function CookieConsentBanner() {
                   setAnalyticsEnabled(false);
                   saveConsent(true, false, false);
                 }}
-                className="flex-1 h-9 border border-border hover:bg-muted text-foreground font-medium text-[14px] rounded-md transition-all duration-200"
+                className="flex-1 h-9 border border-border hover:bg-muted text-foreground font-medium text-[14px] rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 Solo necesarias
               </button>

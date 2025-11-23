@@ -160,7 +160,7 @@ export function HowItWorks() {
                             </span>
                           </div>
                         </div>
-                        <button className="w-full py-1.5 bg-electric-purple text-white rounded-lg text-xs font-medium shadow-lg shadow-electric-purple/25">
+                        <button className="w-full py-1.5 bg-electric-purple text-white rounded-lg text-xs font-medium shadow-lg shadow-electric-purple/25 transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
                           Confirmar
                         </button>
                       </div>
@@ -186,7 +186,7 @@ export function HowItWorks() {
                           153.80 USDT
                         </div>
                       </div>
-                      <button className="w-full py-1.5 bg-green-600 text-white rounded-lg text-xs font-medium">
+                      <button className="w-full py-1.5 bg-green-600 text-white rounded-lg text-xs font-medium transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
                         Reclamar
                       </button>
                     </div>
@@ -206,10 +206,10 @@ export function HowItWorks() {
               const isActive = activeStep === index;
 
               return (
-                <div
+                <button
                   key={step.id}
                   className={cn(
-                    "relative p-6 rounded-2xl border-2 transition-all duration-300 cursor-pointer",
+                    "relative w-full text-left p-6 rounded-2xl border-2 transition-all duration-300 ease-in-out cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                     isActive
                       ? `${step.borderColor} ${step.bgColor}`
                       : "border-transparent hover:bg-muted/50",
@@ -256,7 +256,7 @@ export function HowItWorks() {
                       )}
                     />
                   )}
-                </div>
+                </button>
               );
             })}
           </div>
@@ -295,14 +295,14 @@ export function HowItWorks() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <div className="flex justify-between items-center p-3 rounded-lg border border-border hover:border-electric-purple/50 cursor-pointer transition-colors">
+                    <button className="w-full flex justify-between items-center p-3 rounded-lg border border-border hover:border-electric-purple/50 cursor-pointer transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
                       <span className="font-medium text-green-600">Sí</span>
                       <span className="text-sm font-bold">65%</span>
-                    </div>
-                    <div className="flex justify-between items-center p-3 rounded-lg border border-border hover:border-electric-purple/50 cursor-pointer transition-colors">
+                    </button>
+                    <button className="w-full flex justify-between items-center p-3 rounded-lg border border-border hover:border-electric-purple/50 cursor-pointer transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
                       <span className="font-medium text-red-600">No</span>
                       <span className="text-sm font-bold">35%</span>
-                    </div>
+                    </button>
                   </div>
                 </motion.div>
               )}
@@ -351,7 +351,7 @@ export function HowItWorks() {
                         </span>
                       </div>
                     </div>
-                    <button className="w-full py-2 bg-electric-purple text-white rounded-lg font-medium shadow-lg shadow-electric-purple/25">
+                    <button className="w-full py-2 bg-electric-purple text-white rounded-lg font-medium shadow-lg shadow-electric-purple/25 transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
                       Confirmar Compra
                     </button>
                   </div>
@@ -385,7 +385,7 @@ export function HowItWorks() {
                       153.80 USDT
                     </div>
                   </div>
-                  <button className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors">
+                  <button className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
                     Reclamar Ganancias
                   </button>
                 </motion.div>

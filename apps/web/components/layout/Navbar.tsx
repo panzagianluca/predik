@@ -81,10 +81,14 @@ export function Navbar() {
   );
 
   const AccederButton = () => (
-    <Link href="https://app.predik.io">
+    <Link
+      href="https://app.predik.io"
+      className="rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+    >
       <button
-        className="group/button relative inline-flex items-center justify-center overflow-hidden rounded-md bg-[hsl(var(--electric-purple))] backdrop-blur-lg px-6 h-9 text-[14px] sm:text-sm font-semibold text-white transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl hover:shadow-[hsl(var(--electric-purple))]/50"
+        className="group/button relative inline-flex items-center justify-center overflow-hidden rounded-md bg-[hsl(var(--electric-purple))] backdrop-blur-lg px-6 h-9 text-[14px] sm:text-sm font-semibold text-white transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl hover:shadow-[hsl(var(--electric-purple))]/50 focus-visible:outline-none"
         type="button"
+        tabIndex={-1}
       >
         <span className="relative z-10">Acceder</span>
         <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-13deg)_translateX(-100%)] group-hover/button:duration-1000 group-hover/button:[transform:skew(-13deg)_translateX(100%)]">
@@ -108,7 +112,10 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 flex-shrink-0">
+            <Link
+              href="/"
+              className="flex items-center gap-2 flex-shrink-0 rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
               {mounted && (
                 <Image
                   src={logoSrc}
@@ -342,14 +349,14 @@ export function Navbar() {
                 <div className="flex flex-col gap-6">
                   <Link
                     href="/"
-                    className="text-lg font-medium hover:text-[hsl(var(--electric-purple))] transition-colors"
+                    className="text-lg font-medium hover:text-[hsl(var(--electric-purple))] rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Inicio
                   </Link>
                   <Link
                     href="/como-funciona"
-                    className="text-lg font-medium hover:text-[hsl(var(--electric-purple))] transition-colors"
+                    className="text-lg font-medium hover:text-[hsl(var(--electric-purple))] rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Cómo Funciona
@@ -362,31 +369,31 @@ export function Navbar() {
                     <div className="flex flex-col gap-3 pl-4 border-l border-border/50">
                       <a
                         href="https://app.predik.io"
-                        className="hover:text-[hsl(var(--electric-purple))] transition-colors"
+                        className="hover:text-[hsl(var(--electric-purple))] rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       >
                         Trending
                       </a>
                       <a
                         href="https://app.predik.io?filter=politica"
-                        className="hover:text-[hsl(var(--electric-purple))] transition-colors"
+                        className="hover:text-[hsl(var(--electric-purple))] rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       >
                         Política
                       </a>
                       <a
                         href="https://app.predik.io?filter=economia"
-                        className="hover:text-[hsl(var(--electric-purple))] transition-colors"
+                        className="hover:text-[hsl(var(--electric-purple))] rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       >
                         Economía
                       </a>
                       <a
                         href="https://app.predik.io?filter=deportes"
-                        className="hover:text-[hsl(var(--electric-purple))] transition-colors"
+                        className="hover:text-[hsl(var(--electric-purple))] rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       >
                         Deportes
                       </a>
                       <a
                         href="https://app.predik.io"
-                        className="font-semibold hover:text-[hsl(var(--electric-purple))] transition-colors"
+                        className="font-semibold hover:text-[hsl(var(--electric-purple))] rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       >
                         Ver Todos →
                       </a>
@@ -401,42 +408,42 @@ export function Navbar() {
                       <Link
                         href="/about"
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="hover:text-[hsl(var(--electric-purple))] transition-colors"
+                        className="hover:text-[hsl(var(--electric-purple))] rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       >
                         Acerca de
                       </Link>
                       <Link
                         href="/roadmap"
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="hover:text-[hsl(var(--electric-purple))] transition-colors"
+                        className="hover:text-[hsl(var(--electric-purple))] rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       >
                         Roadmap
                       </Link>
                       <Link
                         href="/blog"
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="hover:text-[hsl(var(--electric-purple))] transition-colors"
+                        className="hover:text-[hsl(var(--electric-purple))] rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       >
                         Blog
                       </Link>
                       <Link
                         href="/faq"
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="hover:text-[hsl(var(--electric-purple))] transition-colors"
+                        className="hover:text-[hsl(var(--electric-purple))] rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       >
                         FAQ
                       </Link>
                       <Link
                         href="/contacto"
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="hover:text-[hsl(var(--electric-purple))] transition-colors"
+                        className="hover:text-[hsl(var(--electric-purple))] rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       >
                         Contacto
                       </Link>
                       <Link
                         href="/carreras"
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="font-semibold hover:text-[hsl(var(--electric-purple))] transition-colors"
+                        className="font-semibold hover:text-[hsl(var(--electric-purple))] rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       >
                         Carreras →
                       </Link>
