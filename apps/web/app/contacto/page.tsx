@@ -17,7 +17,7 @@ export default function ContactPage() {
         <FadeIn>
           {/* Header */}
           <div className="mb-12">
-            <h1 className="text-4xl sm:text-5xl font-bold mb-4">Contacto</h1>
+            <h1 className="text-3xl font-bold mb-4">Contacto</h1>
             <p className="text-lg text-muted-foreground max-w-2xl">
               Estamos acá para ayudarte. Envianos tu consulta y te responderemos
               lo antes posible.
@@ -45,7 +45,7 @@ export default function ContactPage() {
                       <p className="font-medium text-sm">Email</p>
                       <a
                         href="mailto:support@predik.io"
-                        className="text-sm text-muted-foreground hover:text-electric-purple transition-colors"
+                        className="text-sm text-muted-foreground hover:text-electric-purple transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-sm"
                       >
                         support@predik.io
                       </a>
@@ -87,7 +87,7 @@ export default function ContactPage() {
                 </p>
                 <a
                   href="/faq"
-                  className="inline-flex items-center text-sm font-medium text-electric-purple hover:underline"
+                  className="inline-flex items-center text-sm font-medium text-electric-purple hover:underline transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-sm"
                 >
                   Ver Preguntas Frecuentes →
                 </a>

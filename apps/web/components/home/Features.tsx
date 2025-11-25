@@ -6,27 +6,27 @@ import { FadeIn } from "@/components/animations/FadeIn";
 export function Features() {
   const features = [
     {
-      title: "Transparencia Total",
+      title: "Transparencia total",
       description:
-        "Todas las transacciones y resoluciones ocurren on-chain en BNB Smart Chain. Verificable por cualquiera, en cualquier momento.",
+        "Todas las transacciones y resultados quedan registrados en la BNB Smart Chain. Cualquiera puede verificarlos, en cualquier momento.",
       icon: ShieldCheck,
     },
     {
-      title: "Pagos Instantáneos",
+      title: "Pagos instantáneos",
       description:
-        "Sin intermediarios. Los contratos inteligentes distribuyen las ganancias automáticamente a tu wallet apenas se resuelve el mercado.",
+        "Recibí tus ganancias directo en tu wallet, sin intermediarios, apenas se resuelve el mercado.",
       icon: Zap,
     },
     {
-      title: "Mercados Regionales",
+      title: "Mercados regionales",
       description:
-        "Especializados en eventos de Latam: Política Argentina, Economía Regional y Fútbol Sudamericano.",
+        "Enfocados en eventos de Latam como Política Argentina, Economía regional y Fútbol sudamericano.",
       icon: Globe2,
     },
     {
-      title: "Bajas Comisiones",
+      title: "Comisiones bajas",
       description:
-        "Operá con fees mínimos gracias a la eficiencia de BNB Chain y la arquitectura optimizada de Predik.",
+        "Pagá menos comisiones gracias a la eficiencia de BNB Chain y la arquitectura optimizada de Predik.",
       icon: Coins,
     },
   ];
@@ -54,9 +54,7 @@ export function Features() {
                   <div className="w-12 h-12 rounded-xl bg-electric-purple/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                     <Icon className="w-6 h-6 text-electric-purple" />
                   </div>
-                  <h3 className="text-lg font-bold mb-3 group-hover:text-electric-purple transition-colors">
-                    {feature.title}
-                  </h3>
+                  <h3 className="text-lg font-bold mb-3">{feature.title}</h3>
                   <p className="text-muted-foreground leading-relaxed text-sm">
                     {feature.description}
                   </p>

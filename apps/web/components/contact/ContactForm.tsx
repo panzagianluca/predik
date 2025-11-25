@@ -3,6 +3,13 @@
 import { useState } from "react";
 import { Button } from "@predik/ui";
 import { Send, Loader2, CheckCircle2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const CONTACT_REASONS = [
   { value: "soporte", label: "Soporte Técnico" },
@@ -89,7 +96,7 @@ export function ContactForm() {
             onChange={(e) =>
               setFormData({ ...formData, fullName: e.target.value })
             }
-            className="w-full px-4 py-2.5 rounded-md border border-border bg-background text-foreground placeholder:text-muted-foreground transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-4 py-2.5 rounded-md border border-border bg-background text-foreground placeholder:text-muted-foreground transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed [&:-webkit-autofill]:shadow-[inset_0_0_0_1000px] [&:-webkit-autofill]:shadow-background dark:[&:-webkit-autofill]:shadow-background [&:-webkit-autofill]:[-webkit-text-fill-color:hsl(var(--foreground))]"
             placeholder="Tu nombre completo"
             disabled={isSubmitting}
           />
@@ -111,7 +118,7 @@ export function ContactForm() {
             onChange={(e) =>
               setFormData({ ...formData, email: e.target.value })
             }
-            className="w-full px-4 py-2.5 rounded-md border border-border bg-background text-foreground placeholder:text-muted-foreground transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-4 py-2.5 rounded-md border border-border bg-background text-foreground placeholder:text-muted-foreground transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed [&:-webkit-autofill]:shadow-[inset_0_0_0_1000px] [&:-webkit-autofill]:shadow-background dark:[&:-webkit-autofill]:shadow-background [&:-webkit-autofill]:[-webkit-text-fill-color:hsl(var(--foreground))]"
             placeholder="tu@email.com"
             disabled={isSubmitting}
           />
@@ -125,26 +132,24 @@ export function ContactForm() {
           >
             Motivo <span className="text-red-500">*</span>
           </label>
-          <select
-            id="reason"
-            required
+          <Select
             value={formData.reason}
-            onChange={(e) =>
-              setFormData({ ...formData, reason: e.target.value })
+            onValueChange={(value: string) =>
+              setFormData({ ...formData, reason: value })
             }
-            className="w-full px-4 py-2.5 rounded-md border border-border bg-background text-foreground transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed appearance-none bg-[length:20px_20px] bg-[right_12px_center] bg-no-repeat"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
-            }}
             disabled={isSubmitting}
           >
-            <option value="">Selecciona un motivo</option>
-            {CONTACT_REASONS.map((reason) => (
-              <option key={reason.value} value={reason.value}>
-                {reason.label}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecciona un motivo" />
+            </SelectTrigger>
+            <SelectContent>
+              {CONTACT_REASONS.map((reason) => (
+                <SelectItem key={reason.value} value={reason.value}>
+                  {reason.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Message */}
@@ -165,7 +170,7 @@ export function ContactForm() {
             rows={6}
             minLength={20}
             maxLength={3000}
-            className="w-full px-4 py-2.5 rounded-md border border-border bg-background text-foreground placeholder:text-muted-foreground transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed resize-y"
+            className="w-full px-4 py-2.5 rounded-md border border-border bg-background text-foreground placeholder:text-muted-foreground transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed resize-none max-h-48 overflow-auto [&:-webkit-autofill]:shadow-[inset_0_0_0_1000px] [&:-webkit-autofill]:shadow-background dark:[&:-webkit-autofill]:shadow-background [&:-webkit-autofill]:[-webkit-text-fill-color:hsl(var(--foreground))]"
             placeholder="Escribe tu mensaje aquí (mínimo 20 caracteres)..."
             disabled={isSubmitting}
           />
@@ -184,16 +189,16 @@ export function ContactForm() {
           <Button
             type="submit"
             disabled={!isFormValid || isSubmitting}
-            className="w-full sm:w-auto px-8 py-3 bg-electric-purple text-white rounded-md font-semibold transition-all duration-300 ease-in-out hover:bg-electric-purple/90 hover:scale-105 hover:shadow-lg hover:shadow-electric-purple/50 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none flex items-center gap-2 justify-center"
+            className="w-full sm:w-auto h-9 px-8 text-sm bg-electric-purple text-white rounded-md font-semibold transition-all duration-300 ease-in-out hover:bg-electric-purple/90 hover:scale-105 hover:shadow-lg hover:shadow-electric-purple/50 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none flex items-center gap-2 justify-center"
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="h-5 w-5 animate-spin" />
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
                 Enviando...
               </>
             ) : (
               <>
-                <Send className="h-5 w-5" />
+                <Send className="h-3.5 w-3.5" />
                 Enviar Mensaje
               </>
             )}
