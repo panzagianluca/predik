@@ -225,6 +225,14 @@ export function Footer() {
                   Política de Privacidad
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/cookies"
+                  className="text-muted-foreground hover:text-foreground rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
+                  Política de Cookies
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
