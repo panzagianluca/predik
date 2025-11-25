@@ -258,8 +258,15 @@ async function translateMarketsToSpanish(markets: any[]): Promise<any[]> {
             `⚠️  Translation failed for ${market.slug}, using English as fallback`,
           );
           translation = {
+            id: `fallback-${market.id}`,
+            marketId: market.id,
+            marketSlug: market.slug,
             titleEs: market.title,
             descriptionEs: market.description,
+            titleEn: market.title,
+            descriptionEn: market.description,
+            translatedAt: new Date(),
+            updatedAt: new Date(),
           };
         }
       }
@@ -267,8 +274,8 @@ async function translateMarketsToSpanish(markets: any[]): Promise<any[]> {
       // Return market with Spanish translations
       return {
         ...market,
-        titleEs: translation.titleEs,
-        descriptionEs: translation.descriptionEs,
+        titleEs: translation?.titleEs || market.title,
+        descriptionEs: translation?.descriptionEs || market.description,
       };
     }),
   );
