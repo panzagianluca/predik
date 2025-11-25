@@ -208,10 +208,24 @@ async function translateMarketToSpanish(market: any): Promise<any> {
       `🆕 New market "${market.title}" (${market.slug}) - translating...`,
     );
 
-    const { titleEs, descriptionEs } = await translateWithDeepL({
-      title: market.title,
-      description: market.description,
-    });
+    let titleEs: string;
+    let descriptionEs: string;
+
+    try {
+      const translated = await translateWithDeepL({
+        title: market.title,
+        description: market.description,
+      });
+      titleEs = translated.titleEs;
+      descriptionEs = translated.descriptionEs;
+    } catch (translationError: any) {
+      // If translation fails (quota exceeded, etc), use English as fallback
+      logger.error(
+        `⚠️  Translation failed for ${market.slug}, using English as fallback`,
+      );
+      titleEs = market.title;
+      descriptionEs = market.description;
+    }
 
     // Store in database for future use
     try {

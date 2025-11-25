@@ -94,8 +94,20 @@ export async function GET(request: NextRequest) {
 
       logger.log(`✅ Fetched ALL ${allMarkets.length} markets from Myriad`);
 
+      // Filter out 5 Min Candle markets
+      const filteredMarkets = allMarkets.filter(
+        (m: any) =>
+          !m.title?.includes("5 Min Candle") &&
+          !m.title?.includes("candles from"),
+      );
+      logger.log(
+        `🔍 Filtered to ${filteredMarkets.length} markets (excluded 5 Min Candles)`,
+      );
+
       // 🌐 TRANSLATION: Get Spanish translations from DB or create them
-      const translatedMarkets = await translateMarketsToSpanish(allMarkets);
+      const translatedMarkets = await translateMarketsToSpanish(
+        filteredMarkets,
+      );
 
       return NextResponse.json(translatedMarkets, {
         headers: {
@@ -142,8 +154,18 @@ export async function GET(request: NextRequest) {
 
     logger.log("✅ Myriad V2 API response:", markets.length || 0, "markets");
 
+    // Filter out 5 Min Candle markets
+    const filteredMarkets = markets.filter(
+      (m: any) =>
+        !m.title?.includes("5 Min Candle") &&
+        !m.title?.includes("candles from"),
+    );
+    logger.log(
+      `🔍 Filtered to ${filteredMarkets.length} markets (excluded 5 Min Candles)`,
+    );
+
     // 🌐 TRANSLATION: Get Spanish translations from DB or create them
-    const translatedMarkets = await translateMarketsToSpanish(markets);
+    const translatedMarkets = await translateMarketsToSpanish(filteredMarkets);
 
     return NextResponse.json(translatedMarkets, {
       headers: {
@@ -192,25 +214,54 @@ async function translateMarketsToSpanish(markets: any[]): Promise<any[]> {
           `🆕 New market detected: "${market.title}" - translating...`,
         );
 
-        const { titleEs, descriptionEs } = await translateMarketToSpanish({
-          title: market.title,
-          description: market.description,
-        });
+        try {
+          const { titleEs, descriptionEs } = await translateMarketToSpanish({
+            title: market.title,
+            description: market.description,
+          });
 
-        // Store in database for future use
-        const [newTranslation] = await db
-          .insert(marketTranslations)
-          .values({
-            marketId: market.id,
-            marketSlug: market.slug,
-            titleEs,
-            descriptionEs,
-            titleEn: market.title,
-            descriptionEn: market.description,
-          })
-          .returning();
+          // Store in database for future use
+          try {
+            const [newTranslation] = await db
+              .insert(marketTranslations)
+              .values({
+                marketId: market.id,
+                marketSlug: market.slug,
+                titleEs,
+                descriptionEs,
+                titleEn: market.title,
+                descriptionEn: market.description,
+              })
+              .returning();
 
-        translation = newTranslation;
+            translation = newTranslation;
+          } catch (dbError: any) {
+            // Handle duplicate key (race condition)
+            const errorCode = dbError.code || dbError.cause?.code;
+            if (errorCode === "23505") {
+              logger.log(
+                `⚡ Race condition for market ${market.id}, fetching existing...`,
+              );
+              translation = await db
+                .select()
+                .from(marketTranslations)
+                .where(eq(marketTranslations.marketId, market.id))
+                .limit(1)
+                .then((rows) => rows[0]);
+            } else {
+              throw dbError;
+            }
+          }
+        } catch (translationError: any) {
+          // If translation fails (quota exceeded, etc), use English as fallback
+          logger.error(
+            `⚠️  Translation failed for ${market.slug}, using English as fallback`,
+          );
+          translation = {
+            titleEs: market.title,
+            descriptionEs: market.description,
+          };
+        }
       }
 
       // Return market with Spanish translations
