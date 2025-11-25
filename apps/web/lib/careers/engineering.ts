@@ -1,0 +1,180 @@
+import { Code, Layers, Server } from "lucide-react";
+import type { JobPosition } from "./types";
+
+export const engineeringJobs: JobPosition[] = [
+  {
+    id: "cto",
+    slug: "cto",
+    title: "Chief Technology Officer (CTO)",
+    category: "engineering",
+    type: "full-time",
+    icon: Code,
+    shortDescription:
+      "Lidera la visión tecnológica y el equipo de desarrollo de Predik.",
+    description:
+      "Buscamos un CTO experimentado para liderar nuestra visión técnica y construir el equipo de ingeniería. Serás responsable de la arquitectura, decisiones tecnológicas clave, y de escalar nuestra plataforma de mercados de predicción.",
+    responsibilities: [
+      "Definir y ejecutar la estrategia tecnológica de la empresa",
+      "Liderar y hacer crecer el equipo de ingeniería",
+      "Tomar decisiones de arquitectura para escalar la plataforma",
+      "Colaborar con el CEO en la visión del producto",
+      "Gestionar la infraestructura y seguridad de la plataforma",
+      "Evaluar e implementar nuevas tecnologías Web3",
+    ],
+    requirements: [
+      "10+ años de experiencia en desarrollo de software",
+      "5+ años liderando equipos de ingeniería",
+      "Experiencia con proyectos Web3/blockchain",
+      "Conocimiento profundo de arquitectura de sistemas distribuidos",
+      "Experiencia con TypeScript, Node.js, y frameworks modernos",
+      "Historial probado de llevar productos a producción",
+    ],
+    niceToHave: [
+      "Experiencia con Solidity y smart contracts EVM",
+      "Conocimiento de DeFi y protocolos descentralizados",
+      "Experiencia en startups o empresas de alto crecimiento",
+      "Contribuciones a proyectos open source",
+    ],
+    isLeadership: true,
+  },
+  {
+    id: "web3-engineer",
+    slug: "web3-engineer",
+    title: "Web3 Engineer",
+    category: "engineering",
+    type: "full-time",
+    icon: Code,
+    shortDescription:
+      "Desarrolla e integra smart contracts y protocolos blockchain.",
+    description:
+      "Buscamos un Web3 Engineer para trabajar en la integración con smart contracts, protocolos DeFi, y expandir nuestras capacidades blockchain. Trabajarás con Solidity, EVM, y múltiples cadenas.",
+    responsibilities: [
+      "Desarrollar e integrar smart contracts en Solidity",
+      "Implementar integraciones con protocolos DeFi",
+      "Optimizar interacciones on-chain para eficiencia de gas",
+      "Auditar y mejorar la seguridad de contratos",
+      "Integrar nuevas cadenas EVM compatibles",
+      "Colaborar con el equipo frontend en la integración Web3",
+    ],
+    requirements: [
+      "3+ años de experiencia en desarrollo blockchain",
+      "Dominio de Solidity y desarrollo de smart contracts",
+      "Experiencia con cadenas EVM (Ethereum, BNB Chain, etc.)",
+      "Conocimiento de protocolos DeFi y AMMs",
+      "Experiencia con herramientas: Hardhat, Foundry, o similares",
+      "Familiaridad con auditorías de seguridad",
+    ],
+    niceToHave: [
+      "Experiencia con prediction markets o protocolos similares",
+      "Conocimiento de oráculos (Chainlink, UMA)",
+      "Contribuciones a proyectos Web3 open source",
+      "Experiencia con TheGraph y subgraphs",
+    ],
+    isLeadership: false,
+  },
+  {
+    id: "fullstack-developer",
+    slug: "fullstack-developer",
+    title: "Full Stack Developer",
+    category: "engineering",
+    type: "full-time",
+    icon: Layers,
+    shortDescription:
+      "Construye features end-to-end en nuestra plataforma Next.js.",
+    description:
+      "Buscamos un Full Stack Developer para construir y mejorar nuestra plataforma de mercados de predicción. Trabajarás con Next.js, TypeScript, y tecnologías Web3 para crear experiencias de usuario excepcionales.",
+    responsibilities: [
+      "Desarrollar features full-stack con Next.js y TypeScript",
+      "Implementar integraciones con wallets y Web3",
+      "Diseñar y mantener APIs RESTful",
+      "Optimizar rendimiento y experiencia de usuario",
+      "Colaborar con diseño para implementar interfaces",
+      "Participar en code reviews y mejorar calidad de código",
+    ],
+    requirements: [
+      "3+ años de experiencia con React/Next.js",
+      "Dominio de TypeScript",
+      "Experiencia con bases de datos SQL y ORMs",
+      "Conocimiento de APIs REST y GraphQL",
+      "Familiaridad con integraciones Web3 (wagmi, ethers.js)",
+      "Experiencia con Tailwind CSS o CSS-in-JS",
+    ],
+    niceToHave: [
+      "Experiencia con Drizzle ORM o Prisma",
+      "Conocimiento de Vercel y edge computing",
+      "Experiencia con testing (Jest, Playwright)",
+      "Familiaridad con monorepos (Turborepo)",
+    ],
+    isLeadership: false,
+  },
+  {
+    id: "backend-developer",
+    slug: "backend-developer",
+    title: "Backend Developer",
+    category: "engineering",
+    type: "full-time",
+    icon: Server,
+    shortDescription:
+      "Desarrolla APIs robustas y escalables para la plataforma.",
+    description:
+      "Buscamos un Backend Developer para construir y mantener nuestra infraestructura de APIs y servicios. Trabajarás en sistemas de alta disponibilidad que procesan datos de mercados en tiempo real.",
+    responsibilities: [
+      "Diseñar y desarrollar APIs escalables",
+      "Implementar sistemas de procesamiento de datos en tiempo real",
+      "Integrar con servicios externos y APIs de terceros",
+      "Optimizar queries y rendimiento de base de datos",
+      "Implementar sistemas de caché y colas",
+      "Documentar APIs y mantener estándares de código",
+    ],
+    requirements: [
+      "3+ años de experiencia en desarrollo backend",
+      "Experiencia con Node.js y TypeScript",
+      "Dominio de bases de datos SQL (PostgreSQL preferido)",
+      "Conocimiento de Redis, colas de mensajes",
+      "Experiencia con APIs REST y/o GraphQL",
+      "Familiaridad con Docker y despliegue en cloud",
+    ],
+    niceToHave: [
+      "Experiencia con sistemas event-driven",
+      "Conocimiento de blockchain y Web3",
+      "Experiencia con Vercel/AWS/GCP",
+      "Familiaridad con observabilidad (logs, métricas, tracing)",
+    ],
+    isLeadership: false,
+  },
+  {
+    id: "devops",
+    slug: "devops",
+    title: "DevOps Engineer",
+    category: "engineering",
+    type: "full-time",
+    icon: Server,
+    shortDescription:
+      "Gestiona la infraestructura y automatización de deployments.",
+    description:
+      "Buscamos un DevOps Engineer para gestionar nuestra infraestructura cloud, pipelines de CI/CD, y asegurar la disponibilidad de nuestros servicios 24/7.",
+    responsibilities: [
+      "Gestionar infraestructura cloud (Vercel, AWS, etc.)",
+      "Implementar y mantener pipelines de CI/CD",
+      "Monitorear servicios y responder a incidentes",
+      "Automatizar procesos de deployment",
+      "Implementar prácticas de seguridad e Infrastructure as Code",
+      "Optimizar costos de infraestructura",
+    ],
+    requirements: [
+      "3+ años de experiencia en DevOps/SRE",
+      "Experiencia con plataformas cloud (AWS, GCP, o Vercel)",
+      "Conocimiento de Docker y orquestación de contenedores",
+      "Experiencia con CI/CD (GitHub Actions, etc.)",
+      "Familiaridad con monitoreo (Datadog, Grafana, etc.)",
+      "Conocimiento de networking y seguridad",
+    ],
+    niceToHave: [
+      "Experiencia con infraestructura blockchain (nodos RPC)",
+      "Conocimiento de Kubernetes",
+      "Certificaciones cloud (AWS, GCP)",
+      "Experiencia con Terraform o Pulumi",
+    ],
+    isLeadership: false,
+  },
+];

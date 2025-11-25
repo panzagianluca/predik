@@ -1,0 +1,143 @@
+import { Megaphone, MessageSquare, Users } from "lucide-react";
+import type { JobPosition } from "./types";
+
+export const marketingJobs: JobPosition[] = [
+  {
+    id: "cmo",
+    slug: "cmo",
+    title: "Chief Marketing Officer (CMO)",
+    category: "marketing",
+    type: "full-time",
+    icon: Megaphone,
+    shortDescription:
+      "Lidera la estrategia de marketing y crecimiento de Predik.",
+    description:
+      "Buscamos un CMO con experiencia en Web3 para liderar nuestra estrategia de go-to-market y hacer crecer nuestra comunidad en Latinoamérica. Serás responsable del posicionamiento de marca, adquisición de usuarios, y todas las iniciativas de marketing.",
+    responsibilities: [
+      "Definir y ejecutar la estrategia de marketing integral",
+      "Liderar el equipo de marketing y redes sociales",
+      "Desarrollar campañas de adquisición de usuarios",
+      "Gestionar el presupuesto de marketing y medir ROI",
+      "Construir partnerships estratégicos y alianzas",
+      "Posicionar a Predik como líder en mercados de predicción LATAM",
+    ],
+    requirements: [
+      "7+ años de experiencia en marketing digital",
+      "Experiencia comprobable en marketing Web3/crypto",
+      "Track record de crecimiento de comunidades",
+      "Conocimiento profundo del ecosistema crypto latinoamericano",
+      "Experiencia liderando equipos de marketing",
+      "Excelentes habilidades de comunicación en español e inglés",
+    ],
+    niceToHave: [
+      "Red de contactos en el ecosistema crypto LATAM",
+      "Experiencia con growth hacking y viralidad",
+      "Conocimiento de prediction markets",
+      "Experiencia con influencer marketing",
+    ],
+    isLeadership: true,
+  },
+  {
+    id: "social-media-manager",
+    slug: "social-media-manager",
+    title: "Social Media Manager",
+    category: "marketing",
+    type: "full-time",
+    icon: MessageSquare,
+    shortDescription: "Gestiona nuestra presencia en X, Instagram y TikTok.",
+    description:
+      "Buscamos un Social Media Manager creativo para gestionar nuestra presencia en redes sociales y construir una comunidad activa alrededor de Predik.",
+    responsibilities: [
+      "Crear y publicar contenido diario en X, Instagram y TikTok",
+      "Desarrollar estrategia de contenido para cada plataforma",
+      "Interactuar con la comunidad y responder comentarios",
+      "Analizar métricas y optimizar estrategia",
+      "Identificar tendencias y oportunidades virales",
+      "Coordinar con el equipo de marketing campañas integradas",
+    ],
+    requirements: [
+      "2+ años manejando redes sociales profesionales",
+      "Experiencia creando contenido para X, Instagram y TikTok",
+      "Conocimiento del ecosistema crypto/Web3",
+      "Excelente redacción en español",
+      "Capacidad de crear contenido visual básico",
+      "Comprensión de métricas y analytics de redes",
+    ],
+    niceToHave: [
+      "Cuenta personal activa en crypto Twitter",
+      "Experiencia con herramientas de scheduling (Buffer, etc.)",
+      "Habilidades de edición de video",
+      "Conocimiento de prediction markets",
+    ],
+    isLeadership: false,
+  },
+  {
+    id: "marketing-assistant",
+    slug: "marketing-assistant",
+    title: "Marketing Assistant",
+    category: "marketing",
+    type: "full-time",
+    icon: Megaphone,
+    shortDescription: "Apoya al equipo de marketing en campañas y operaciones.",
+    description:
+      "Buscamos un Marketing Assistant proactivo para apoyar en la ejecución de campañas, gestión de contenido, y operaciones diarias del equipo de marketing.",
+    responsibilities: [
+      "Apoyar en la ejecución de campañas de marketing",
+      "Gestionar calendario de contenido",
+      "Coordinar con influencers y partners",
+      "Preparar reportes de métricas y analytics",
+      "Investigar tendencias y competencia",
+      "Asistir en la organización de eventos y AMAs",
+    ],
+    requirements: [
+      "1+ año de experiencia en marketing digital",
+      "Conocimiento básico del ecosistema crypto",
+      "Organización y atención al detalle",
+      "Manejo de herramientas de productividad",
+      "Buen nivel de inglés escrito",
+      "Proactividad y ganas de aprender",
+    ],
+    niceToHave: [
+      "Estudios en marketing o comunicación",
+      "Experiencia en startups",
+      "Conocimiento de Notion, Slack, y herramientas similares",
+      "Interés genuino en prediction markets",
+    ],
+    isLeadership: false,
+  },
+  {
+    id: "community-manager",
+    slug: "community-manager",
+    title: "Community Manager",
+    category: "marketing",
+    type: "full-time",
+    icon: Users,
+    shortDescription:
+      "Construye y modera nuestra comunidad en Discord y Telegram.",
+    description:
+      "Buscamos un Community Manager para construir, moderar y hacer crecer nuestra comunidad en Discord, Telegram y otras plataformas. Serás la voz de Predik y el puente entre el equipo y los usuarios.",
+    responsibilities: [
+      "Moderar y gestionar comunidades en Discord y Telegram",
+      "Crear programas de engagement y retención",
+      "Organizar eventos, AMAs y actividades comunitarias",
+      "Recopilar feedback de usuarios y reportar al equipo",
+      "Desarrollar embajadores y contribuidores de la comunidad",
+      "Crear contenido educativo para la comunidad",
+    ],
+    requirements: [
+      "2+ años de experiencia como community manager",
+      "Experiencia en comunidades crypto/Web3",
+      "Excelentes habilidades de comunicación",
+      "Disponibilidad para responder en diferentes horarios",
+      "Capacidad de manejar situaciones de crisis",
+      "Conocimiento de bots de Discord y herramientas de moderación",
+    ],
+    niceToHave: [
+      "Experiencia construyendo comunidades desde cero",
+      "Red de contactos en comunidades crypto LATAM",
+      "Conocimiento de gamification y engagement",
+      "Experiencia con DAOs o proyectos descentralizados",
+    ],
+    isLeadership: false,
+  },
+];

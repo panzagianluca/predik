@@ -1,0 +1,143 @@
+import { Briefcase, Shield, Calculator } from "lucide-react";
+import type { JobPosition } from "./types";
+
+export const operationsJobs: JobPosition[] = [
+  {
+    id: "product-manager",
+    slug: "product-manager",
+    title: "Product Manager",
+    category: "operations",
+    type: "full-time",
+    icon: Briefcase,
+    shortDescription:
+      "Define el roadmap y prioriza el desarrollo del producto.",
+    description:
+      "Buscamos un Product Manager para definir la visión del producto, priorizar el roadmap, y asegurar que construimos las features correctas para nuestros usuarios.",
+    responsibilities: [
+      "Definir y priorizar el roadmap del producto",
+      "Escribir especificaciones y user stories",
+      "Conducir investigación de usuarios y análisis de mercado",
+      "Colaborar con ingeniería y diseño en la ejecución",
+      "Medir y analizar métricas de producto",
+      "Comunicar progreso y decisiones a stakeholders",
+    ],
+    requirements: [
+      "3+ años de experiencia como Product Manager",
+      "Experiencia en productos B2C digitales",
+      "Capacidad de priorizar con datos e intuición",
+      "Excelentes habilidades de comunicación",
+      "Experiencia trabajando con equipos de ingeniería",
+      "Mentalidad orientada a resultados",
+    ],
+    niceToHave: [
+      "Experiencia en productos Web3/fintech",
+      "Background técnico",
+      "Conocimiento de prediction markets",
+      "Experiencia en startups early-stage",
+    ],
+    isLeadership: false,
+  },
+  {
+    id: "operations-manager",
+    slug: "operations-manager",
+    title: "Operations Manager",
+    category: "operations",
+    type: "full-time",
+    icon: Briefcase,
+    shortDescription: "Gestiona las operaciones diarias y procesos del equipo.",
+    description:
+      "Buscamos un Operations Manager para optimizar nuestros procesos internos, gestionar operaciones diarias, y asegurar que el equipo pueda trabajar de forma eficiente.",
+    responsibilities: [
+      "Optimizar procesos internos y workflows",
+      "Gestionar herramientas y sistemas del equipo",
+      "Coordinar reuniones, OKRs y planificación",
+      "Manejar relaciones con vendors y proveedores",
+      "Apoyar en contratación y onboarding",
+      "Documentar procesos y crear SOPs",
+    ],
+    requirements: [
+      "3+ años de experiencia en operations o similar",
+      "Excelentes habilidades organizativas",
+      "Experiencia con herramientas de productividad",
+      "Capacidad de manejar múltiples proyectos",
+      "Atención al detalle y orientación a procesos",
+      "Buena comunicación escrita y verbal",
+    ],
+    niceToHave: [
+      "Experiencia en startups tech",
+      "Conocimiento del ecosistema crypto",
+      "Experiencia con equipos remotos",
+      "Background en consultoría o project management",
+    ],
+    isLeadership: false,
+  },
+  {
+    id: "legal-compliance",
+    slug: "legal-compliance",
+    title: "Legal & Compliance Advisor",
+    category: "operations",
+    type: "contract",
+    icon: Shield,
+    shortDescription: "Asesora en regulaciones crypto y compliance para LATAM.",
+    description:
+      "Buscamos un asesor legal especializado en crypto y fintech para guiar nuestra estrategia de compliance en Latinoamérica. Este es un rol de consultoría/contrato.",
+    responsibilities: [
+      "Asesorar en regulaciones crypto de LATAM",
+      "Desarrollar políticas de compliance",
+      "Revisar términos de servicio y documentación legal",
+      "Monitorear cambios regulatorios relevantes",
+      "Asesorar en estructura corporativa y jurisdiccional",
+      "Coordinar con counsel externo cuando sea necesario",
+    ],
+    requirements: [
+      "5+ años de experiencia en derecho financiero o tech",
+      "Conocimiento de regulaciones crypto en LATAM",
+      "Experiencia con empresas fintech o blockchain",
+      "Título de abogado y licencia vigente",
+      "Capacidad de explicar temas legales complejos",
+      "Disponibilidad para consultas regulares",
+    ],
+    niceToHave: [
+      "Experiencia con exchanges o protocolos DeFi",
+      "Conocimiento de regulaciones en múltiples países LATAM",
+      "Red de contactos en el sector",
+      "Experiencia con estructuras offshore",
+    ],
+    isLeadership: false,
+  },
+  {
+    id: "finance-accountant",
+    slug: "finance-accountant",
+    title: "Finance & Accountant",
+    category: "operations",
+    type: "contract",
+    icon: Calculator,
+    shortDescription:
+      "Gestiona finanzas, tesorería y contabilidad de la empresa.",
+    description:
+      "Buscamos un profesional de finanzas para manejar la contabilidad, tesorería (incluyendo crypto), y reportes financieros de Predik. Este es un rol de consultoría/contrato.",
+    responsibilities: [
+      "Gestionar contabilidad y libros financieros",
+      "Manejar tesorería fiat y crypto",
+      "Preparar reportes financieros mensuales",
+      "Gestionar pagos a proveedores y contractors",
+      "Coordinar con contadores externos para impuestos",
+      "Asesorar en planificación financiera",
+    ],
+    requirements: [
+      "3+ años de experiencia en finanzas o contabilidad",
+      "Conocimiento de contabilidad para crypto/blockchain",
+      "Experiencia con tesorería multi-currency",
+      "Título en contabilidad, finanzas o similar",
+      "Manejo de herramientas financieras modernas",
+      "Organización y atención al detalle",
+    ],
+    niceToHave: [
+      "Experiencia con startups crypto",
+      "Conocimiento de DeFi y gestión de treasury on-chain",
+      "Experiencia con múltiples jurisdicciones",
+      "CPA o certificación equivalente",
+    ],
+    isLeadership: false,
+  },
+];
