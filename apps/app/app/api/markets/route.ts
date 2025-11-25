@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
 import { db } from "@/lib/db";
 import { marketTranslations } from "@predik/database";
-import { inArray } from "drizzle-orm";
+import { inArray, eq } from "drizzle-orm";
 import { translateMarketToSpanish } from "@/lib/translation/deepl";
 
 const MYRIAD_API_URL =
