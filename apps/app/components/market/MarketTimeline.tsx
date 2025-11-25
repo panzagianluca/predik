@@ -72,7 +72,7 @@ export function MarketTimeline({ market }: MarketTimelineProps) {
 
   return (
     <Card className="w-full">
-      <CardContent className="p-4 space-y-4">
+      <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <h3 className="text-[14px] font-semibold">Línea de Tiempo</h3>
           <button

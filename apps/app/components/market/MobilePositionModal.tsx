@@ -239,11 +239,7 @@ export function MobilePositionModal({
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
-            transition={{
-              type: "spring",
-              damping: 30,
-              stiffness: 300,
-            }}
+            transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
             className="fixed bottom-0 left-0 right-0 z-50 bg-background rounded-t-2xl shadow-2xl max-h-[85vh] overflow-y-auto"
           >
             {/* Header */}

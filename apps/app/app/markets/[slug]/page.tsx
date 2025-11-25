@@ -704,7 +704,7 @@ export default function MarketDetailPage() {
 
             {/* Market Stats - Mobile Only (shown before tabs) */}
             <Card className="lg:hidden">
-              <CardContent className="p-4 space-y-4">
+              <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-[14px] font-semibold">Estadísticas</h3>
                   <button
@@ -997,9 +997,6 @@ export default function MarketDetailPage() {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Timeline - Desktop Only */}
-            <MarketTimeline market={market} />
 
             {/* Related Markets */}
             {market.relatedMarkets && market.relatedMarkets.length > 0 && (

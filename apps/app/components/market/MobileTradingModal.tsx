@@ -297,14 +297,13 @@ export function MobileTradingModal({
       });
 
       if (tradeType === "buy") {
-        if (tradeAmount > Number(balance)) {
+        // Check balance but don't block calculation - just set warning
+        if (isConnected && tradeAmount > Number(balance)) {
           setError(
-            `Saldo insuficiente. Tienes ${Number(balance).toFixed(2)} ${
+            `Saldo insuficiente de ${
               market.token?.symbol || "USDT"
-            }`,
+            }. Tienes ${Number(balance).toFixed(2)}, necesitas ${tradeAmount}`,
           );
-          setCalculation(null);
-          return;
         }
 
         // Use exact same API as desktop
@@ -404,7 +403,9 @@ export function MobileTradingModal({
       }
     } catch (err) {
       logger.error("Error calculating trade:", err);
-      setError("Error al calcular la operación");
+      setError(
+        "No se puede calcular la operación. El mercado puede estar cerrado o tener liquidez insuficiente.",
+      );
       setCalculation(null);
     } finally {
       setIsCalculating(false);
@@ -418,21 +419,39 @@ export function MobileTradingModal({
       !selectedOutcome ||
       !amount ||
       !market.token
-    )
+    ) {
+      setError("Please connect your wallet and enter an amount");
       return;
+    }
+
+    const provider = (await getProvider()) as any;
+    if (!provider) {
+      setError("No wallet provider available. Please connect your wallet.");
+      setIsExecuting(false);
+      return;
+    }
+
+    const tradeAmount = parseFloat(amount);
+
+    if (tradeAmount <= 0) {
+      setError("Please enter a valid amount");
+      return;
+    }
+
+    if (tradeType === "buy" && tradeAmount > Number(balance)) {
+      setError(
+        `Saldo insuficiente de ${market.token.symbol}. Tienes ${Number(
+          balance,
+        ).toFixed(2)}, necesitas ${tradeAmount}`,
+      );
+      return;
+    }
 
     setIsExecuting(true);
     setError(null);
     haptics.medium();
 
     try {
-      const provider = (await getProvider()) as any;
-      if (!provider) {
-        setError("No wallet provider available");
-        setIsExecuting(false);
-        return;
-      }
-
       const polkamarketsjs = await import("polkamarkets-js");
       const web3Module = await import("web3");
       const Web3 = web3Module.default || web3Module;
@@ -585,7 +604,8 @@ export function MobileTradingModal({
     } catch (err: any) {
       logger.error("Trade execution error:", err);
       haptics.error();
-      setError(err.message || "Error al ejecutar la operación");
+      const message = err instanceof Error ? err.message : "Error desconocido";
+      setError(`Operación fallida: ${message}`);
 
       // Track failed trade
       trackTradeFailed(
@@ -635,7 +655,7 @@ export function MobileTradingModal({
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
-            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+            transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
             className="fixed bottom-0 left-0 right-0 bg-background border-t border-border rounded-t-3xl z-[60] lg:hidden h-[90vh] flex flex-col"
           >
             {/* Header */}
@@ -666,10 +686,18 @@ export function MobileTradingModal({
                 onValueChange={(value) => setTradeType(value as "buy" | "sell")}
               >
                 <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="buy" onClick={() => haptics.selection()}>
+                  <TabsTrigger
+                    value="buy"
+                    onClick={() => haptics.selection()}
+                    className="data-[state=active]:text-green-600"
+                  >
                     Comprar
                   </TabsTrigger>
-                  <TabsTrigger value="sell" onClick={() => haptics.selection()}>
+                  <TabsTrigger
+                    value="sell"
+                    onClick={() => haptics.selection()}
+                    className="data-[state=active]:text-red-600"
+                  >
                     Vender
                   </TabsTrigger>
                 </TabsList>
@@ -700,12 +728,15 @@ export function MobileTradingModal({
                       }
                       onClick={() => setSelectedOutcome(outcome)}
                       className={cn(
-                        "h-auto py-3 transition-all duration-300",
+                        "h-auto py-3 transition-all duration-300 ease-in-out relative overflow-hidden",
                         selectedOutcome?.id === outcome.id &&
-                          "bg-electric-purple hover:bg-electric-purple/90",
+                          "bg-electric-purple hover:bg-electric-purple/90 border-electric-purple shadow-lg shadow-electric-purple/20",
                       )}
                     >
-                      <div className="flex items-center justify-between w-full gap-2">
+                      {selectedOutcome?.id === outcome.id && (
+                        <div className="absolute inset-0 -translate-x-full animate-[shimmer_3s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                      )}
+                      <div className="flex items-center justify-between w-full gap-2 relative z-10">
                         <span className="font-semibold text-sm">
                           {translateOutcomeTitle(outcome.title)}
                         </span>
@@ -775,8 +806,15 @@ export function MobileTradingModal({
                 </div>
               )}
 
-              {/* Trade Summary */}
-              {calculation && !isCalculating && (
+              {/* Loading State */}
+              {isCalculating && amount && parseFloat(amount) > 0 && (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-electric-purple" />
+                </div>
+              )}
+
+              {/* Trade Summary - Show even with errors like desktop */}
+              {!isCalculating && calculation && (
                 <div className="border border-border rounded-lg p-4 space-y-3 bg-muted/30">
                   <h4 className="font-semibold text-sm">
                     Resumen de Operación
@@ -849,13 +887,6 @@ export function MobileTradingModal({
                       </div>
                     )}
                   </div>
-                </div>
-              )}
-
-              {/* Loading State */}
-              {isCalculating && amount && parseFloat(amount) > 0 && (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin text-electric-purple" />
                 </div>
               )}
             </div>
