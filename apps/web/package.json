@@ -12,6 +12,8 @@
     "@predik/config": "*",
     "@predik/ui": "*",
     "@radix-ui/react-navigation-menu": "^1.2.14",
+    "@upstash/ratelimit": "^2.0.7",
+    "@upstash/redis": "^1.35.6",
     "clsx": "^2.1.1",
     "lucide-react": "^0.544.0",
     "motion": "^12.23.22",
@@ -19,6 +21,7 @@
     "next-themes": "^0.4.6",
     "react": "19.2.0",
     "react-dom": "19.2.0",
+    "resend": "^6.5.2",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
