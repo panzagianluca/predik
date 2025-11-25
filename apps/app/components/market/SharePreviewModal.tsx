@@ -191,7 +191,7 @@ export function SharePreviewModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        className="!max-w-[min(1240px,calc(100vw-2rem))] w-full p-0 gap-0 overflow-hidden"
+        className="!max-w-[min(1240px,calc(100vw-2rem))] sm:!max-w-xl w-full p-0 gap-0 overflow-hidden"
         from="bottom"
       >
         <DialogTitle className="sr-only">
