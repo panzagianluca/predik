@@ -1,21 +1,10 @@
 import Web3 from "web3";
 import { logger } from "./logger";
-
-const PM_ABI = [
-  {
-    type: "function",
-    name: "getUserMarketShares",
-    inputs: [
-      { name: "marketId", type: "uint256", internalType: "uint256" },
-      { name: "user", type: "address", internalType: "address" },
-    ],
-    outputs: [
-      { name: "liquidity", type: "uint256", internalType: "uint256" },
-      { name: "outcomes", type: "uint256[]", internalType: "uint256[]" },
-    ],
-    stateMutability: "view",
-  },
-] as const;
+// Use the official Polkamarkets ABI to avoid decode mismatches
+// The package ships the full contract ABI, including read functions
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore - JSON typed as any
+import PM_FULL_ABI from "polkamarkets-js/abis/PredictionMarketV3_4.json";
 
 export async function getHolderShares(
   marketId: number,
@@ -26,7 +15,7 @@ export async function getHolderShares(
   );
 
   const contract = new web3.eth.Contract(
-    PM_ABI as any,
+    PM_FULL_ABI as any,
     process.env.NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS!,
   );
 
@@ -35,10 +24,29 @@ export async function getHolderShares(
       .getUserMarketShares(marketId, holderAddress)
       .call();
 
-    // result is { liquidity, outcomes }
+    // The official ABI defines tuple outputs; normalize both object/array forms
+    // Possible shapes:
+    // - { liquidityShares: string, outcomeShares: string[] }
+    // - { liquidity: string, outcomes: string[] }
+    // - [ liquidityShares, outcomeShares ]
+    const liquidityRaw =
+      (result?.liquidityShares as string) ??
+      (result?.liquidity as string) ??
+      (Array.isArray(result) ? (result[0] as string) : undefined);
+    const outcomesRaw =
+      (result?.outcomeShares as string[]) ??
+      (result?.outcomes as string[]) ??
+      (Array.isArray(result) ? (result[1] as string[]) : undefined);
+
+    if (!liquidityRaw || !outcomesRaw) {
+      throw new Error(
+        "Unexpected getUserMarketShares result shape from contract read",
+      );
+    }
+
     return {
-      liquidityShares: BigInt(result.liquidity as string),
-      outcomeShares: (result.outcomes as string[]).map((s) => BigInt(s)),
+      liquidityShares: BigInt(liquidityRaw),
+      outcomeShares: outcomesRaw.map((s) => BigInt(s)),
     };
   } catch (err) {
     logger.error(`Error fetching shares for ${holderAddress}:`, err);
