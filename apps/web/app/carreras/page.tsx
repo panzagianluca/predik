@@ -23,8 +23,10 @@ export const metadata: Metadata = {
 };
 
 export default function CareersPage() {
-  const leadershipJobs = getLeadershipJobs();
-  const regularJobs = getRegularJobs();
+  const leadershipJobs = getLeadershipJobs().map(
+    ({ icon: _icon, ...rest }) => rest,
+  );
+  const regularJobs = getRegularJobs().map(({ icon: _icon, ...rest }) => rest);
 
   return (
     <div className="min-h-screen relative pt-24 pb-16">

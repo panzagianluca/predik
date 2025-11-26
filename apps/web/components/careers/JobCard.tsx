@@ -1,17 +1,50 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, MapPin, Clock } from "lucide-react";
+import {
+  ArrowRight,
+  MapPin,
+  Clock,
+  Code,
+  Megaphone,
+  Palette,
+  Briefcase,
+  Server,
+  Users,
+  MessageSquare,
+  Layers,
+  Shield,
+  Calculator,
+} from "lucide-react";
 import { motion } from "motion/react";
 import { type JobPosition, jobCategories, jobTypes } from "@/lib/careers";
 
+// Map job IDs to icons (client-side only)
+const jobIcons: Record<string, React.ComponentType<{ className?: string }>> = {
+  cto: Code,
+  cmo: Megaphone,
+  "web3-engineer": Code,
+  "fullstack-developer": Layers,
+  "backend-developer": Server,
+  devops: Server,
+  "social-media-manager": MessageSquare,
+  "marketing-assistant": Megaphone,
+  "community-manager": Users,
+  "ui-ux-designer": Palette,
+  "brand-designer": Palette,
+  "product-manager": Briefcase,
+  "operations-manager": Briefcase,
+  "legal-compliance": Shield,
+  "finance-accountant": Calculator,
+};
+
 interface JobCardProps {
-  job: JobPosition;
+  job: Omit<JobPosition, "icon">;
   index?: number;
 }
 
 export function JobCard({ job, index = 0 }: JobCardProps) {
-  const Icon = job.icon;
+  const Icon = jobIcons[job.id] || Briefcase;
   const category = jobCategories[job.category];
 
   return (

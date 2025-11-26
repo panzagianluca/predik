@@ -14,8 +14,37 @@ import {
   Clock,
   CheckCircle2,
   Briefcase,
+  Code,
+  Megaphone,
+  Palette,
+  Server,
+  Users,
+  MessageSquare,
+  Layers,
+  Shield,
+  Calculator,
+  type LucideIcon,
 } from "lucide-react";
 import type { Metadata } from "next";
+
+// Map job IDs to icons
+const jobIcons: Record<string, LucideIcon> = {
+  cto: Code,
+  cmo: Megaphone,
+  "web3-engineer": Code,
+  "fullstack-developer": Layers,
+  "backend-developer": Server,
+  devops: Server,
+  "social-media-manager": MessageSquare,
+  "marketing-assistant": Megaphone,
+  "community-manager": Users,
+  "ui-ux-designer": Palette,
+  "brand-designer": Palette,
+  "product-manager": Briefcase,
+  "operations-manager": Briefcase,
+  "legal-compliance": Shield,
+  "finance-accountant": Calculator,
+};
 
 interface JobPageProps {
   params: Promise<{
@@ -59,7 +88,7 @@ export default async function JobPage({ params }: JobPageProps) {
     notFound();
   }
 
-  const Icon = job.icon;
+  const Icon = jobIcons[job.id] || Briefcase;
   const category = jobCategories[job.category];
 
   return (
