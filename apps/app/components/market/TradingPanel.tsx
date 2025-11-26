@@ -264,48 +264,26 @@ export function TradingPanel({
 
   const loadUserPosition = async () => {
     try {
-      if (!market.token) {
+      if (!market.token || !userAddress) {
         setUserPosition(null);
         return;
       }
 
-      const provider = (await getProvider()) as any;
-      if (!provider) {
-        logger.warn("⚠️ No provider available");
-        setUserPosition(null);
-        return;
-      }
-
-      // Check wallet network FIRST
-      if (provider.request) {
-        const chainId = String(
-          await provider.request({
-            method: "eth_chainId",
-          }),
-        );
-        const expectedChainId = "0x38"; // BNB Chain = 56 = 0x38
-
-        if (chainId !== expectedChainId) {
-          logger.warn("⚠️ Wrong network for position check:", chainId);
-          setUserPosition(null);
-          return;
-        }
-      }
+      // Use public RPC for reading position data (read-only)
+      // This ensures position loads regardless of wallet network state
+      const publicRpcUrl =
+        process.env.NEXT_PUBLIC_RPC_URL || "https://bsc-dataseed.binance.org/";
 
       const polkamarketsjs = await import("polkamarkets-js");
       const web3Module = await import("web3");
       const Web3 = web3Module.default || web3Module;
 
       const polkamarkets = new polkamarketsjs.Application({
-        web3Provider: provider,
+        web3Provider: publicRpcUrl,
       });
 
-      const web3 = new Web3(provider as any);
-      (window as any).web3 = web3;
+      const web3 = new Web3(publicRpcUrl);
       (polkamarkets as any).web3 = web3;
-      if (provider.request) {
-        await provider.request({ method: "eth_requestAccounts" });
-      }
 
       const pm = polkamarkets.getPredictionMarketV3PlusContract({
         contractAddress:
@@ -358,47 +336,22 @@ export function TradingPanel({
     setError(null);
 
     try {
-      // Try to get provider, but allow calculations without it (for logged-out preview)
-      const provider = (await getProvider()) as any;
-
-      // If user is connected, validate network
-      if (provider && provider.request && isConnected) {
-        const chainId = String(
-          await provider.request({
-            method: "eth_chainId",
-          }),
-        );
-        const expectedChainId = "0x38"; // BNB Chain = 56 = 0x38
-
-        if (chainId !== expectedChainId) {
-          setError(
-            "Por favor conectá tu wallet a BNB Smart Chain (Chain ID 56)",
-          );
-          setCalculation(null);
-          setIsCalculating(false);
-          return;
-        }
-      }
+      // ALWAYS use public RPC for calculations (read-only operations)
+      // This ensures calculations work regardless of wallet connection or network state
+      // The wallet provider is only needed for actual transaction execution
+      const publicRpcUrl =
+        process.env.NEXT_PUBLIC_RPC_URL || "https://bsc-dataseed.binance.org/";
 
       const polkamarketsjs = await import("polkamarkets-js");
       const web3Module = await import("web3");
       const Web3 = web3Module.default || web3Module;
 
-      // Use provider if available, otherwise use public RPC for read-only calculations
-      const web3Provider = provider || "https://bsc-dataseed.binance.org/";
-
       const polkamarkets = new polkamarketsjs.Application({
-        web3Provider: web3Provider,
+        web3Provider: publicRpcUrl,
       });
 
-      const web3 = new Web3(web3Provider as any);
-      (window as any).web3 = web3;
+      const web3 = new Web3(publicRpcUrl);
       (polkamarkets as any).web3 = web3;
-
-      // Request account access only if provider exists and user is connected
-      if (provider && provider.request && isConnected) {
-        await provider.request({ method: "eth_requestAccounts" });
-      }
 
       const pm = polkamarkets.getPredictionMarketV3PlusContract({
         contractAddress:
