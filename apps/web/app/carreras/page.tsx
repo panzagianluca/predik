@@ -64,7 +64,7 @@ export default function CareersPage() {
   return (
     <div className="min-h-screen relative pt-24 pb-16">
       <div className="absolute inset-0 bg-background/80 backdrop-blur-sm [mask-image:linear-gradient(to_bottom,transparent,black_100px)] -z-10" />
-      <div className="max-w-5xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <FadeIn>
           <div className="mb-12">
