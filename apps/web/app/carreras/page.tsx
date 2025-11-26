@@ -3,11 +3,10 @@ import { JobCard } from "@/components/careers/JobCard";
 import {
   jobPositions,
   getLeadershipJobs,
-  getRegularJobs,
   getJobsByCategory,
   jobCategories,
 } from "@/lib/careers";
-import type { JobCategory } from "@/lib/careers/types";
+import type { JobCategory, JobPosition } from "@/lib/careers/types";
 import {
   MapPin,
   Globe,
@@ -29,6 +28,9 @@ export const metadata: Metadata = {
   },
 };
 
+// Type for job without the icon (which can't be serialized to client)
+type JobWithoutIcon = Omit<JobPosition, "icon">;
+
 export default function CareersPage() {
   const leadershipJobs = getLeadershipJobs().map(
     ({ icon: _icon, ...rest }) => rest,
@@ -37,7 +39,7 @@ export default function CareersPage() {
   // Group regular jobs by category
   const regularJobsByCategory: {
     category: JobCategory;
-    jobs: ReturnType<typeof getRegularJobs>;
+    jobs: JobWithoutIcon[];
   }[] = [];
   const categories: JobCategory[] = [
     "engineering",
