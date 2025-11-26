@@ -1,12 +1,14 @@
 import { FadeIn } from "@/components/animations/FadeIn";
 import { JobCard } from "@/components/careers/JobCard";
+import { jobPositions, getLeadershipJobs, getRegularJobs } from "@/lib/careers";
 import {
-  jobPositions,
-  whyWorkAtPredik,
-  getLeadershipJobs,
-  getRegularJobs,
-} from "@/lib/careers";
-import { MapPin, Globe } from "lucide-react";
+  MapPin,
+  Globe,
+  TrendingUp,
+  Users,
+  Layers,
+  Briefcase,
+} from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -59,23 +61,48 @@ export default function CareersPage() {
               ¿Por qué trabajar en Predik?
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {whyWorkAtPredik.map((item, index) => {
-                const Icon = item.icon;
-                return (
-                  <div
-                    key={index}
-                    className="p-5 bg-card border border-border rounded-xl"
-                  >
-                    <div className="w-10 h-10 rounded-lg bg-electric-purple/10 flex items-center justify-center mb-3">
-                      <Icon className="h-5 w-5 text-electric-purple" />
-                    </div>
-                    <h3 className="font-semibold mb-2">{item.title}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {item.description}
-                    </p>
-                  </div>
-                );
-              })}
+              <div className="p-5 bg-card border border-border rounded-xl">
+                <div className="w-10 h-10 rounded-lg bg-electric-purple/10 flex items-center justify-center mb-3">
+                  <TrendingUp className="h-5 w-5 text-electric-purple" />
+                </div>
+                <h3 className="font-semibold mb-2">
+                  Startup en etapa temprana
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Sé parte del equipo fundador y ayuda a definir el futuro de
+                  los mercados de predicción en Latinoamérica.
+                </p>
+              </div>
+              <div className="p-5 bg-card border border-border rounded-xl">
+                <div className="w-10 h-10 rounded-lg bg-electric-purple/10 flex items-center justify-center mb-3">
+                  <Users className="h-5 w-5 text-electric-purple" />
+                </div>
+                <h3 className="font-semibold mb-2">100% Remoto</h3>
+                <p className="text-sm text-muted-foreground">
+                  Trabajá desde donde quieras. Preferimos timezone LATAM pero
+                  somos flexibles.
+                </p>
+              </div>
+              <div className="p-5 bg-card border border-border rounded-xl">
+                <div className="w-10 h-10 rounded-lg bg-electric-purple/10 flex items-center justify-center mb-3">
+                  <Layers className="h-5 w-5 text-electric-purple" />
+                </div>
+                <h3 className="font-semibold mb-2">Web3 Nativo</h3>
+                <p className="text-sm text-muted-foreground">
+                  Trabaja con tecnología blockchain de punta: smart contracts,
+                  DeFi, y mercados descentralizados.
+                </p>
+              </div>
+              <div className="p-5 bg-card border border-border rounded-xl">
+                <div className="w-10 h-10 rounded-lg bg-electric-purple/10 flex items-center justify-center mb-3">
+                  <Briefcase className="h-5 w-5 text-electric-purple" />
+                </div>
+                <h3 className="font-semibold mb-2">Equity para líderes</h3>
+                <p className="text-sm text-muted-foreground">
+                  Los roles de liderazgo incluyen participación en el equity de
+                  la empresa.
+                </p>
+              </div>
             </div>
           </div>
         </FadeIn>
