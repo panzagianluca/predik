@@ -6,7 +6,7 @@ export const operationsJobs: JobPosition[] = [
     id: "product-manager",
     slug: "product-manager",
     title: "Product Manager",
-    category: "operations",
+    category: "producto",
     type: "full-time",
     icon: Briefcase,
     shortDescription:

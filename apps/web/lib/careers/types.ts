@@ -14,7 +14,12 @@ import {
 } from "lucide-react";
 
 export type JobType = "full-time" | "part-time" | "contract";
-export type JobCategory = "engineering" | "marketing" | "design" | "operations";
+export type JobCategory =
+  | "engineering"
+  | "marketing"
+  | "design"
+  | "operations"
+  | "producto";
 
 export interface JobPosition {
   id: string;
@@ -39,6 +44,7 @@ export const jobCategories: Record<
   marketing: { label: "Marketing", color: "text-pink-500" },
   design: { label: "Diseño", color: "text-purple-500" },
   operations: { label: "Operaciones", color: "text-green-500" },
+  producto: { label: "Producto", color: "text-orange-500" },
 };
 
 export const jobTypes: Record<JobType, string> = {
