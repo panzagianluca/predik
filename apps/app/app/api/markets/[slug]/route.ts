@@ -3,7 +3,7 @@ import { setCachedHolders, getCachedHolders } from "@/lib/holdersCache";
 import { logger } from "@/lib/logger";
 import { db } from "@/lib/db";
 import { marketTranslations } from "@predik/database";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { translateMarketToSpanish as translateWithDeepL } from "@/lib/translation/deepl";
 
 const MYRIAD_API_URL =
@@ -102,25 +102,55 @@ export async function GET(
       }
     }
 
-    // Add related markets to the response
-    const responseData = {
-      ...data,
-      relatedMarkets,
-    };
-
     // 🌐 TRANSLATION: Get Spanish translation from DB or create it
     let translatedData;
     try {
-      translatedData = await translateMarketToSpanish(responseData);
+      translatedData = await translateMarketToSpanish(data);
     } catch (translationError) {
       logger.error(`Translation failed for ${slug}:`, translationError);
       // Fall back to original data without translation
       translatedData = {
-        ...responseData,
-        titleEs: responseData.title,
-        descriptionEs: responseData.description,
+        ...data,
+        titleEs: data.title,
+        descriptionEs: data.description,
       };
     }
+
+    // Fetch translations for related markets from DB
+    let translatedRelatedMarkets = relatedMarkets;
+    if (relatedMarkets.length > 0) {
+      try {
+        const relatedSlugs = relatedMarkets.map((m: any) => m.slug);
+        const translations = await db
+          .select()
+          .from(marketTranslations)
+          .where(inArray(marketTranslations.marketSlug, relatedSlugs));
+
+        // Create a map for quick lookup
+        const translationMap = new Map(
+          translations.map((t) => [t.marketSlug, t]),
+        );
+
+        // Add translations to related markets
+        translatedRelatedMarkets = relatedMarkets.map((m: any) => {
+          const translation = translationMap.get(m.slug);
+          return {
+            ...m,
+            titleEs: translation?.titleEs || m.title,
+            descriptionEs: translation?.descriptionEs || m.description,
+          };
+        });
+      } catch (err) {
+        logger.error("Error fetching translations for related markets:", err);
+        // Fall back to untranslated
+      }
+    }
+
+    // Add translated related markets to the response
+    const responseData = {
+      ...translatedData,
+      relatedMarkets: translatedRelatedMarkets,
+    };
 
     // Fire-and-forget: pre-warm holders cache so the Holders tab can show results instantly
     try {
@@ -171,7 +201,7 @@ export async function GET(
       logger.debug("holders pre-warm error", err);
     }
 
-    return NextResponse.json(translatedData, {
+    return NextResponse.json(responseData, {
       headers: {
         "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60",
       },

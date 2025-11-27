@@ -11,23 +11,23 @@ const config: Config = {
     extend: {
       // Mobile-first breakpoints (Tailwind defaults + custom)
       screens: {
-        'xs': '375px',   // Small phones
-        'sm': '640px',   // Large phones (default)
-        'md': '768px',   // Tablets (default)
-        'lg': '1024px',  // Desktop (default)
-        'xl': '1280px',  // Large desktop (default)
-        '2xl': '1536px', // Extra large (default)
+        xs: "375px", // Small phones
+        sm: "640px", // Large phones (default)
+        md: "768px", // Tablets (default)
+        lg: "1024px", // Desktop (default)
+        xl: "1280px", // Large desktop (default)
+        "2xl": "1536px", // Extra large (default)
       },
       fontFamily: {
-        sans: ['Satoshi', 'system-ui', 'sans-serif'],
+        sans: ["Satoshi", "system-ui", "sans-serif"],
       },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         // Custom colors for Predik
-        'electric-purple': '#A855F7',
-        'slate-black': '#1C1917',
-        'soft-white': '#F9FAFB',
+        "electric-purple": "#A855F7",
+        "slate-black": "#1C1917",
+        "soft-white": "#F9FAFB",
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
@@ -71,6 +71,14 @@ const config: Config = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      keyframes: {
+        shimmer: {
+          "100%": { transform: "translateX(100%)" },
+        },
+      },
+      animation: {
+        shimmer: "shimmer 3s infinite",
       },
     },
   },
