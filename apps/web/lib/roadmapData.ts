@@ -145,6 +145,33 @@ export const roadmapData: RoadmapColumn[] = [
     title: "Completadas",
     features: [
       {
+        id: "contacto",
+        title: "Página de Contacto",
+        description: "Formulario de contacto para usuarios y soporte",
+        badges: [
+          { label: "Frontend", color: "blue" },
+          { label: "UX", color: "purple" },
+        ],
+      },
+      {
+        id: "blog",
+        title: "Blog",
+        description: "Sección de blog con artículos y noticias",
+        badges: [
+          { label: "Frontend", color: "blue" },
+          { label: "UX", color: "purple" },
+        ],
+      },
+      {
+        id: "carreras",
+        title: "Página de Carreras",
+        description: "Portal de empleo y oportunidades laborales",
+        badges: [
+          { label: "Frontend", color: "blue" },
+          { label: "UX", color: "purple" },
+        ],
+      },
+      {
         id: "posthog",
         title: "PostHog Analytics",
         description: "Seguimiento de comportamiento de usuarios e insights",
