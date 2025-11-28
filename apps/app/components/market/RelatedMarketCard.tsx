@@ -4,6 +4,7 @@ import { Market } from "@/types/market";
 import Link from "next/link";
 import Image from "next/image";
 import { translateOutcomeTitle } from "@/lib/translation/outcomeTranslations";
+import { getOutcomeColor } from "@/lib/outcomeColors";
 
 interface RelatedMarketCardProps {
   market: Market;
@@ -18,11 +19,11 @@ export function RelatedMarketCard({ market }: RelatedMarketCardProps) {
 
   const probability = mostProbableOutcome.price * 100;
 
-  // Get outcome color (green for first, red for second)
-  const outcomeColor =
-    market.outcomes.findIndex((o) => o.id === mostProbableOutcome.id) === 0
-      ? "#22c55e"
-      : "#ef4444";
+  // Get outcome color using the centralized color system
+  const outcomeIndex = market.outcomes.findIndex(
+    (o) => o.id === mostProbableOutcome.id,
+  );
+  const outcomeColor = getOutcomeColor(mostProbableOutcome.title, outcomeIndex);
 
   return (
     <Link

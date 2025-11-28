@@ -7,7 +7,15 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/animate-ui/components/animate/tooltip";
-import { Calendar, TrendingUp, Droplet, Bookmark } from "lucide-react";
+import {
+  Calendar,
+  TrendingUp,
+  Droplet,
+  Bookmark,
+  XCircle,
+  CheckCircle2,
+  Infinity,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -18,6 +26,7 @@ import { translateOutcomeTitle } from "@/lib/translation/outcomeTranslations";
 import { cn } from "@/lib/utils";
 import { useAccount } from "wagmi";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { getOutcomeColor } from "@/lib/outcomeColors";
 import {
   trackMarketClick,
   trackOutcomeClick,
@@ -261,28 +270,6 @@ export function MarketCard({ market }: MarketCardProps) {
     })}`;
   };
 
-  // Get outcome color
-  const getOutcomeColor = (index: number, totalOutcomes: number) => {
-    // For 2 outcomes: use green/red
-    if (totalOutcomes <= 2) {
-      return index === 0 ? "#22c55e" : "#ef4444"; // Green for first, Red for second
-    }
-
-    // For 3+ outcomes: use diverse color palette
-    const colorPalette = [
-      "#22c55e", // Green
-      "#3b82f6", // Blue
-      "#f59e0b", // Amber
-      "#ef4444", // Red
-      "#8b5cf6", // Purple
-      "#ec4899", // Pink
-      "#14b8a6", // Teal
-      "#f97316", // Orange
-    ];
-
-    return colorPalette[index % colorPalette.length];
-  };
-
   // Check if market has multiple outcomes (3+)
   const hasMultipleOutcomes = market.outcomes.length > 2;
 
@@ -347,72 +334,71 @@ export function MarketCard({ market }: MarketCardProps) {
               setIsScrolling(!isAtBottom);
             }}
           >
-            {market.outcomes.map((outcome, index) => {
-              const probability = outcome.price * 100;
-              const outcomeColor = getOutcomeColor(
-                index,
-                market.outcomes.length,
-              );
+            {[...market.outcomes]
+              .sort((a, b) => b.price - a.price) // Sort by probability descending
+              .map((outcome, index) => {
+                const probability = outcome.price * 100;
+                const outcomeColor = getOutcomeColor(outcome.title, index);
 
-              return (
-                <Link
-                  key={outcome.id}
-                  href={`/markets/${market.slug}?outcome=${outcome.id}`}
-                  className="block group rounded-sm transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                  prefetch={true}
-                  onClick={() => {
-                    trackOutcomeClick(
-                      market.id,
-                      market.slug,
-                      outcome.id,
-                      outcome.title,
-                      "market_card_outcome",
-                    );
-                  }}
-                >
-                  <div className="space-y-1 hover:opacity-80 transition-opacity duration-300 ease-in-out">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="font-medium">
-                        {translateOutcomeTitle(outcome.title)}
-                      </span>
-                      <span
-                        className="font-bold"
-                        style={{ color: outcomeColor }}
-                      >
-                        <CountUp
-                          start={probability > 10 ? probability - 5 : 0}
-                          end={probability}
-                          duration={0.8}
-                          decimals={2}
-                          suffix="%"
-                          preserveValue
-                        />
-                      </span>
-                    </div>
+                return (
+                  <Link
+                    key={outcome.id}
+                    href={`/markets/${market.slug}?outcome=${outcome.id}`}
+                    className="block group rounded-sm transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                    prefetch={true}
+                    onClick={() => {
+                      trackOutcomeClick(
+                        market.id,
+                        market.slug,
+                        outcome.id,
+                        outcome.title,
+                        "market_card_outcome",
+                      );
+                    }}
+                  >
+                    <div className="space-y-1 hover:opacity-80 transition-opacity duration-300 ease-in-out">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="font-medium">
+                          {translateOutcomeTitle(outcome.title)}
+                        </span>
+                        <span
+                          className="font-bold"
+                          style={{ color: outcomeColor }}
+                        >
+                          <CountUp
+                            start={probability > 10 ? probability - 5 : 0}
+                            end={probability}
+                            duration={0.8}
+                            decimals={2}
+                            suffix="%"
+                            preserveValue
+                          />
+                        </span>
+                      </div>
 
-                    {/* Animated Progress Bar */}
-                    <div className="w-full bg-muted rounded-full h-2 overflow-hidden relative">
-                      <motion.div
-                        className="h-full rounded-full relative overflow-hidden"
-                        style={{ backgroundColor: outcomeColor }}
-                        initial={{ width: "0%" }}
-                        animate={{
-                          width: isVisible ? `${probability}%` : "0%",
-                        }}
-                        transition={{
-                          duration: 0.2,
-                          ease: "easeOut",
-                          delay: 0.1,
-                        }}
-                      >
-                        {/* Shimmer effect */}
-                        <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-                      </motion.div>
+                      {/* Animated Progress Bar */}
+                      <div className="w-full bg-muted rounded-full h-2 overflow-hidden relative">
+                        <motion.div
+                          className="h-full rounded-full relative overflow-hidden"
+                          style={{ backgroundColor: outcomeColor }}
+                          initial={{ width: "0%" }}
+                          animate={{
+                            width: isVisible ? `${probability}%` : "0%",
+                          }}
+                          transition={{
+                            duration: 0.2,
+                            ease: "easeOut",
+                            delay: 0.1,
+                          }}
+                        >
+                          {/* Shimmer effect */}
+                          <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+                        </motion.div>
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              );
-            })}
+                  </Link>
+                );
+              })}
           </div>
 
           {/* Gradient fade at bottom for 3+ outcomes - hidden when scrolled to bottom */}
@@ -423,17 +409,89 @@ export function MarketCard({ market }: MarketCardProps) {
 
         {/* Footer Metadata - Date | Volume | BNB, Save */}
         <div className="flex items-center justify-between text-xs text-muted-foreground pt-3 border-t border-border mt-4 gap-1">
-          {/* Close Date */}
-          {/* Left: Date */}
+          {/* Left: Status/Date based on market state */}
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="flex items-center gap-1 hover:text-foreground transition-colors duration-300 ease-in-out cursor-help">
-                <Calendar className="w-3 h-3" />
-                <span>{formatRelativeDate(market.expiresAt)}</span>
+                {market.state === "resolved" ? (
+                  <>
+                    <CheckCircle2 className="w-3 h-3 text-green-500" />
+                    <span className="text-green-600 dark:text-green-400">
+                      Resuelto
+                    </span>
+                  </>
+                ) : market.state === "closed" ? (
+                  <>
+                    <XCircle className="w-3 h-3 text-orange-500" />
+                    <span className="text-orange-600 dark:text-orange-400">
+                      Cerrado
+                    </span>
+                  </>
+                ) : new Date(market.expiresAt).getFullYear() >= 2099 ? (
+                  <>
+                    <Infinity className="w-3 h-3" />
+                    <span>{formatRelativeDate(market.expiresAt)}</span>
+                  </>
+                ) : (
+                  <>
+                    <Calendar className="w-3 h-3" />
+                    <span>{formatRelativeDate(market.expiresAt)}</span>
+                  </>
+                )}
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              Cierra: {formatAbsoluteDate(market.expiresAt)}
+              {(() => {
+                const isIndefinite =
+                  new Date(market.expiresAt).getFullYear() >= 2099;
+                const winningOutcome = market.outcomes.find(
+                  (o) => o.id === market.resolvedOutcomeId || o.price === 1,
+                );
+
+                // For indefinite markets, try to get last trading date from price charts
+                const getLastTradingDate = (): string | null => {
+                  if (!isIndefinite) return null;
+                  for (const outcome of market.outcomes) {
+                    const allChart =
+                      outcome.priceCharts?.find((c) => c.timeframe === "all") ||
+                      outcome.price_charts?.find((c) => c.timeframe === "all");
+                    if (allChart?.prices?.length) {
+                      const lastPoint =
+                        allChart.prices[allChart.prices.length - 1];
+                      return (
+                        lastPoint.date ||
+                        new Date(lastPoint.timestamp * 1000).toISOString()
+                      );
+                    }
+                  }
+                  return null;
+                };
+
+                const lastTradingDate = getLastTradingDate();
+
+                if (market.state === "resolved") {
+                  if (isIndefinite) {
+                    // For indefinite resolved markets, just show winner (no date)
+                    const winnerStr = winningOutcome
+                      ? winningOutcome.title
+                      : null;
+                    if (winnerStr) return `Ganador: ${winnerStr}`;
+                    return "Mercado resuelto";
+                  }
+                  return `Resuelto el ${formatAbsoluteDate(market.expiresAt)}`;
+                }
+                if (market.state === "closed") {
+                  if (isIndefinite && lastTradingDate) {
+                    return `Cerrado el ${formatAbsoluteDate(lastTradingDate)}`;
+                  }
+                  return isIndefinite
+                    ? "Se obtuvo el resultado"
+                    : "Esperando resolución";
+                }
+                return isIndefinite
+                  ? "Cierra cuando ocurre alguna de las opciones"
+                  : `Cierra: ${formatAbsoluteDate(market.expiresAt)}`;
+              })()}
             </TooltipContent>
           </Tooltip>
 

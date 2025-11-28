@@ -13,6 +13,7 @@ import { useTheme } from "next-themes";
 import { LogoSpinner } from "@/components/ui/logo-spinner";
 import { logger } from "@/lib/logger";
 import { Outcome } from "@/types/market";
+import { getOutcomeColor } from "@/lib/outcomeColors";
 
 interface ProbabilityChartProps {
   outcomes: Outcome[];
@@ -117,23 +118,26 @@ export function ProbabilityChart({
 
     chartRef.current = chart;
 
-    // Outcome colors - Green for first (usually "Yes"), Red for second (usually "No")
-    const outcomeColors = [
-      {
-        lineColor: "#22c55e",
-        topColor: "rgba(34, 197, 94, 0.4)",
-        bottomColor: "rgba(34, 197, 94, 0.0)",
-      }, // Green
-      {
-        lineColor: "#ef4444",
-        topColor: "rgba(239, 68, 68, 0.4)",
-        bottomColor: "rgba(239, 68, 68, 0.0)",
-      }, // Red
-    ];
-
-    // Add series for each outcome
+    // Add series for each outcome with dynamic colors based on title
     outcomes.forEach((outcome, index) => {
-      const colors = outcomeColors[index] || outcomeColors[0];
+      const lineColor = getOutcomeColor(outcome.title, index);
+      // Extract RGB values from hex for gradient
+      const hexToRgb = (hex: string) => {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result
+          ? {
+              r: parseInt(result[1], 16),
+              g: parseInt(result[2], 16),
+              b: parseInt(result[3], 16),
+            }
+          : { r: 34, g: 197, b: 94 }; // fallback to green
+      };
+      const rgb = hexToRgb(lineColor);
+      const colors = {
+        lineColor,
+        topColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4)`,
+        bottomColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.0)`,
+      };
 
       const series = chart.addSeries(LineSeries, {
         color: colors.lineColor,
@@ -238,7 +242,7 @@ export function ProbabilityChart({
               tooltipData.push({
                 title: outcome.title,
                 value: data.value as number,
-                color: index === 0 ? "#22c55e" : "#ef4444", // Green for first, Red for second
+                color: getOutcomeColor(outcome.title, index),
               });
             }
           }
@@ -352,7 +356,7 @@ export function ProbabilityChart({
               markers.push({
                 x: xCoordinate,
                 y: yCoordinate,
-                color: index === 0 ? "#22c55e" : "#ef4444", // Green for Yes, Red for No
+                color: getOutcomeColor(outcome.title, index),
               });
             }
           }

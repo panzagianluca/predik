@@ -54,6 +54,7 @@ import {
   translateTag,
 } from "@/lib/translation/marketTranslations";
 import { translateOutcomeTitle } from "@/lib/translation/outcomeTranslations";
+import { getOutcomeColor } from "@/lib/outcomeColors";
 
 // Helper function to format description with bold markdown
 const formatDescription = (text: string) => {
@@ -171,9 +172,28 @@ export default function MarketDetailPage() {
       day: "numeric",
       month: "long",
       year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
     });
+  };
+
+  // For indefinite markets, get the last trading date from price charts
+  const getLastTradingDate = (): string | null => {
+    if (!market) return null;
+    const isIndefinite = new Date(market.expiresAt).getFullYear() >= 2099;
+    if (!isIndefinite) return null;
+
+    // Try to find the last price point from any outcome's "all" timeframe chart
+    for (const outcome of market.outcomes) {
+      const allChart =
+        outcome.priceCharts?.find((c) => c.timeframe === "all") ||
+        outcome.price_charts?.find((c) => c.timeframe === "all");
+      if (allChart?.prices?.length) {
+        const lastPoint = allChart.prices[allChart.prices.length - 1];
+        return (
+          lastPoint.date || new Date(lastPoint.timestamp * 1000).toISOString()
+        );
+      }
+    }
+    return null;
   };
 
   // Calculate time remaining
@@ -401,11 +421,44 @@ export default function MarketDetailPage() {
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
                     <span>
-                      {market.state === "open"
-                        ? countdown
-                          ? `Cierra en ${countdown}`
-                          : `Cierra en ${getTimeRemaining(market.expiresAt)}`
-                        : `Cerrado el ${formatDate(market.expiresAt)}`}
+                      {(() => {
+                        const isIndefinite =
+                          new Date(market.expiresAt).getFullYear() >= 2099;
+                        const winningOutcome = market.outcomes.find(
+                          (o) =>
+                            o.id === market.resolvedOutcomeId || o.price === 1,
+                        );
+                        const lastTradingDate = getLastTradingDate();
+
+                        if (market.state === "open") {
+                          if (isIndefinite) {
+                            return "Sin fecha de cierre";
+                          }
+                          return countdown
+                            ? `Cierra en ${countdown}`
+                            : `Cierra en ${getTimeRemaining(market.expiresAt)}`;
+                        }
+
+                        // For resolved indefinite markets, just show winner (no date)
+                        if (market.state === "resolved" && isIndefinite) {
+                          if (winningOutcome) {
+                            return `Ganador: ${translateOutcomeTitle(
+                              winningOutcome.title,
+                            )}`;
+                          }
+                          return "Mercado resuelto";
+                        }
+
+                        // For closed indefinite markets, show last trading date if available
+                        if (market.state === "closed" && isIndefinite) {
+                          if (lastTradingDate) {
+                            return `Cerrado el ${formatDate(lastTradingDate)}`;
+                          }
+                          return "Se obtuvo el resultado";
+                        }
+
+                        return `Cerrado el ${formatDate(market.expiresAt)}`;
+                      })()}
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
@@ -678,11 +731,53 @@ export default function MarketDetailPage() {
                           </p>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Cierra:</span>
+                          <span className="text-muted-foreground">
+                            {market.state === "resolved"
+                              ? "Cerrado:"
+                              : "Cierra:"}
+                          </span>
                           <p className="font-medium">
-                            {formatDate(market.expiresAt)}
+                            {(() => {
+                              const isIndefinite =
+                                new Date(market.expiresAt).getFullYear() >=
+                                2099;
+                              const lastTradingDate = getLastTradingDate();
+
+                              if (isIndefinite) {
+                                if (lastTradingDate) {
+                                  return formatDate(lastTradingDate);
+                                }
+                                if (
+                                  market.state === "closed" ||
+                                  market.state === "resolved"
+                                ) {
+                                  return "Fecha no disponible";
+                                }
+                                return "Sin fecha definida";
+                              }
+                              return formatDate(market.expiresAt);
+                            })()}
                           </p>
                         </div>
+                        {market.state === "resolved" && (
+                          <div>
+                            <span className="text-muted-foreground">
+                              Ganador:
+                            </span>
+                            <p className="font-medium text-cyan-600 dark:text-cyan-400">
+                              {(() => {
+                                const winningOutcome = market.outcomes.find(
+                                  (o) =>
+                                    o.id === market.resolvedOutcomeId ||
+                                    o.price === 1,
+                                );
+                                return winningOutcome
+                                  ? translateOutcomeTitle(winningOutcome.title)
+                                  : "N/A";
+                              })()}
+                            </p>
+                          </div>
+                        )}
                         <div>
                           <span className="text-muted-foreground">Token:</span>
                           <p className="font-medium">
@@ -806,7 +901,7 @@ export default function MarketDetailPage() {
                           <span
                             className="font-bold"
                             style={{
-                              color: index === 0 ? "#22c55e" : "#ef4444",
+                              color: getOutcomeColor(outcome.title, index),
                             }}
                           >
                             <CountUp
@@ -980,7 +1075,7 @@ export default function MarketDetailPage() {
                         <span
                           className="font-bold"
                           style={{
-                            color: index === 0 ? "#22c55e" : "#ef4444",
+                            color: getOutcomeColor(outcome.title, index),
                           }}
                         >
                           <CountUp
@@ -997,6 +1092,9 @@ export default function MarketDetailPage() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Timeline - Desktop */}
+            <MarketTimeline market={market} />
 
             {/* Related Markets */}
             {market.relatedMarkets && market.relatedMarkets.length > 0 && (
@@ -1035,23 +1133,30 @@ export default function MarketDetailPage() {
       {market.state !== "closed" && market.state !== "resolved" && (
         <div className="lg:hidden fixed bottom-16 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm border-t border-border z-40">
           <div className="flex gap-2 max-w-7xl mx-auto">
-            {market.outcomes.map((outcome, index) => (
-              <button
-                key={outcome.id}
-                onClick={() => handleMobileTradeOpen(String(outcome.id))}
-                className={cn(
-                  "flex-1 h-12 rounded-lg font-semibold text-sm transition-all duration-200 flex flex-col items-center justify-center",
-                  index === 0
-                    ? "bg-green-600/75 hover:bg-green-700/75 text-white"
-                    : "bg-red-600/75 hover:bg-red-700/75 text-white",
-                )}
-              >
-                <span>{translateOutcomeTitle(outcome.title)}</span>
-                <span className="text-xs opacity-90">
-                  {(outcome.price * 100).toFixed(1)}%
-                </span>
-              </button>
-            ))}
+            {market.outcomes.map((outcome, index) => {
+              const outcomeColor = getOutcomeColor(outcome.title, index);
+              return (
+                <button
+                  key={outcome.id}
+                  onClick={() => handleMobileTradeOpen(String(outcome.id))}
+                  className="flex-1 h-12 rounded-lg font-semibold text-sm transition-all duration-200 flex flex-col items-center justify-center text-white"
+                  style={{
+                    backgroundColor: `${outcomeColor}BF`, // BF = 75% opacity
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = `${outcomeColor}CC`; // CC = 80% opacity (hover)
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = `${outcomeColor}BF`;
+                  }}
+                >
+                  <span>{translateOutcomeTitle(outcome.title)}</span>
+                  <span className="text-xs opacity-90">
+                    {(outcome.price * 100).toFixed(1)}%
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
       )}

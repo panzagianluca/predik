@@ -21,8 +21,61 @@ interface MarketTimelineProps {
 export function MarketTimeline({ market }: MarketTimelineProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
-  const formatDate = (dateString: string) => {
+  const isIndefinite = new Date(market.expiresAt).getFullYear() >= 2099;
+
+  const winningOutcome = market.outcomes.find(
+    (o) => o.id === market.resolvedOutcomeId || o.price === 1,
+  );
+
+  // For indefinite markets, get the last trading date from price charts
+  const getLastTradingDate = (): string | null => {
+    if (!isIndefinite) return null;
+
+    // Try to find the last price point from any outcome's "all" timeframe chart
+    for (const outcome of market.outcomes) {
+      const allChart =
+        outcome.priceCharts?.find((c) => c.timeframe === "all") ||
+        outcome.price_charts?.find((c) => c.timeframe === "all");
+      if (allChart?.prices?.length) {
+        const lastPoint = allChart.prices[allChart.prices.length - 1];
+        return (
+          lastPoint.date || new Date(lastPoint.timestamp * 1000).toISOString()
+        );
+      }
+    }
+    return null;
+  };
+
+  const lastTradingDate = getLastTradingDate();
+
+  const formatDate = (
+    dateString: string,
+    isResolvedEvent: boolean = false,
+    isClosedEvent: boolean = false,
+  ) => {
     const date = new Date(dateString);
+
+    // For indefinite markets (year >= 2099)
+    if (date.getFullYear() >= 2099) {
+      // For resolved indefinite markets, don't show date (winner shown separately)
+      if (isResolvedEvent) {
+        return null; // Will be hidden, winner label shown instead
+      }
+      // For closed indefinite markets, show last trading date if available
+      if (isClosedEvent && lastTradingDate) {
+        const tradingDate = new Date(lastTradingDate);
+        return tradingDate.toLocaleDateString("es-AR", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
+      }
+      if (isClosedEvent) {
+        return "Se obtuvo el resultado";
+      }
+      return "Sin fecha definida";
+    }
+
     return date.toLocaleDateString("es-AR", {
       day: "numeric",
       month: "short",
@@ -33,11 +86,14 @@ export function MarketTimeline({ market }: MarketTimelineProps) {
     });
   };
 
-  const winningOutcome = market.outcomes.find(
-    (o) => o.id === market.resolvedOutcomeId || o.price === 1,
-  );
-
-  const timelineEvents = [
+  const timelineEvents: Array<{
+    icon: typeof CheckCircle2;
+    label: string;
+    date: string;
+    completed: boolean;
+    color: string;
+    winnerLabel?: string;
+  }> = [
     {
       icon: CheckCircle2,
       label: "Mercado publicado",
@@ -64,9 +120,12 @@ export function MarketTimeline({ market }: MarketTimelineProps) {
     timelineEvents.push({
       icon: Trophy,
       label: "Resuelto",
-      date: market.expiresAt, // Use expiresAt as resolved date fallback
+      date: market.expiresAt,
       completed: true,
       color: "text-cyan-500",
+      winnerLabel: winningOutcome
+        ? translateOutcomeTitle(winningOutcome.title)
+        : undefined,
     });
   }
 
@@ -100,6 +159,7 @@ export function MarketTimeline({ market }: MarketTimelineProps) {
               const Icon = event.icon;
               const isLast = index === timelineEvents.length - 1;
               const isResolvedEvent = event.label === "Resuelto";
+              const isClosedEvent = event.label === "Mercado cerrado";
 
               return (
                 <div key={index} className="flex gap-3">
@@ -137,9 +197,35 @@ export function MarketTimeline({ market }: MarketTimelineProps) {
                     >
                       {event.label}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {formatDate(event.date)}
-                    </p>
+                    {(() => {
+                      const dateText = formatDate(
+                        event.date,
+                        isResolvedEvent,
+                        isClosedEvent,
+                      );
+                      // For resolved indefinite markets, only show winner (no date)
+                      if (dateText === null && event.winnerLabel) {
+                        return (
+                          <p className="text-xs text-cyan-600 dark:text-cyan-400 font-medium mt-0.5">
+                            Ganador: {event.winnerLabel}
+                          </p>
+                        );
+                      }
+                      return (
+                        <>
+                          {dateText && (
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              {dateText}
+                            </p>
+                          )}
+                          {event.winnerLabel && (
+                            <p className="text-xs text-cyan-600 dark:text-cyan-400 font-medium mt-0.5">
+                              Ganador: {event.winnerLabel}
+                            </p>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
                 </div>
               );

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { logger } from "@/lib/logger";
 import { translateOutcomeTitle } from "@/lib/translation/outcomeTranslations";
+import { getOutcomeColor } from "@/lib/outcomeColors";
 import {
   Dialog,
   DialogContent,
@@ -184,11 +185,7 @@ export const MobileSearch = forwardRef<MobileSearchRef>((props, ref) => {
                           <span
                             className="font-semibold"
                             style={{
-                              color:
-                                outcome.title.toLowerCase() === "yes" ||
-                                outcome.title.toLowerCase() === "si"
-                                  ? "#22c55e"
-                                  : "#ef4444",
+                              color: getOutcomeColor(outcome.title, oIndex),
                             }}
                           >
                             {(outcome.price * 100).toFixed(1)}%
