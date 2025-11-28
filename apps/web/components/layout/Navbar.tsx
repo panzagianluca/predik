@@ -227,16 +227,6 @@ export function Navbar() {
                         <li>
                           <NavigationMenuLink asChild>
                             <a
-                              href="/about"
-                              className="block text-sm font-medium p-2 rounded-md hover:bg-[hsl(var(--electric-purple))]/10 transition-colors"
-                            >
-                              Acerca de
-                            </a>
-                          </NavigationMenuLink>
-                        </li>
-                        <li>
-                          <NavigationMenuLink asChild>
-                            <a
                               href="/roadmap"
                               className="block text-sm font-medium p-2 rounded-md hover:bg-[hsl(var(--electric-purple))]/10 transition-colors"
                             >
@@ -405,13 +395,6 @@ export function Navbar() {
                       Recursos
                     </h4>
                     <div className="flex flex-col gap-3 pl-4 border-l border-border/50">
-                      <Link
-                        href="/about"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="hover:text-[hsl(var(--electric-purple))] rounded-md transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                      >
-                        Acerca de
-                      </Link>
                       <Link
                         href="/roadmap"
                         onClick={() => setIsMobileMenuOpen(false)}
