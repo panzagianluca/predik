@@ -164,7 +164,7 @@ export function GlobalSearch() {
 
                     {/* Outcomes */}
                     <div className="flex items-center gap-3 mt-1">
-                      {market.outcomes.slice(0, 2).map((outcome) => (
+                      {market.outcomes.slice(0, 2).map((outcome, oIndex) => (
                         <div
                           key={outcome.id}
                           className="flex items-center gap-1 text-xs"
