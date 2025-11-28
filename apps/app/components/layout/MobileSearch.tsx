@@ -174,7 +174,7 @@ export const MobileSearch = forwardRef<MobileSearchRef>((props, ref) => {
 
                     {/* Outcomes */}
                     <div className="flex items-center gap-3">
-                      {market.outcomes.slice(0, 2).map((outcome) => (
+                      {market.outcomes.slice(0, 2).map((outcome, oIndex) => (
                         <div
                           key={outcome.id}
                           className="flex items-center gap-1 text-xs"

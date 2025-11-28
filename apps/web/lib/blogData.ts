@@ -465,6 +465,116 @@ export const blogPosts: BlogPost[] = [
     imageUrl: "/blog/polkamarkets.jpg",
     tags: ["polkamarkets", "DeFi", "blockchain", "POLK", "tecnología"],
   },
+  {
+    slug: "la-historia-detras-de-myriad-markets",
+    title:
+      "La Historia Detrás de Myriad Markets: De DASTAN al Futuro de los Medios",
+    excerpt:
+      "Descubrí cómo la fusión de Decrypt Media y Rug Radio dio origen a DASTAN, y por qué Myriad Markets representa la evolución natural de los medios descentralizados.",
+    content: `
+<h2>La Historia Detrás de Myriad Markets</h2>
+
+<p>Hay una historia detrás de <strong>Myriad Markets</strong> que explica mucho sobre por qué existe y hacia dónde se dirige.</p>
+
+<p>Para entender Myriad, necesitás entender <strong>DASTAN</strong> y la visión que unió a dos empresas de medios muy poderosas en el espacio Web3.</p>
+
+<img src="https://pbs.twimg.com/media/G6yMxvVWMAAFdts?format=jpg&name=900x900" alt="Myriad Markets - DASTAN" class="w-full rounded-xl my-8" />
+
+<h3>El Nacimiento de DASTAN</h3>
+
+<p>DASTAN se formó a través de la fusión de <strong>Decrypt Media</strong> y <strong>Rug Radio</strong>, dos entidades que podrían parecer diferentes en la superficie pero que comparten una creencia fundamental: la propiedad descentralizada de los medios.</p>
+
+<p><strong>Decrypt</strong> se había establecido como quizás la fuente de noticias más confiable en crypto, con un alcance global que va más allá de Twitter y llega a la conciencia mainstream.</p>
+
+<p>Mientras tanto, <strong>Rug Radio</strong>, fundada por <strong>Farokh Sarmad</strong> (sí, el tipo que entrevistó a Trump y CZ), se convirtió en un punto de encuentro para las voces más influyentes de crypto, con millones de seguidores en plataformas sociales.</p>
+
+<blockquote class="border-l-4 border-[hsl(var(--electric-purple))] pl-4 my-6 italic text-muted-foreground">
+"La visión de Farokh para Rug Radio nunca fue solo crear otra empresa de medios. Fue dar a los creadores propiedad genuina sobre sus plataformas y flujos de ingresos."
+</blockquote>
+
+<br />
+
+<h3>La Visión de Farokh</h3>
+
+<p>La visión de Farokh para Rug Radio nunca fue solo crear otra empresa de medios. Fue sobre liberar a los creadores del modelo tradicional de medios donde las plataformas extraen valor mientras los creadores hacen el trabajo.</p>
+
+<p>Su podcast diario <strong>"FOMO HOUR"</strong> se convirtió en uno de los más grandes de crypto, demostrando que había un apetito masivo por contenido de propiedad de creadores y impulsado por la comunidad.</p>
+
+<br />
+
+<h3>Cuando Dos Fuerzas Se Unen</h3>
+
+<p>Cuando estas dos fuerzas se combinaron bajo DASTAN, algo interesante sucedió. Tenían:</p>
+
+<ul>
+<li><strong>La audiencia:</strong> Millones de usuarios comprometidos y nativos de Web3</li>
+<li><strong>La credibilidad:</strong> La reputación periodística de Decrypt</li>
+<li><strong>La red de creadores:</strong> El establo de voces influyentes de Rug Radio</li>
+</ul>
+
+<p>Pero también tenían una visión más grande: <strong>¿qué pasaría si el consumo de medios pudiera ser más interactivo, más gratificante, y más alineado con la búsqueda de la verdad en lugar de la caza de clicks?</strong></p>
+
+<br />
+
+<h3>El Nacimiento de Myriad Markets</h3>
+
+<p>Así nació <strong>Myriad Markets</strong>. No fue un pivot aleatorio ni una jugada oportunista montándose en la ola de los mercados de predicción. Fue la evolución natural de la misión central de DASTAN.</p>
+
+<p>Las audiencias existentes tanto de Decrypt como de Rug Radio proporcionaron distribución inmediata cuando Myriad se lanzó en <strong>marzo de 2025</strong>, dando a la plataforma una ventaja inicial con la que la mayoría de las startups solo podrían soñar.</p>
+
+<p>Más importante aún, estas audiencias ya estaban preparadas para exactamente lo que Myriad ofrecía:</p>
+
+<ul>
+<li>Eran <strong>conocedores de crypto</strong></li>
+<li>Se <strong>involucraban con predicciones</strong> y especulación diariamente</li>
+<li>Estaban <strong>hambrientos de formas de demostrar</strong> sus insights</li>
+</ul>
+
+<br />
+
+<h3>¿Por Qué Myriad Es Diferente?</h3>
+
+<p>Esta base explica por qué Myriad no es solo otra plataforma de mercados de predicción. Está respaldada por:</p>
+
+<ul>
+<li><strong>Infraestructura de medios real</strong></li>
+<li><strong>Comunidades genuinas</strong></li>
+<li><strong>Una comprensión auténtica</strong> de cómo las personas consumen contenido</li>
+</ul>
+
+<p>La integración con los patrones existentes de consumo de medios no es un agregado posterior — <strong>es el punto central</strong>.</p>
+
+<blockquote class="border-l-4 border-[hsl(var(--electric-purple))] pl-4 my-6 italic text-muted-foreground">
+"Myriad Markets representa la convergencia perfecta entre medios, comunidad y mercados de predicción."
+</blockquote>
+
+<br />
+
+<h3>El Futuro de los Medios Descentralizados</h3>
+
+<p>La historia de DASTAN y Myriad Markets es un ejemplo de cómo la Web3 puede transformar industrias tradicionales. No se trata solo de tokenizar contenido o agregar blockchain por moda — se trata de reimaginar fundamentalmente la relación entre creadores, plataformas y audiencias.</p>
+
+<p>En Predik, estamos orgullosos de construir sobre la infraestructura de Myriad Protocol, llevando esta visión de medios interactivos y descentralizados a Latinoamérica.</p>
+
+<br />
+
+<h3>Recursos</h3>
+
+<ul>
+<li><a href="https://myriadmarkets.com">Myriad Markets</a></li>
+<li><a href="https://decrypt.co">Decrypt Media</a></li>
+<li><a href="https://x.com/MyriadMarkets">@MyriadMarkets en X</a></li>
+</ul>
+    `,
+    author: "Gianluca",
+    authorRole: "Fundador",
+    publishedAt: "2025-11-27",
+    readingTime: "5 min",
+    category: "Tecnología",
+    imageUrl:
+      "https://pbs.twimg.com/media/G6yMxvVWMAAFdts?format=jpg&name=900x900",
+    tags: ["myriad", "DASTAN", "decrypt", "rug radio", "medios", "Web3"],
+  },
 ];
 
 export function getBlogPost(slug: string): BlogPost | undefined {
