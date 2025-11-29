@@ -3,6 +3,7 @@ import { TwitterEmbed } from "@/components/blog/TwitterEmbed";
 import { blogPosts } from "@/lib/blogData";
 import { ArrowLeft, Calendar, Clock, Tag } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Market } from "@/types/market";
@@ -113,18 +114,15 @@ export default async function BlogPostPage({ params }: Props) {
             <FadeIn delay={0.1}>
               <article>
                 {/* Hero Image */}
-                <div className="relative w-full h-48 md:h-64 rounded-xl overflow-hidden mb-8 bg-gradient-to-br from-[hsl(var(--electric-purple))]/20 to-[hsl(var(--electric-purple))]/5">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-6xl md:text-8xl">
-                      {post.category === "Mercados"
-                        ? "⚽"
-                        : post.category === "Tecnología"
-                        ? "⚙️"
-                        : post.category === "Educación"
-                        ? "📊"
-                        : "📈"}
-                    </div>
-                  </div>
+                <div className="relative w-full h-48 md:h-64 rounded-xl overflow-hidden mb-8">
+                  <Image
+                    src={post.imageUrl}
+                    alt={post.title}
+                    fill
+                    sizes="(max-width: 1200px) 100vw, 80vw"
+                    className="object-cover"
+                    priority
+                  />
                 </div>
 
                 <header className="mb-8">
@@ -203,16 +201,14 @@ export default async function BlogPostPage({ params }: Props) {
                           href={`/blog/${relatedPost.slug}`}
                           className="group flex items-start gap-3"
                         >
-                          <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gradient-to-br from-[hsl(var(--electric-purple))]/20 to-[hsl(var(--electric-purple))]/5 flex-shrink-0">
-                            <div className="absolute inset-0 flex items-center justify-center text-lg">
-                              {relatedPost.category === "Mercados"
-                                ? "⚽"
-                                : relatedPost.category === "Tecnología"
-                                ? "⚙️"
-                                : relatedPost.category === "Educación"
-                                ? "📊"
-                                : "📈"}
-                            </div>
+                          <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                            <Image
+                              src={relatedPost.imageUrl}
+                              alt={relatedPost.title}
+                              fill
+                              sizes="48px"
+                              className="object-cover"
+                            />
                           </div>
                           <div className="flex-1 min-w-0">
                             <h4 className="text-sm font-medium leading-tight group-hover:text-[hsl(var(--electric-purple))] transition-colors line-clamp-2">

@@ -2,6 +2,7 @@ import { FadeIn } from "@/components/animations/FadeIn";
 import { blogPosts } from "@/lib/blogData";
 import { Calendar, Clock } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -45,16 +46,14 @@ export default function BlogPage() {
             <FadeIn key={post.slug} delay={0.1 + index * 0.05}>
               <Link href={`/blog/${post.slug}`} className="block group h-full">
                 <article className="h-full bg-card/50 backdrop-blur-sm border border-border rounded-xl overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-[hsl(var(--electric-purple))]/50 hover:-translate-y-1">
-                  <div className="h-32 bg-gradient-to-br from-[hsl(var(--electric-purple))]/20 to-[hsl(var(--electric-purple))]/5 flex items-center justify-center">
-                    <div className="text-4xl">
-                      {post.category === "Mercados"
-                        ? "⚽"
-                        : post.category === "Tecnología"
-                        ? "⚙️"
-                        : post.category === "Educación"
-                        ? "📊"
-                        : "📈"}
-                    </div>
+                  <div className="relative h-40 overflow-hidden">
+                    <Image
+                      src={post.imageUrl}
+                      alt={post.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
                   </div>
                   <div className="p-5">
                     <div className="flex items-center gap-2 mb-2">
