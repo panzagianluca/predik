@@ -101,7 +101,7 @@ export const blogPosts: BlogPost[] = [
     publishedAt: "2025-11-20",
     readingTime: "5 min",
     category: "Educación",
-    imageUrl: "/blog/prediction-markets.jpg",
+    imageUrl: "/blog/1quesonlosmercados.jpg",
     tags: ["mercados de predicción", "blockchain", "DeFi", "educación"],
   },
   {
@@ -199,7 +199,7 @@ export const blogPosts: BlogPost[] = [
     publishedAt: "2025-11-22",
     readingTime: "4 min",
     category: "Mercados",
-    imageUrl: "/blog/boca-river.jpg",
+    imageUrl: "/blog/bocariver.jpg",
     tags: ["argentina", "fútbol", "boca juniors", "river plate", "mercados"],
   },
   {
@@ -320,7 +320,7 @@ export const blogPosts: BlogPost[] = [
     publishedAt: "2025-11-24",
     readingTime: "5 min",
     category: "Tecnología",
-    imageUrl: "/blog/myriad-protocol.jpg",
+    imageUrl: "/blog/queesmyriad.jpg",
     tags: ["myriad", "blockchain", "infraestructura", "tecnología"],
   },
   {
@@ -462,7 +462,7 @@ export const blogPosts: BlogPost[] = [
     publishedAt: "2025-11-25",
     readingTime: "6 min",
     category: "Tecnología",
-    imageUrl: "/blog/polkamarkets.jpg",
+    imageUrl: "/blog/polkamarket.jpg",
     tags: ["polkamarkets", "DeFi", "blockchain", "POLK", "tecnología"],
   },
   {
@@ -571,8 +571,7 @@ export const blogPosts: BlogPost[] = [
     publishedAt: "2025-11-27",
     readingTime: "5 min",
     category: "Tecnología",
-    imageUrl:
-      "https://pbs.twimg.com/media/G6yMxvVWMAAFdts?format=jpg&name=900x900",
+    imageUrl: "/blog/dastan.jpg",
     tags: ["myriad", "DASTAN", "decrypt", "rug radio", "medios", "Web3"],
   },
 ];
